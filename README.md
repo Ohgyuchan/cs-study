@@ -1,2 +1,4 @@
-# algorithm-study
-## 알고리즘 공부노트
+# Study노트
+
+#### 1. [git1](./git/git1.md)
+#### 2. [git2](./git/git2.md)

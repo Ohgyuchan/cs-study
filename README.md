@@ -2,8 +2,8 @@
   개인 전공 공부
 
 ## Git & Github
-[git1](./git/git1.md)
-[git2](./git/git2.md)
+> [git1](./git/git1.md)  
+> [git2](./git/git2.md)  
 
 ## 백준 단계별 문제풀기
 

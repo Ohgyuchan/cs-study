@@ -2,8 +2,15 @@
   개인 전공 공부
 
 ## Git & Github
-> [git1](./git/git1.md)  
-> [git2](./git/git2.md)  
+> [git1](./git/git1.md) Date: 21.Jan  
+> [git2](./git/git2.md) Date: 21.Jan  
+
+## C/C++
+
+## JAVA
+
+## Python
+> [python1](./python/python.md) Date: 21.Jan  
 
 ## 백준 단계별 문제풀기
 
@@ -21,7 +28,7 @@
 
 ## 컴퓨터구조
 
-## HTML & CSS
+## HTML/CSS
 
 ## 수학, 물리
 ##### [Calculus2]

@@ -20,7 +20,7 @@
 ## 백준 알고리즘
 
 ## 앱개발
-> Flutter
+> Flutter  
   Android
 
 ## 자료구조

@@ -15,11 +15,13 @@
 > [python1](./python/python.md) Update: 21.Jan  
 
 ## 백준 단계별 문제풀기
-> [1단계: I/O](.baekjoon_step/1step_IO)
+> [1단계: I/O](./baekjoon_step/1step_IO)
 
 ## 백준 알고리즘
 
-## 안드로이드
+## 앱개발
+> Flutter  
+  Android
 
 ## 자료구조
 

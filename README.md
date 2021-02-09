@@ -16,7 +16,7 @@
 
 ## 백준 단계별 문제풀기
 > [1단계: I/O](./baekjoon_step/1step_IO)
-> [2단계: If](./baekjoon_step/2step_If-statement)
+> [2단계: if](./baekjoon_step/2step_if-statement)
 
 ## 백준 알고리즘
 

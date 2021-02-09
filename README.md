@@ -15,8 +15,8 @@
 > [python1](./python/python.md) Update: 21.Jan  
 
 ## 백준 단계별 문제풀기
-> [1단계: I/O](./baekjoon_step/1step_IO)
-> [2단계: if](./baekjoon_step/2step_if-statement)
+> [1단계: I/O](./baekjoon_step/1step_IO)  
+> [2단계: if](./baekjoon_step/2step_if-statement)  
 
 ## 백준 알고리즘
 

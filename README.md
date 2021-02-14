@@ -1,5 +1,5 @@
 # Study노트
-  개인 전공 공부용 Repository
+  개인 전공 공부용 Repository  
 ## 목표
   * 1일 1커밋(2월 1일 부)
 

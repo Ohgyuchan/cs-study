@@ -24,15 +24,17 @@
 > Flutter  
   Android
 
-## 자료구조
+## DS(DataStructure)
 
-## 논리설계
+## LD(LogicDesign)
 
-## 알고리즘
+## AA(AlgorithmAnalysis)
 
-## DB
+## DB(DataBase)
 
-## 컴퓨터구조
+## CA(ComputerArchitecture)
+
+## OS(OperatingSystem)
 
 ## HTML/CSS
 

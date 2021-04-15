@@ -31,7 +31,7 @@ class PQ {
         }
         ~PQ() { 
             delete[] pq->node;
-            delet pq;
+            delete pq;
         }
         void enQueue(double key, string name); // Insert an element
         void deQueue(); // Delete an element
@@ -156,7 +156,7 @@ int main() {
     char cmd;
     string name;
 
-    do{
+    while(1) {
 
         cout << "*********** MENU ***********" << endl;
         cout << "I : Insert new element into queue." << endl;
@@ -209,6 +209,8 @@ int main() {
             pQueue->printQueue();
 
         }
+        else if(cmd == 'Q')
+            break;
         else {
             cout << "Incorrect inputs!\n\n";
             continue;
@@ -216,7 +218,8 @@ int main() {
         
         cout <<"\n\n";
 
-    } while(cmd != 'Q');
+    }
+    delete pQueue; //destuctor 호출
 
   return 0;
-}e
+} 

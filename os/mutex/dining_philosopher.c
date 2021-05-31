@@ -148,22 +148,34 @@ void* ThreadFn(void *vParam)
 	int *state = param->state;
 	pthread_mutex_t *chopstick = param->chopstick;
 
+	pthread_cond_t cond_var;
+	pthread_cond_init(&cond_var, NULL);
+
 	while(thread_cont){
 
 		// TO DO: implement entry section
-		pthread_mutex_lock(&chopstick[idx]);	
-		pthread_mutex_lock(&chopstick[(idx+1) % 5]);
-		state[idx] = EATING;
+		if((state[(idx+4) % no_phil] != EATING) && (state[(idx+1)%no_phil] != EATING)){
+            		state[idx] = EATING;
+            		if(idx%2 ==0){
+                		pthread_mutex_lock(&chopstick[idx]);
+                		pthread_mutex_lock(&chopstick[(idx+1)%no_phil]);
+            		}else{
+                		pthread_mutex_lock(&chopstick[(idx+1)%no_phil]);
+                		pthread_mutex_lock(&chopstick[idx]);
+            		}
+        	}
+
 
 		CheckPhilosophers(state, no_phil);
 		DisplayPhilosophers(state, no_phil, param->screen_width, param->screen_height);
 		usleep((rand() % 500 + 500) * 1000);
 
 		// TO DO: implement exit section
+		pthread_mutex_unlock(&chopstick[(idx+1) % no_phil]);
+		pthread_mutex_unlock(&chopstick[idx]);
+
 		state[idx] = THINKING;
 		DisplayPhilosophers(state, no_phil, param->screen_width, param->screen_height);
-		pthread_mutex_unlock(&chopstick[idx]);
-		pthread_mutex_unlock(&chopstick[(idx+1) % 5]);
 		usleep((rand() % 500 + 1000) * 1000);
 	}
 

@@ -10,27 +10,22 @@
 
 int main() {
   // N: 끝방번호, count: N번방까지의 최소 개수(벌집겹), range: 같은 벌집겹을 가진 방범위
-  int N, count = 0, range = 1;
+  int N, count = 1, range = 1;
   scanf("%d", &N);
   
-  if(N == 1) {
-    printf("1\n");
-    return 0;
-  }
-
   while(1) {
     // N까지의 최소한의 방의 개수:
     // 1: 1개, 2~7: 2개, 8~19: 3개, 20~38: 4개while
-    range += (count) * 6;
+    range += (count-1) * 6;
     count++;
     
     if(N <= range) {
-      printf("%d\n", count);
       break;
     }
 
   }
   
+  printf("%d\n", count);
 
   return 0;
 }

@@ -155,15 +155,15 @@ void* ThreadFn(void *vParam)
 
 		// TO DO: implement entry section
 		if((state[(idx+4) % no_phil] != EATING) && (state[(idx+1)%no_phil] != EATING)){
-            		state[idx] = EATING;
-            		if(idx%2 ==0){
-                		pthread_mutex_lock(&chopstick[idx]);
-                		pthread_mutex_lock(&chopstick[(idx+1)%no_phil]);
-            		}else{
-                		pthread_mutex_lock(&chopstick[(idx+1)%no_phil]);
-                		pthread_mutex_lock(&chopstick[idx]);
-            		}
-        	}
+			if(idx%2 ==0){
+				pthread_mutex_lock(&chopstick[idx]);
+				pthread_mutex_lock(&chopstick[(idx+1)%no_phil]);
+			}else{
+				pthread_mutex_lock(&chopstick[(idx+1)%no_phil]);
+				pthread_mutex_lock(&chopstick[idx]);
+			}
+			state[idx] = EATING;
+		}
 
 
 		CheckPhilosophers(state, no_phil);

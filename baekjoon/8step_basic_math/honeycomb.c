@@ -17,11 +17,12 @@ int main() {
     // N까지의 최소한의 방의 개수:
     // 1: 1개, 2~7: 2개, 8~19: 3개, 20~38: 4개while
     range += (count-1) * 6;
-    count++;
     
     if(N <= range) {
       break;
     }
+
+    count++;
 
   }
   

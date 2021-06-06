@@ -3,6 +3,7 @@
 /*
  * 소수 찾기
  * 소수(Prime Number): 1과 자기 자신으로만 나누어 떨어지는 수.
+ * Solution: 자신의 2부터 자신의 제곱근까지 나눠보면 된다.
  */
 int main() {
   int N, pnum;

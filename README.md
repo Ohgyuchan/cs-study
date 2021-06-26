@@ -1,7 +1,7 @@
 # Study노트
   개인 전공 공부용 Repository  
 ## 목표
-  * 1일 1커밋(21년 3월 10일 부)
+  * 1일 1커밋(21년 2월 ~ )
 
 ## Git & Github
 > [git1](./git/git1.md) Update: 21.Jan  

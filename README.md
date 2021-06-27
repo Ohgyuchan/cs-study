@@ -24,17 +24,15 @@
 > Flutter  
   Android
 
-## DS(DataStructure)
+## Data Structure
 
-## LD(LogicDesign)
+## Algorithm
 
-## AA(AlgorithmAnalysis)
+## DataBase
 
-## DB(DataBase)
+## Computer Architecture
 
-## CA(ComputerArchitecture)
-
-## OS(OperatingSystem)
+## Operating System
 
 ## HTML/CSS
 

@@ -1,7 +1,7 @@
 레포지토리 fork 뜨기, clone과 fork의 차이, pull request 보내기
 
-## 2.1 fork
-#### 2.1.1 git clone과 fork의 차이
+## 2.1. fork
+#### 2.1.1. git clone과 fork의 차이
 
 > 
 **clone** : github에 있는 **내 레포지토리**를 로컬로 복제
@@ -11,7 +11,7 @@
 
 이렇게 fork한 내 레포지토리를 forked repository라고 부릅니다.
 
-#### 2.1.2 How to fork a Repository
-#### 2.1.3 forked repository 업데이트
+#### 2.1.2. How to fork a Repository
+#### 2.1.3. forked repository 업데이트
 
-## 2.2 Pull Request
+## 2.2. Pull Request

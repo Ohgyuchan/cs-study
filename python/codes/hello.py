@@ -9,4 +9,3 @@ print(a)
 print(type(a))
 a = 3
 b = 4
-print(a%b)

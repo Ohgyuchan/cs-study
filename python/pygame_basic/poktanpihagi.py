@@ -18,14 +18,14 @@ YELLOW = (255, 255, 0)
 
 background_image = pygame.image.load("/Users/terman/dev/cs-study/python/pygame_basic/background.jpg")
 
-bomb_image = pygame.image.load('/Users/terman/dev/cs-study/python/pygame_basic/ddong.png')
-bombs = []
+ddong_image = pygame.image.load('/Users/terman/dev/cs-study/python/pygame_basic/ddong.png')
+ddongs = []
 for i in range(10):
-    rect = bomb_image.get_rect()
+    rect = ddong_image.get_rect()
     rect.left = random.randint(0, SCREEN_WIDTH - rect.width)
     rect.top = -100
     dy = random.randint(3, 8)
-    bombs.append({'rect': rect, 'dy': dy})
+    ddongs.append({'rect': rect, 'dy': dy})
 
 person_image = pygame.image.load('/Users/terman/dev/cs-study/python/pygame_basic/person.png')
 person_rect = pygame.Rect(person_image.get_rect())
@@ -55,16 +55,16 @@ while running: #게임 루프
         elif event.key == pygame.K_RIGHT:
             person_dx = 0
 
-    for bomb in bombs:
-        bomb['rect'].top += bomb['dy']
-        if bomb['rect'].top > SCREEN_HEIGHT:
+    for ddong in ddongs:
+        ddong['rect'].top += ddong['dy']
+        if ddong['rect'].top > SCREEN_HEIGHT:
             count += 1
-            bombs.remove(bomb)
-            rect = pygame.Rect(bomb_image.get_rect())
+            ddongs.remove(ddong)
+            rect = pygame.Rect(ddong_image.get_rect())
             rect.left = random.randint(0, SCREEN_WIDTH)
             rect.top = -100
             dy = random.randint(3, 9)
-            bombs.append({'rect': rect, 'dy': dy})
+            ddongs.append({'rect': rect, 'dy': dy})
 
     person.left = person.left + person_dx
 
@@ -74,11 +74,11 @@ while running: #게임 루프
         person.left = SCREEN_WIDTH - person.width
 
     #화면 그리기
-    for bomb in bombs:
-        screen.blit(bomb_image, bomb['rect'])
+    for ddong in ddongs:
+        screen.blit(ddong_image, ddong['rect'])
         # 충돌 조건
-        if person.top + 13 <= bomb['rect'].bottom:
-            if person.left + 13 <= bomb['rect'].right and person.right >= bomb['rect'].left + 13:
+        if person.top + 13 <= ddong['rect'].bottom:
+            if person.left + 13 <= ddong['rect'].right and person.right >= ddong['rect'].left + 13:
                 print("충돌!")
                 running = False
 

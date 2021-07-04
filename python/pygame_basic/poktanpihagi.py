@@ -33,8 +33,8 @@ person.left = SCREEN_WIDTH // 2 - person.width // 2
 person.top = SCREEN_HEIGHT - person.height
 person_dx = 0
 person_dy = 0
-
-while True: #게임 루프
+running = True
+while running: #게임 루프
     screen.blit(background_image, (0, 0)) #단색으로 채워 화면 지우기
 
     #변수 업데이트
@@ -75,6 +75,10 @@ while True: #게임 루프
 
     for bomb in bombs:
         screen.blit(bomb_image, bomb['rect'])
+        # 충돌 조건
+        if person.colliderect(rect):
+            print("충돌!")
+            running = False
 
     screen.blit(person_image, person)
     counter = game_font.render(str(int(count)), True, (0, 0, 0))

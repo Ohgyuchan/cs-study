@@ -123,11 +123,10 @@ while running:
         print("타임아웃")
         running = False
 
-    # 잠시 대기
-    pygame.time.delay(2000) # 2초 대기(2000ms)
-
     pygame.display.update() # 게임화면 그리기(반복해서 그리기)
 
+# 잠시 대기
+pygame.time.delay(2000) # 2초 대기(2000ms)
 
 # pygame 종료
 pygame.quit()

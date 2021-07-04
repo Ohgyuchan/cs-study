@@ -4,9 +4,12 @@ import random
 pygame.init() #파이 게임 초기화
 SCREEN_WIDTH = 480
 SCREEN_HEIGHT = 640
-pygame.display.set_caption('똥피하기') # Game title
+pygame.display.set_caption('남친피하기') # Game title
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT)) #화면 크기 설정
 clock = pygame.time.Clock() 
+
+game_font = pygame.font.Font(None, 40) # 폰트 객체 생성(폰트, 크기)
+count = 0
 
 #변수
 BLACK = (0, 0, 0)
@@ -17,7 +20,7 @@ background_image = pygame.image.load("/Users/terman/dev/cs-study/python/pygame_b
 
 bomb_image = pygame.image.load('/Users/terman/dev/cs-study/python/pygame_basic/ddong.png')
 bombs = []
-for i in range(30):
+for i in range(10):
     rect = pygame.Rect(bomb_image.get_rect())
     rect.left = random.randint(0, SCREEN_WIDTH)
     rect.top = -100
@@ -53,6 +56,7 @@ while True: #게임 루프
     for bomb in bombs:
         bomb['rect'].top += bomb['dy']
         if bomb['rect'].top > SCREEN_HEIGHT:
+            count += 1
             bombs.remove(bomb)
             rect = pygame.Rect(bomb_image.get_rect())
             rect.left = random.randint(0, SCREEN_WIDTH)
@@ -73,6 +77,9 @@ while True: #게임 루프
         screen.blit(bomb_image, bomb['rect'])
 
     screen.blit(person_image, person)
+    counter = game_font.render(str(int(count)), True, (0, 0, 0))
+    # 출력할 글자, Ture, 글자색상(RGB)
+    screen.blit(counter, (10, 10))
 
     pygame.display.update() #모든 화면 그리기 업데이트
     clock.tick(30) #30 FPS (초당 프레임 수) 를 위한 딜레이 추가, 딜레이 시간이 아닌 목표로 하는 FPS 값

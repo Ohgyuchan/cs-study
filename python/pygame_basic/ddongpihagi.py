@@ -21,10 +21,10 @@ count = 0
 
 # 1. 사용자 게임 초기화 (배경화면, 게임 이미지, 좌표, 폰트 등)
 # 배경 만들기
-background = pygame.image.load("/Users/terman/dev/cs-study/python/pygame_basic/background.png")
+background = pygame.image.load("/Users/terman/dev/cs-study/python/pygame_basic/background.jpg")
 
 #캐릭터 만들기
-character = pygame.image.load("/Users/terman/dev/cs-study/python/pygame_basic/character.png")
+character = pygame.image.load("/Users/terman/dev/cs-study/python/pygame_basic/person.png")
 character_size = character.get_rect().size
 character_width = character_size[0]
 character_height = character_size[1]
@@ -36,7 +36,7 @@ to_x = 0
 character_speed = 10
 
 # 똥 만들기
-ddong = pygame.image.load("/Users/terman/dev/cs-study/python/pygame_basic/enemy.png")
+ddong = pygame.image.load("/Users/terman/dev/cs-study/python/pygame_basic/ddong.png")
 ddong_size = ddong.get_rect().size
 ddong_width = ddong_size[0]
 ddong_height = ddong_size[1]

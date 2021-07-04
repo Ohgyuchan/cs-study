@@ -67,7 +67,6 @@ while running: #게임 루프
             ddongs.append({'rect': rect, 'dy': dy})
 
     person.left = person.left + person_dx
-
     if person.left < 0:
         person.left = 0
     elif person.left > SCREEN_WIDTH - person.width:
@@ -77,7 +76,7 @@ while running: #게임 루프
     for ddong in ddongs:
         screen.blit(ddong_image, ddong['rect'])
         # 충돌 조건
-        if person.top + 13 <= ddong['rect'].bottom:
+        if person.top + 10 <= ddong['rect'].bottom and person.top + ((person.bottom - person.top) / 2) > ddong['rect'].top:
             if person.left + 13 <= ddong['rect'].right and person.right >= ddong['rect'].left + 13:
                 print("충돌!")
                 running = False

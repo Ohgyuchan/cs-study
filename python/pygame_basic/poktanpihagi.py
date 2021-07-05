@@ -1,11 +1,11 @@
-import pygame #파이 게임 모듈 임포트
+import pygame # 파이 게임 모듈 임포트
 import random
 
-pygame.init() #파이 게임 초기화
+pygame.init() # 파이 게임 초기화
 SCREEN_WIDTH = 480
 SCREEN_HEIGHT = 640
 pygame.display.set_caption('똥피하기') # Game title
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT)) #화면 크기 설정
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT)) # 화면 크기 설정
 clock = pygame.time.Clock() 
 
 game_font = pygame.font.Font(None, 40) # 폰트 객체 생성(폰트, 크기)
@@ -20,7 +20,7 @@ background_image = pygame.image.load("/Users/terman/dev/cs-study/python/pygame_b
 
 ddong_image = pygame.image.load('/Users/terman/dev/cs-study/python/pygame_basic/ddong.png')
 ddongs = []
-for i in range(10):
+for i in range(20):
     rect = ddong_image.get_rect()
     rect.left = random.randint(0, SCREEN_WIDTH - rect.width)
     rect.top = -100

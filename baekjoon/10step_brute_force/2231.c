@@ -17,25 +17,21 @@ N이 주어졌을 때, N의 가장 작은 생성자를 구해내는 프로그램
 */
 #include <stdio.h>
 
-int main()
-{
+int main() {
     int N;
     
     scanf("%d", &N);
     
-    for (int i = 1; i < N; i++)
-    {
+    for (int i = 1; i < N; i++) {
         int temp = i;
         int contructor = i;
         
-        while(temp > 0)
-        {
+        while(temp > 0) {
             contructor += temp % 10;
             temp /= 10;
         }
         
-        if (contructor == N)
-        {
+        if (contructor == N) {
             printf("%d", i);
             N = 0;
             break;
@@ -44,4 +40,6 @@ int main()
     
     if (N != 0)
         printf("0");
+
+    return 0;
 }

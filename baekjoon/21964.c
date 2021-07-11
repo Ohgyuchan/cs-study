@@ -5,7 +5,7 @@ int main() {
     int N;
     char *str;
     scanf("%d", &N);
-    str = malloc(sizeof(char) * N);
+    str = (char *)malloc(sizeof(char) * N);
 
     scanf("%s", str);
 

@@ -24,7 +24,7 @@ int main() {
     
     for (int i = 1; i < N; i++) {
         int temp = i;
-        int contructor = i;
+        int contructor = temp;
         
         while(temp > 0) {
             contructor += temp % 10;
@@ -33,13 +33,11 @@ int main() {
         
         if (contructor == N) {
             printf("%d", i);
-            N = 0;
-            break;
+            return 0;
         }
     }
-    
-    if (N != 0)
-        printf("0");
+
+    printf("0");
 
     return 0;
 }

@@ -51,8 +51,6 @@ int main() {
     scanf("%d", &N);
 
     print_hanoi_count(N);
-
-    printf("%s\n", K);
     
     if(N <= 20)
         hanoi(N, 1, 2, 3);

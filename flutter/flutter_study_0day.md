@@ -16,4 +16,4 @@
 ## 7step Detail Page - BottomBar 수정
 ## 8step Detail Page - AppBar 수정
 
-[Youtube](https://www.youtube.com/watch?v=TvG1ZHDqyLc&list=PLgRxBCVPaZ_1j9Z66HEu71ST3GqssBdma)
+[Youtube 영상 자료](https://www.youtube.com/playlist?list=PLW-3bp81vhrdNVs2sNP51LY9C5RJw3cJI)

@@ -129,21 +129,21 @@ class MyApp extends StatelessWidget {
     ```dart
     Widget build(BuildContext context) {
         return MaterialApp(
-        title: 'Carrot Clone',
-        theme: ThemeData(
-            primaryColor: Colors.white,
-            primarySwatch: Colors.blue,
-        ),
-        home: Scaffold(
-            appBar: AppBar(     // 여기부터
-            title: Row(
-                children: [
-                Text('양덕동'),
-                Icon(Icons.arrow_drop_down),
-                ],
+            title: 'Carrot Clone',
+            theme: ThemeData(
+                primaryColor: Colors.white,
+                primarySwatch: Colors.blue,
             ),
-            ),
-        ),                    // 여기까지
+            home: Scaffold(
+                appBar: AppBar(     // 여기부터
+                    title: Row(
+                        children: [
+                        Text('양덕동'),
+                        Icon(Icons.arrow_drop_down),
+                        ],
+                    ),
+                ),
+            ),                    // 여기까지
         );
     }
     ```
@@ -278,8 +278,16 @@ class _AppState extends State<AppScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _bodyWidget(),
-      bottomNavigationBar: _bottomNavigationBarWidget(),
+        appBar: AppBar(
+                title: Row(
+                    children: [
+                    Text('양덕동'),
+                    Icon(Icons.arrow_drop_down),
+                    ],
+                ),
+        ),
+        body: _bodyWidget(),
+        bottomNavigationBar: _bottomNavigationBarWidget(),
     );
   }
 
@@ -419,7 +427,7 @@ $ flutter pub get
 ```
 ### 2.4.2. DataUtils Class 생성
 `/lib/utils/data_utils.dart` 에 아래 내용 복붙
-
+> **1000**을 **1,000**으로 포맷하는 코드입니다.
 ```dart
 import 'package:intl/intl.dart';
 
@@ -432,12 +440,15 @@ class DataUtils {
 }
 ```
 
+
 `/lib/screens/app_screen.dart` `AppScreen -> _bodyWidget()` 수정
 ```dart
+import 'package:carrot_clone/screens/home_screen.dart'; // NEW
+...
 Widget _bodyWidget() {
     switch (_currentPageIndex) {
       case 0: // 홈
-        return HomeScreen();
+        return HomeScreen(); // Update
       case 1: // 동네 생활
         return Center(
           child: Text('동네 생활'),
@@ -457,6 +468,7 @@ Widget _bodyWidget() {
     }
     return Container();
   }
+...
 ```
 ## 2.5. ListView 만들기
 ## 2.6. Home Screen - AppBar 수정

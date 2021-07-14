@@ -34,7 +34,7 @@
         $ flutter pub get
         ```
        * `android minSDK version` 18로 변경
-       flutter_secure_storage를 쓰려면 android sdk version이 최소 18이어야 된다.
+        > flutter_secure_storage를 쓰려면 android sdk version이 최소 18이어야 된다.
        
        * `android/app/buile.gradle` 에서 `minSkdVersion` 수정
        ```

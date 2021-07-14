@@ -418,19 +418,19 @@ $ flutter pub add intl
 $ flutter pub get
 ```
 ### 2.4.2. DataUtils Class 생성
-1. `/lib/utils/data_utils.dart` 에 아래 내용 복붙
-    ```dart
-    import 'package:intl/intl.dart';
+`/lib/utils/data_utils.dart` 에 아래 내용 복붙
 
-    class DataUtils {
-        static final formatTowon = new NumberFormat("#,###", "ko_KR");
-        static String calcStringToWon(String priceString) {
-            if (priceString == '무료나눔') return priceString;
-            return "${formatTowon.format(int.parse(priceString))}원";
-        }
+```dart
+import 'package:intl/intl.dart';
+
+class DataUtils {
+    static final formatTowon = new NumberFormat("#,###", "ko_KR");
+    static String calcStringToWon(String priceString) {
+        if (priceString == '무료나눔') return priceString;
+        return "${formatTowon.format(int.parse(priceString))}원";
     }
-
-    ```
+}
+```
 
 `/lib/screens/app_screen.dart` `AppScreen -> _bodyWidget()` 수정
 ```dart

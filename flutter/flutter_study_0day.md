@@ -680,8 +680,21 @@ class _HomeScreenState extends State<HomeScreen> {
     );                      // NEW
   }
 ```
-## 2.6. Home Screen - AppBar 수정
+<img src="../assets/images/flutter_firebase/carrot_clone_11.png" width="200" height="400">
 
+## 2.6. Home Screen - AppBar 수정
+`/lib/screens/app_screen.dart -> build()` 수정
+```dart
+@override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _bodyWidget(),
+      bottomNavigationBar: _bottomNavigationBarWidget(),
+    );
+  }
+```
+<img src="../assets/images/flutter_firebase/carrot_clone_12.png" width="200" height="400">
+`/lib/screens/home_screen.dart -> build()` 수정
 ## 2.7. Detail Screen 만들기
 ## 2.8. Detail Screen - BottomBar 수정
 ## 2.9. Detail Screen - AppBar 수정

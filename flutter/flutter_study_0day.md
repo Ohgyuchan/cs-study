@@ -26,8 +26,8 @@
   2. 압축파일에 있는 `assets`를 `carrot_clone/` 에 assets 가져오기
 
   3. `lib/repository` 에 다운로드한 데이터 집어넣기
-    * `carrot_clone
-    * carrot_clone_data/repository/*`
+    * `carrot_clone`
+    * `carrot_clone_data/repository/*`
     ```
     $ flutter pub add flutter_secure_storage
     $ flutter pub get

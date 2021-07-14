@@ -50,7 +50,7 @@
         ...
         ```
 ### 2.1.1. assets 적용하기
-`pubspec.yaml`
+`/pubspec.yaml`
 > **Indentation** 주의
 ```
 // 변경 전
@@ -69,7 +69,7 @@
 $ flutter pub get
 ```
 ## 2.2. BottomNavigationBar 만들기
-`carrot_clone/main.dart` 을 아래 내용으로 변경
+`/lib/main.dart` 을 아래 내용으로 변경
 ```dart
 import 'package:flutter/material.dart';
 
@@ -99,7 +99,7 @@ class MyApp extends StatelessWidget {
         ```
         $ flutter pub add flutter_svg
         ```
-   * 방법2: `pubspec.yaml` 에서, NEW 주석이 달린 부분을 복붙
+   * 방법2: `/pubspec.yaml` 에서, NEW 주석이 달린 부분을 복붙
        ```
        dependencies:
        flutter:
@@ -112,7 +112,7 @@ class MyApp extends StatelessWidget {
        $ flutter pub get
        ```
 * 패키지 사용
-   * `carrot_clone/main.dart`
+   * `/lib/main.dart`
     ```
     import 'package:flutter/material.dart';
     import 'package:flutter_svg/flutter_svg.dart'; // NEW
@@ -125,7 +125,7 @@ class MyApp extends StatelessWidget {
 ### 2.2.2. BottomNavigation 만들기
 * AppBar 추가
     
-    `carrot_clone/lib/main`
+    `/lib/main`
     ```dart
     Widget build(BuildContext context) {
         return MaterialApp(
@@ -174,7 +174,7 @@ class MyApp extends StatelessWidget {
     ```
     <img src="../assets/images/flutter_firebase/carrot_clone_7.png" width="200" height="400">
 ### 2.2.3. BottomNavigationBar 위젯 쓰기
-`carrot_clone/lib/main.dart -> Scaffold(:bottomNavigationBar)` 에서 `Container` 위젯을 `BottomNavigationBar` 로 변경 
+`/lib/main.dart -> Scaffold(:bottomNavigationBar)` 에서 `Container` 위젯을 `BottomNavigationBar` 로 변경 
 ```dart
 body: Center(
           child: Text('body'),
@@ -418,18 +418,19 @@ $ flutter pub add intl
 $ flutter pub get
 ```
 ### 2.4.2. DataUtils Class 생성
-`/lib/utils/data_utils.dart` 에 아래 내용 복붙
-```dart
-import 'package:intl/intl.dart';
+1. `/lib/utils/data_utils.dart` 에 아래 내용 복붙
+    ```dart
+    import 'package:intl/intl.dart';
 
-class DataUtils {
-  static final formatToWon = new NumberFormat("#,###", "ko_KR");
-  static String calcStringToWon(String priceString) {
-    if (priceString == '무료나눔') return priceString;
-    return "${oCcy.format(int.parse(priceString))}원";
-  }
-}
-```
+    class DataUtils {
+        static final formatTowon = new NumberFormat("#,###", "ko_KR");
+        static String calcStringToWon(String priceString) {
+            if (priceString == '무료나눔') return priceString;
+            return "${formatTowon.format(int.parse(priceString))}원";
+        }
+    }
+
+    ```
 
 `/lib/screens/app_screen.dart` `AppScreen -> _bodyWidget()` 수정
 ```dart

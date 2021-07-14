@@ -28,27 +28,27 @@
   3. `lib/repository` 에 다운로드한 데이터 집어넣기
        1. `carrot_clone`
        2. `carrot_clone_data/repository/*`
-  4. 
-    ```
-    $ flutter pub add flutter_secure_storage
-    $ flutter pub get
-    ```
-    * `android minSDK version` 18로 변경
-    flutter_secure_storage를 쓰려면 android sdk version이 최소 18이어야 된다.
-    
-    * `android/app/buile.gradle` 에서 `minSkdVersion` 수정
-    ```
-    ...
-    defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.example.carrot_clone"
-        minSdkVersion 18 // Update
-        targetSdkVersion 30
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
-    }
-    ...
-    ```
+  4. `flutter_secure_storage` pakage 적용
+        ```
+        $ flutter pub add flutter_secure_storage
+        $ flutter pub get
+        ```
+       * `android minSDK version` 18로 변경
+       flutter_secure_storage를 쓰려면 android sdk version이 최소 18이어야 된다.
+       
+       * `android/app/buile.gradle` 에서 `minSkdVersion` 수정
+       ```
+       ...
+       defaultConfig {
+           // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+           applicationId "com.example.carrot_clone"
+           minSdkVersion 18 // Update
+           targetSdkVersion 30
+           versionCode flutterVersionCode.toInteger()
+           versionName flutterVersionName
+       }
+        ...
+        ```
 ### 2.1.1. assets 적용하기
 `pubspec.yaml`
 > **Indentation** 주의

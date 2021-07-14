@@ -439,7 +439,26 @@ class DataUtils {
     }
 }
 ```
+`/lib/screens/home_screen.dart` 에 `HomeScreen` Class 생성
+```dart
+import 'package:flutter/material.dart';
 
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key}) : super(key: key);
+
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.black,
+    );
+  }
+}
+```
 
 `/lib/screens/app_screen.dart` `AppScreen -> _bodyWidget()` 수정
 ```dart
@@ -470,8 +489,199 @@ Widget _bodyWidget() {
   }
 ...
 ```
-## 2.5. ListView 만들기
+<img src="../assets/images/flutter_firebase/carrot_clone_10.png" width="200" height="400">
+
+## 2.5. HomeScreen - ListView 만들기
+### 2.5.1. Data List 변수 선언
+```dart
+class _HomeScreenState extends State<HomeScreen> {
+  // 여기부터
+  List<Map<String, String>> data = [];
+
+  @override
+  void initState() {
+    data = [
+      {
+        "image": "assets/images/ara-1.jpg",
+        "title": "네메시스 축구화275",
+        "location": "팡주팡역시 서구 화정동",
+        "price": "30000",
+        "likes": "2"
+      },
+      {
+        "image": "assets/images/ara-2.jpg",
+        "title": "LA갈비 5kg팔아요~",
+        "location": "팡주팡역시 서구 풍암동",
+        "price": "100000",
+        "likes": "5"
+      },
+      {
+        "image": "assets/images/ara-3.jpg",
+        "title": "치약팝니다",
+        "location": "팡주팡역시 서구 봉선동",
+        "price": "5000",
+        "likes": "0"
+      },
+      {
+        "image": "assets/images/ara-4.jpg",
+        "title": "[풀박스]맥북프로16인치 터치바 스페이스그레이 256GB",
+        "location": "팡주팡역시 서구 임암동",
+        "price": "2500000",
+        "likes": "6"
+      },
+      {
+        "image": "assets/images/ara-5.jpg",
+        "title": "디월트존기임팩",
+        "location": "팡주팡역시 광산구 신촌동",
+        "price": "150000",
+        "likes": "2"
+      },
+      {
+        "image": "assets/images/ara-6.jpg",
+        "title": "갤럭시s10",
+        "location": "팡주팡역시 서구 화정동",
+        "price": "180000",
+        "likes": "2"
+      },
+      {
+        "image": "assets/images/ara-7.jpg",
+        "title": "선반",
+        "location": "팡주팡역시 서구 화정동",
+        "price": "15000",
+        "likes": "2"
+      },
+      {
+        "image": "assets/images/ara-8.jpg",
+        "title": "냉장 쇼케이스",
+        "location": "팡주팡역시 북구 용봉동",
+        "price": "80000",
+        "likes": "3"
+      },
+      {
+        "image": "assets/images/ara-9.jpg",
+        "title": "대우 미니냉장고",
+        "location": "팡주팡역시 서구 화정동",
+        "price": "30000",
+        "likes": "3"
+      },
+      {
+        "image": "assets/images/ara-10.jpg",
+        "title": "멜킨스 풀업 턱걸이 판매합니다.",
+        "location": "팡주팡역시 서구 풍암동",
+        "price": "50000",
+        "likes": "7"
+      },
+    ];
+    super.initState();
+  }
+  // 여기까지
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.black,
+    );
+  }
+}
+```
+
+### 2.5.2. ListView 위젯 사용하기
+아래 코드를 `build()` 아래에 복붙
+```dart
+  Widget _bodyWidget() {
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      itemBuilder: (BuildContext _context, int index) {
+        return GestureDetector(
+          onTap: () {
+            print(data[index]['title']);
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            height: 110,
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular((10)),
+                  ),
+                  child: Hero(
+                    tag: "${data[index]["cid"]}",
+                    child: Image.asset(
+                      "${data[index]["image"]}",
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.only(left: 20),
+                    height: 100,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "${data[index]["title"]}",
+                          style: TextStyle(fontSize: 15),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          "${data[index]["location"]}",
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.black.withOpacity(0.3),
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          DataUtils.calcStringToWon(
+                              data[index]["price"].toString()),
+                          style: TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              SvgPicture.asset(
+                                "assets/svg/heart_off.svg",
+                                height: 13,
+                                width: 13,
+                              ),
+                              SizedBox(width: 5),
+                              Text("${data[index]["likes"]}"),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+      separatorBuilder: (BuildContext _context, int index) {
+        return Container(
+          height: 1,
+          color: Colors.black.withOpacity(0.4),
+        );
+      },
+      itemCount: data.length,
+    );
+  }
+```
+`/lib/home_screen.dart -> build()` 수정
+```dart
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(        // NEW
+      body: _bodyWidget(),  // NEW
+    );                      // NEW
+  }
+```
 ## 2.6. Home Screen - AppBar 수정
+
 ## 2.7. Detail Screen 만들기
 ## 2.8. Detail Screen - BottomBar 수정
 ## 2.9. Detail Screen - AppBar 수정

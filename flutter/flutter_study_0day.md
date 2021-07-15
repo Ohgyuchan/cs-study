@@ -263,10 +263,10 @@ class AppScreen extends StatefulWidget {
   const AppScreen({Key? key}) : super(key: key);
 
   @override
-  _AppState createState() => _AppState();
+  _AppScreenState createState() => _App_AppScreenStateState();
 }
 
-class _AppState extends State<AppScreen> {
+class _AppScreenState extends State<AppScreen> {
   late int _currentPageIndex;
 
   @override
@@ -368,6 +368,7 @@ class _AppState extends State<AppScreen> {
 > `selectedFontSize`, `selectedItemColor`, 
 `selectedLavelStyle` 옵션을 추가해서 선택된 `BottomNavigationBarItem` 에 효과를 줍니다.
 
+`/lib/screens/app_screen -> _bottomNavigationBarWidget()`
 ```dart
 Widget _bottomNavigationBarWidget() {
     return BottomNavigationBar(
@@ -460,7 +461,7 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 ```
 
-`/lib/screens/app_screen.dart` `AppScreen -> _bodyWidget()` 수정
+`/lib/screens/app_screen.dart` `_AppScreenState -> _bodyWidget()` 수정
 ```dart
 import 'package:carrot_clone/screens/home_screen.dart'; // NEW
 ...
@@ -493,6 +494,7 @@ Widget _bodyWidget() {
 
 ## 2.5. HomeScreen - ListView 만들기
 ### 2.5.1. Data List 변수 선언
+`/lib/screens/home_screen.dart`
 ```dart
 class _HomeScreenState extends State<HomeScreen> {
   // 여기부터
@@ -586,6 +588,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
 ### 2.5.2. ListView 위젯 사용하기
 아래 코드를 `build()` 아래에 복붙
+
+`/lib/screens/home_screen.dart -> _HomeScreenState -> _bodywidget()`
 ```dart
   Widget _bodyWidget() {
     return ListView.separated(
@@ -694,9 +698,1012 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 ```
 <img src="../assets/images/flutter_firebase/carrot_clone_12.png" width="200" height="400">
-`/lib/screens/home_screen.dart -> build()` 수정
+
+`/lib/screens/home_screen.dart -> _HomeScreenState -> build()` 수정
+
+```dart
+@override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: _appBarWidget(), // NEW
+      body: _bodyWidget(),
+    );
+  }
+```
+
+```dart
+AppBar _appBarWidget() {
+  return AppBar(
+      title: PopupMenuButton<String>(
+        offset: Offset(0, 30),
+        shape: ShapeBorder.lerp(
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+            1),
+        onSelected: (String where) {
+          print(where);
+          setState(() {
+            _currentLocation = where;
+          });
+        },
+        itemBuilder: (BuildContext context) {
+          return [
+            PopupMenuItem(
+              value: "ara",
+              child: Text('아라동'),
+            ),
+            PopupMenuDivider(
+              height: 1.0,
+            ),
+            PopupMenuItem(
+              value: "ora",
+              child: Text('오라동'),
+            ),
+            PopupMenuDivider(
+              height: 1.0,
+            ),
+            PopupMenuItem(
+              value: "donam",
+              child: Text('도남동'),
+            ),
+          ];
+        },
+        child: Row(
+          children: [
+            Text(
+              "${locationTypeToString[_currentLocation]}",
+            ),
+            Icon(Icons.arrow_drop_down)
+          ],
+        ),
+      ),
+      elevation: 1,
+      actions: [
+        IconButton(
+          onPressed: () {},
+          icon: Icon(Icons.search),
+        ),
+        IconButton(
+          onPressed: () {},
+          icon: Icon(Icons.tune),
+        ),
+        IconButton(
+            onPressed: () {},
+            icon: SvgPicture.asset(
+              'assets/svg/bell.svg',
+              width: 22,
+            )),
+      ],
+    );
+}
+```
+<img src="../assets/images/flutter_firebase/carrot_clone_13.png" width="200" height="400">
+
+### 2.6.1. Pop Up Menu Event 처리
+`/lib/screens/home_screen.dart -> _HomeScreenState`  
+Data Repository 불러오기
+```dart
+...
+late ContentsRepository _contentsRepository; // NEW
+
+@override
+  void initState() {
+    super.initState();
+    _currentLocation = 'ara';
+    _contentsRepository = ContentsRepository(); // NEW
+  }
+...
+```
+
+`/lib/screens/home_screen.dart -> _HomeScreenState -> _bodyWidget()` 수정
+```dart
+Widget _bodyWidget() {
+    return FutureBuilder(
+      future: _contentsRepository.loadContentsFromLocation(_currentLocation),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (snapshot.hasError) {
+          if (snapshot.error.toString() == "Exception: Data is Null") {
+            return Center(
+              child: Text('해당 지역에 데이터가 없습니다.'),
+            );
+          }
+          return Center(
+            child: Text('데이터 오류'),
+          );
+        } else if (snapshot.hasData) {
+          return _makeDataList(snapshot.data as List<Map<String, String>>);
+        }
+
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+  }
+```
+<img src="../assets/images/flutter_firebase/carrot_clone_13.png" width="200" height="400"><img src="../assets/images/flutter_firebase/carrot_clone_14.png" width="200" height="400"><img src="../assets/images/flutter_firebase/carrot_clone_15.png" width="200" height="400">
+
 ## 2.7. Detail Screen 만들기
-## 2.8. Detail Screen - BottomBar 수정
-## 2.9. Detail Screen - AppBar 수정
+`/lib/screens/detail_screen.dart` 생성  
+`StatefullWidget` 으로 `DeatailScreen` Class 생성
+
+`/lib/screens/detail_screen.dart`
+```dart
+import 'package:flutter/material.dart';
+
+class DetailScreen extends StatefulWidget {
+  const DetailScreen({Key? key}) : super(key: key);
+
+  @override
+  _DetailScreenState createState() => _DetailScreenState();
+}
+
+class _DetailScreenState extends State<DetailScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Detail'),
+      ),
+      body: Container(color: Colors.blue),
+      bottomNavigationBar: Container(
+          height: 100,
+          color: Colors.red
+        )
+    );
+  }
+}
+```
+### 2.7.1. HomeScreen -> DestailScreen Route
+`/lib/screens/home_screen.dart -> _HomeScreenState -> _makeDataList()`
+```dart
+  Widget _makeDataList(List<Map<String, String>> data) {
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      itemBuilder: (BuildContext _context, int index) {
+        return GestureDetector(
+          onTap: () {
+            // 여기부터
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => DetailScreen()),
+            );
+            // 여기까지
+            print(data[index]['title']);
+          },
+```
+<img src="../assets/images/flutter_firebase/carrot_clone_16.png" width="200" height="400">
+
+### 2.7.2. Detail Screen - Body 만들기
+`caraousel_slider` 패키지 다운로드
+```
+$ flutter pub add carousel_slider
+$ flutter pub get
+```
+
+`/lib/screens/detail_screen.dart`   
+`DetailScreen` 수정
+
+```dart
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:carrot_clone/components/manner_temparature.dart';
+import 'package:carrot_clone/repositories/contents_repository.dart';
+import 'package:carrot_clone/utils/data_utils.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+
+class DetailScreen extends StatefulWidget {
+  final String cid;
+  final String image;
+  final String title;
+  final String location;
+  final String price;
+  final String likes;
+
+  const DetailScreen(
+      {Key? key,
+      required this.cid,
+      required this.image,
+      required this.title,
+      required this.location,
+      required this.price,
+      required this.likes})
+      : super(key: key);
+
+  @override
+  _DetailScreenState createState() => _DetailScreenState();
+}
+
+class _DetailScreenState extends State<DetailScreen>
+    with SingleTickerProviderStateMixin {
+  late Map<String, String> data;
+  late ContentsRepository _contentsRepository;
+  late Size size;
+  List<String> imgList = [];
+  late int _currentIndex;
+  double scrollPositionToAlpha = 0;
+  ScrollController _appBarScrollController = ScrollController();
+  late AnimationController _appBarAnimationController;
+  late Animation _colorTween;
+  late bool _isMyFavoriteContent;
+
+  @override
+  void initState() {
+    data = {
+      "cid": widget.cid,
+      "image": widget.image,
+      "title": widget.title,
+      "location": widget.location,
+      "price": widget.price,
+      "likes": widget.likes
+    };
+    _isMyFavoriteContent = false;
+    _appBarAnimationController = AnimationController(vsync: this);
+    _colorTween = ColorTween(
+      begin: Colors.white,
+      end: Colors.black,
+    ).animate(_appBarAnimationController);
+    _appBarScrollController.addListener(() {
+      setState(() {
+        if (_appBarScrollController.offset > 255)
+          scrollPositionToAlpha = 255;
+        else
+          scrollPositionToAlpha = _appBarScrollController.offset;
+        _appBarAnimationController.value = scrollPositionToAlpha / 255;
+      });
+    });
+    _contentsRepository = ContentsRepository();
+    _loadMyFavoriteContentState();
+    super.initState();
+  }
+
+  _loadMyFavoriteContentState() async {
+    bool checkIsMyFavorite =
+        await _contentsRepository.isMyFavoriteContents("${data['cid']}");
+    setState(() {
+      _isMyFavoriteContent = checkIsMyFavorite;
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    size = MediaQuery.of(context).size;
+    imgList = [
+      "${data['image']}",
+      "${data['image']}",
+      "${data['image']}",
+      "${data['image']}",
+    ];
+    _currentIndex = 0;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Detail'),
+      ),
+      body: Container(color: Colors.blue),
+      bottomNavigationBar: Container(
+          height: 100,
+          color: Colors.red
+        )
+    );
+  }
+
+  Widget _bodyWidget() {
+    return CustomScrollView(
+      controller: _appBarScrollController,
+      slivers: [
+        SliverList(
+          delegate: SliverChildListDelegate(
+            [
+              _makeSliderImage(),
+              _sellerSimpleInfo(),
+              Divider(height: 1, thickness: 1),
+              _contentDetail(),
+              Divider(height: 1, thickness: 1),
+              _otherSellContents(),
+            ],
+          ),
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+          sliver: SliverGrid(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
+            ),
+            delegate: SliverChildListDelegate(
+              List.generate(20, (index) {
+                return Container(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10.0),
+                        child: Container(
+                          color: Colors.grey,
+                          height: 120,
+                        ),
+                      ),
+                      Text("상품 제목", style: TextStyle(fontSize: 14.0)),
+                      Text("금액",
+                          style: TextStyle(
+                              fontSize: 14.0, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget _makeSliderImage() {
+    return Container(
+      child: Stack(
+        children: [
+          Hero(
+            tag: "${data['cid']}",
+            // Hero애니메이션 도중에 발생하는 오버플로우 때문에 애니매이션 동작 재정의
+            flightShuttleBuilder: (
+              BuildContext flightContext,
+              Animation<double> animation,
+              HeroFlightDirection flightDirection,
+              BuildContext fromHeroContext,
+              BuildContext toHeroContext,
+            ) {
+              return SingleChildScrollView(
+                // fromHeroContext: 시작크기로 애니메이션 진행, toHeroContext: 끝크기로 애니메이션 진행
+                child: toHeroContext.widget,
+              );
+            },
+            child: Container(
+              child: CarouselSlider(
+                items: imgList.map((url) {
+                  return Column(
+                    children: [
+                      Image.asset(
+                        url,
+                        width: size.width,
+                        fit: BoxFit.fill,
+                      ),
+                    ],
+                  );
+                }).toList(),
+                options: CarouselOptions(
+                    height: size.width,
+                    initialPage: 0,
+                    enableInfiniteScroll: false,
+                    viewportFraction: 1,
+                    onPageChanged: (index, reason) {
+                      setState(() {
+                        _currentIndex = index;
+                      });
+                    }),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: imgList.asMap().entries.map((entry) {
+                return Container(
+                  width: 10.0,
+                  height: 10.0,
+                  margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 5.0),
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white
+                          .withOpacity(_currentIndex == entry.key ? 0.9 : 0.4)),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _sellerSimpleInfo() {
+    return Padding(
+      padding: const EdgeInsets.all(15.0),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 35,
+            backgroundImage: Image.asset("assets/images/user.png").image,
+          ),
+          SizedBox(width: 10.0),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "개발하는곰",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              Text("포항시 양덕동"),
+            ],
+          ),
+          Expanded(
+            child: MannerTemperature(mannerTemperature: 37.5),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _contentDetail() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 15.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(height: 20.0),
+          Text(
+            "${data["title"]}",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            ),
+          ),
+          Text(
+            "디지털/가전 ・ 22시간 전",
+            style: TextStyle(
+              color: Colors.grey,
+              fontSize: 12,
+            ),
+          ),
+          SizedBox(height: 15.0),
+          Text(
+            "선물 받은 새상품 입니다.\n상품 꺼내보기만 했습니다.\n거래는 직거래만 합니다.",
+            style: TextStyle(
+              fontSize: 15,
+              height: 1.5,
+            ),
+          ),
+          SizedBox(height: 15.0),
+          Text(
+            "채팅 3 ・ 관심 17 ・ 조회 235",
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey,
+            ),
+          ),
+          SizedBox(height: 15.0),
+        ],
+      ),
+    );
+  }
+
+  Widget _otherSellContents() {
+    return Padding(
+      padding: const EdgeInsets.all(15.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            "판매자의 다른 판매 상품",
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            "모두보기",
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+```
+
+`MannerTemperature` 만들기
+`lib/components/manner_temparature.dart`
+
+```dart
+import 'package:flutter/material.dart';
+
+class MannerTemperature extends StatelessWidget {
+  double mannerTemperature;
+  late int level;
+  MannerTemperature({Key? key, required this.mannerTemperature}) {
+    _calcTempLevel();
+  }
+
+  void _calcTempLevel() {
+    if (20 >= mannerTemperature) {
+      level = 0;
+    } else if (20 < mannerTemperature && 32 >= mannerTemperature) {
+      level = 1;
+    } else if (32 < mannerTemperature && 36.5 >= mannerTemperature) {
+      level = 2;
+    } else if (36.5 < mannerTemperature && 40 >= mannerTemperature) {
+      level = 3;
+    } else if (40 < mannerTemperature && 50 >= mannerTemperature) {
+      level = 4;
+    } else if (50 < mannerTemperature) {
+      level = 5;
+    }
+  }
+
+  final List<Color> tempPerColors = [
+    Color(0xff072038),
+    Color(0xff0d3a65),
+    Color(0xff186ec0),
+    Color(0xff37b24d),
+    Color(0xffffad13),
+    Color(0xfff76707),
+  ];
+
+  Widget _makeTempLabelAndBar() {
+    return Container(
+      width: 65,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            "$mannerTemperature°C",
+            style: TextStyle(
+              color: tempPerColors[level],
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Container(
+              height: 6,
+              color: Colors.black.withOpacity(0.2),
+              child: Row(
+                children: [
+                  Container(
+                    height: 6,
+                    width: 65 / 99 * mannerTemperature,
+                    color: tempPerColors[level],
+                  ),
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _makeTempToCharactorIcon() {
+    return Container(
+      width: 30,
+      height: 30,
+      child: Image.asset("assets/images/level-$level.jpg"),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              _makeTempLabelAndBar(),
+              SizedBox(width: 7),
+              _makeTempToCharactorIcon(),
+            ],
+          ),
+          SizedBox(height: 5),
+          Text(
+            "매너온도",
+            style: TextStyle(
+                decoration: TextDecoration.underline,
+                fontSize: 12,
+                color: Colors.grey),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+```
+
+`/lib/screens/home_screen.dart _HomeScreeState -> _makeDataList()`
+
+```dart
+...
+Widget _makeDataList(List<Map<String, String>> data) {
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      itemBuilder: (BuildContext _context, int index) {
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                // 여기부터
+                  builder: (context) => DetailScreen(
+                      cid: "${data[index]['cid']}",
+                      image: "${data[index]['image']}",
+                      title: "${data[index]['title']}",
+                      location: "${data[index]['location']}",
+                      price: "${data[index]['price']}",
+                      likes: "${data[index]['likes']}")),
+                // 여기까지
+            );
+            print(data[index]['title']);
+          },
+...
+```
+<img src="../assets/images/flutter_firebase/carrot_clone_17.png" width="200" height="400">
+
+### 2.7.3. Detail Screen - BottomNavigation 만들기
+
+```dart
+Widget _bottomNavigationBarWidget() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+      width: size.width,
+      height: 55,
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () async {
+              _isMyFavoriteContent
+                  ? await _contentsRepository
+                      .deleteMyFavoriteContent("${data['cid']}")
+                  : await _contentsRepository.addMyFavoriteContent(data);
+              setState(() {
+                _isMyFavoriteContent = !_isMyFavoriteContent;
+              });
+              print("관심상품이벤트발생");
+            },
+            child: SvgPicture.asset(
+              _isMyFavoriteContent
+                  ? "assets/svg/heart_on.svg"
+                  : "assets/svg/heart_off.svg",
+              width: 20,
+              height: 20,
+              color: Color(0xfff08f4f),
+            ),
+          ),
+          SizedBox(width: 15),
+          VerticalDivider(width: 1, thickness: 1.0),
+          SizedBox(width: 15),
+          Column(
+            children: [
+              Text(
+                DataUtils.calcStringToWon("${data["price"]}"),
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                "가격제안불가",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
+              )
+            ],
+          ),
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10.0, vertical: 7.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    // BoxDecoration 사용시에는 color를 BoxDecoration 안에 설정해줘야 함.
+                    color: Color(0xfff08f4f),
+                  ),
+                  child: Text(
+                    "채팅으로 거래하기",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+```
+`/lib/screens/detail_screen -> build()`
+```dart
+@override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Detail'),
+      ),
+      body: _bodyWidget(),
+      bottomNavigationBar: _bottomNavigationBarWidget(), // NEW
+    );
+  }
+```
+
+### 2.7.4. Detail Screen - AppBar 만들기
+
+```dart
+AppBar _appBarWidget() {
+    return AppBar(
+      backgroundColor: Colors.white.withAlpha(scrollPositionToAlpha.toInt()),
+      elevation: 0,
+      leading: IconButton(
+        onPressed: () {
+          Get.back();
+        },
+        icon: _makeAnimatedIcon(Icons.arrow_back),
+      ),
+      actions: [
+        IconButton(
+          onPressed: () {},
+          icon: _makeAnimatedIcon(Icons.share_outlined),
+        ),
+        IconButton(
+          onPressed: () {},
+          icon: _makeAnimatedIcon(Icons.more_vert),
+        ),
+      ],
+    );
+  }
+
+```
+
+```dart
+Widget _makeAnimatedIcon(IconData iconData) {
+    return AnimatedBuilder(
+      animation: _colorTween,
+      builder: (context, child) => Icon(
+        iconData,
+        color: _colorTween.value,
+      ),
+    );
+  }
+```
+
+```dart
+ @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      extendBodyBehindAppBar: true, // NEW
+      appBar: _appBarWidget(),  // NEW
+      body: _bodyWidget(),
+      bottomNavigationBar: _bottomNavigationBarWidget(),
+    );
+  }
+```
+## 2.8 관심 목록
+`/lib/screens/app_screen.dart -> _bodyWidget()`
+
+```dart
+Widget _bodyWidget() {
+    switch (_currentPageIndex) {
+      case 0: // 홈
+        return HomeScreen();
+      case 1: // 동네 생활
+        return Center(
+          child: Text('동네 생활'),
+        );
+      case 2: // 내 근처
+        return Center(
+          child: Text('내 근처'),
+        );
+      case 3: // 채팅
+        return Center(
+          child: Text('채팅'),
+        );
+      case 4: // 나의 당근
+        return MyFavoriteScreen(); // NEW
+    }
+    return Container();
+  }
+```
+
+`/lib/screens/favorite_screen.dart`
+
+```dart
+import 'package:carrot_clone/repositories/contents_repository.dart';
+import 'package:carrot_clone/screens/detail_screen.dart';
+import 'package:carrot_clone/utils/data_utils.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+
+class MyFavoriteScreen extends StatefulWidget {
+  const MyFavoriteScreen({Key? key}) : super(key: key);
+
+  @override
+  _MyFavoriteScreenState createState() => _MyFavoriteScreenState();
+}
+
+class _MyFavoriteScreenState extends State<MyFavoriteScreen> {
+  late ContentsRepository contentsRepository;
+
+  @override
+  void initState() {
+    contentsRepository = ContentsRepository();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: _appBarWidget(),
+      body: _bodyWidget(),
+    );
+  }
+
+  AppBar _appBarWidget() {
+    return AppBar(
+      elevation: 1,
+      title: Text(
+        "관심목록",
+        style: TextStyle(fontSize: 15),
+      ),
+    );
+  }
+
+  Widget _bodyWidget() {
+    return FutureBuilder(
+      future: _loadMyFavoriteContentsList(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (snapshot.hasError) {
+          if (snapshot.error.toString() == "Exception: Data is Null") {
+            return Center(
+              child: Text('해당 데이터가 없습니다.'),
+            );
+          }
+          return Center(
+            child: Text('데이터 오류'),
+          );
+        } else if (snapshot.hasData) {
+          return snapshot.data.toString() == '[]'
+              ? Center(child: Text('해당 데이터가 없습니다.'))
+              : _makeDataList(snapshot.data as List<dynamic>);
+        }
+
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+  }
+
+  Future<dynamic> _loadMyFavoriteContentsList() async {
+    return await contentsRepository.loadMyFavoriteContents();
+  }
+
+  _makeDataList(List<dynamic> data) {
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      itemBuilder: (BuildContext _context, int index) {
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => DetailScreen(
+                        cid: "${data[index]['cid']}",
+                        image: "${data[index]['image']}",
+                        title: "${data[index]['title']}",
+                        location: "${data[index]['location']}",
+                        price: "${data[index]['price']}",
+                        likes: "${data[index]['likes']}")));
+            print(data[index]['title']);
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            height: 100,
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular((10)),
+                  ),
+                  child: Hero(
+                    tag: "${data[index]["cid"]}",
+                    child: Image.asset(
+                      "${data[index]["image"]}",
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.only(left: 20),
+                    height: 100,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "${data[index]["title"]}",
+                          style: TextStyle(fontSize: 15),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          "${data[index]["location"]}",
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.black.withOpacity(0.3),
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          DataUtils.calcStringToWon(
+                              data[index]["price"].toString()),
+                          style: TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              SvgPicture.asset(
+                                "assets/svg/heart_off.svg",
+                                height: 13,
+                                width: 13,
+                              ),
+                              SizedBox(width: 5),
+                              Text("${data[index]["likes"]}"),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+      separatorBuilder: (BuildContext _context, int index) {
+        return Container(
+          height: 1,
+          color: Colors.black.withOpacity(0.4),
+        );
+      },
+      itemCount: data.length,
+    );
+  }
+}
+
+```
 
 [Youtube 영상 자료](https://www.youtube.com/playlist?list=PLW-3bp81vhrdNVs2sNP51LY9C5RJw3cJI)

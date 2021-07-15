@@ -106,7 +106,9 @@ $ open ios/Runner.xcworkspace
 > 주의사항:   
 > 반드시 `Xcode`를 통해서 넣어야 됩니다.  
 > ![Xcode](/assets/images/flutter_firebase/flutter_firebase_6.png)
+> 
 > `Create folder references` 가 아닌 `Create groups` 을 선택
+> 
 > ![Create gruops](/assets/images/flutter_firebase/flutter_firebase_7.png)
 
 [참고](https://blog.codemagic.io/firebase-authentication-google-sign-in-using-flutter/)

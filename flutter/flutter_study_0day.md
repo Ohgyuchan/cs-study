@@ -1706,8 +1706,7 @@ class _MyFavoriteScreenState extends State<MyFavoriteScreen> {
 }
 
 ```
-<img src="../
-assets/images/flutter_firebase/carrot_clone_19.png" width="200" height="400">
+<img src="../assets/images/flutter_firebase/carrot_clone_19.png" width="200" height="400">
 
 ## 2.9 프로필 페이지 만들기
 ### 2.9.1. Route 설정

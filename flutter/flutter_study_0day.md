@@ -4,7 +4,7 @@
 [MAC 환경변수 설정](https://blog.naver.com/bluecrossing/222277992718)
 
 # 2. Flutter 당근마켓 UI 클론 코딩 무작정 따라하기
-[전체 코드](https://github.com/Ohgyuchan/carrot_clone)
+[전체 코드](https://github.com/Ohgyuchan/flutter_dev/tree/master/carrot_clone)
 
 ## 2.1. 프로젝트 생성
 * `Create New Flutter Project` 클릭
@@ -1706,8 +1706,7 @@ class _MyFavoriteScreenState extends State<MyFavoriteScreen> {
 }
 
 ```
-<img src="../
-assets/images/flutter_firebase/carrot_clone_19.png" width="200" height="400">
+<img src="../assets/images/flutter_firebase/carrot_clone_19.png" width="200" height="400">
 
 ## 2.9 프로필 페이지 만들기
 ### 2.9.1. Route 설정

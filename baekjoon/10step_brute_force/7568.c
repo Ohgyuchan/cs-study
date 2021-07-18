@@ -3,7 +3,7 @@
 int main() {
   int N;
   int count;
-  int arr[50][2]
+  int arr[50][2];
   scanf("%d", &N);
 
   for(int i = 0 ; i < N ; i++) {
@@ -14,11 +14,11 @@ int main() {
     count = 0;
 
     for(int j = 0; j < N; j++) {
-      if(arr[i][0] < arr[j][0])
+      if(arr[i][0] < arr[j][0] && arr[i][1] < arr[j][1])
         count++;
     }
     
-    printf("%d", count + 1);
+    printf("%d ", count + 1);
 
   }
 

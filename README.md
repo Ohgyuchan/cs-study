@@ -21,7 +21,7 @@
 ## 백준 알고리즘
 
 ## 앱개발
-> Flutter  
+> [Flutter](./flutter)  
   Android
 
 ## Data Structure

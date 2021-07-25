@@ -89,7 +89,9 @@ defaultConfig {
 
 ### Android SHA-1 key 값 넣기
 > ```
-> $ keytool -keystore debug.keystore -list -v
+> $ keytool -exportcert -list -v -alias androiddebugkey -keystore ~/.android/debug.keystore
+> 또는
+> $ keytool -keystore ~/.android/debug.keystore -list -v
 > ```
 > Initial Password: android
 ### 2.2 iOS

@@ -92,11 +92,11 @@ defaultConfig {
 > // mac
 > $ keytool -list -v \
 > -alias androiddebugkey -keystore ~/.android/debug.keystore
-
-
+> 
 > // windows
 > $ keytool -list -v \
 > -alias androiddebugkey -keystore %USERPROFILE%\.android\debug.keystore
+> 
 > ```
 > Initial Password: android
 ### 2.2 iOS

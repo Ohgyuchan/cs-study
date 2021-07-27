@@ -209,6 +209,9 @@ service cloud.firestore {
   }
 }
 ```
+
+## 6. [당근마켓UI 클론에 Firebase CRUD 적용하기 (Security Rules)](https://github.com/Ohgyuchan/flutter_dev/tree/firebase/carrot_clone)
+
 * 참고 자료   
 [Firebase Security-rules (한글)](https://gist.github.com/Dohyunwoo/b8370f208619c7f44a2a13fb390e1514)   
 [Firebase 보안 규칙 (공식문서)](https://firebase.google.com/docs/rules)   

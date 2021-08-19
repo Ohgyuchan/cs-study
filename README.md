@@ -22,7 +22,7 @@
 
 ## 앱개발
 > [Flutter](./flutter)  
-> Flutter Paractice
+> [Flutter Paractice](https://github.com/Ohgyuchan/flutter_dev)  
   Android
 
 ## Data Structure

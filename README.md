@@ -19,6 +19,7 @@
 > [2단계: if](./baekjoon_step/2step_if-statement)  
 
 ## 백준 알고리즘
+[백준](./baekjoon)
 
 ## 앱개발
 > [Flutter](./flutter)  

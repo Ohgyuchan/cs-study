@@ -44,7 +44,7 @@
 ;Problem 4:
 ;Solved by myself: Y
 ;Time taken: about 2 mins
-;[contract] inchworm-travel: number -> boolean
+;[contract] is-odd? number -> boolean
 ;[purpose]: To know if the given number is an odd number
 ;[tests]: (test (is-odd 3) #t)
 ;         (test (is-odd 4) #f)
@@ -169,7 +169,8 @@
 ;Time taken: about 10 mins
 ;[contract] update-name symbol symbol list -> list
 ;[purpose]: update-name To get a corresponding list of an alphabetical character  with names starting with the alphabet character
-;[tests]:
+;[tests]: (test (update-name 'cherry 'claire (cons 'jc (cons 'cherry (cons 'kate empty)))) '(jc claire kate))
+;         (test (update-name 'jc 'JC (cons 'jc (cons 'jc (cons 'kate (cons 'cherry (cons 'jc empty)))))) '(JC JC kate cherry JC))
 (define (update-name old new slst)
   (for/list ([i slst])
     (cond

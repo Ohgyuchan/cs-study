@@ -1,4 +1,5 @@
 .DS_Store
 a.out
+main
 .rkt~
 .vscode/*

@@ -41,11 +41,10 @@ int main() {
     }
     gamma_img = gray_img.clone();
     
-    for (iterator = gamma_img.begin<uchar>(), end = gamma_img.end<uchar>(); iterator != end; iterator++) {
+    end = gamma_img.end<uchar>();
+    for (iterator = gamma_img.begin<uchar>(); iterator != end; iterator++)
         *iterator = pixel[(*iterator)];
-    }
 
-    imshow("Input image", gray_img);
     imshow("negative image", negative_img);
     imshow("log image", log_img);
     imshow("gamma image", gamma_img);

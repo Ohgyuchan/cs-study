@@ -10,15 +10,17 @@ int main() {
     Mat gray_img;
     Mat negative_img;
     
-    gray_img = imread("lena.png", 0);
+    gray_img = imread("Lena.png", 0);
 
     //negative image
-    negative_img = gray_img.clone();
-    for (int i = 0; i < gray_img.rows; i++) {
-        for (int j = 0; j < gray_img.cols; j++) {
-            negative_img.at<uchar>(i, j) = 255 - gray_img.at<uchar>(i, j);
-        }
-    }
+    // negative_img = gray_img.clone();
+    // for (int i = 0; i < gray_img.rows; i++) {
+    //     for (int j = 0; j < gray_img.cols; j++) {
+    //         negative_img.at<uchar>(i, j) = 255 - gray_img.at<uchar>(i, j);
+    //     }
+    // }
+
+    negative_img = 255 - gray_img;
 
     //log image
     Mat float_img, log_img;
@@ -47,8 +49,8 @@ int main() {
 
     imshow("gray image", gray_img);
     imshow("negative image", negative_img);
-    imshow("log image", log_img);
-    imshow("gamma image", gamma_img);
+    // imshow("log image", log_img);
+    // imshow("gamma image", gamma_img);
 
     waitKey(0);
     return 0;

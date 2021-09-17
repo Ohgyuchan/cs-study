@@ -1,6 +1,5 @@
 #include "opencv/cv.hpp"
 #include <iostream>
-#include <time.h>
 
 using namespace cv;
 using namespace std;
@@ -26,12 +25,13 @@ int main() {
         int fps = cap.get(CAP_PROP_FPS);
 
         if(msec >= 3000) {
+            waitKey(0);
             break;
         }
 
         cout << "frames: " << frames <<"/" << total_frames << endl;
 
-        imshow("video", frame);
+        imshow("Input Vedio", frame);
 
         //fps: 24, 1000/24: 41.6666666667
         waitKey(1000/fps);

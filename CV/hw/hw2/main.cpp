@@ -10,11 +10,8 @@ int main() {
     
     gray_img = imread("Lena.png", 0);
 
-    //negative image
-    // negative_img = gray_img.clone();
-    // for (int i = 0; i < gray_img.rows; i++)
-    //     for (int j = 0; j < gray_img.cols; j++)
-    //         negative_img.at<uchar>(i, j) = 255 - gray_img.at<uchar>(i, j);
+    // negative image
+    // s = L-1- r
 
     negative_img = 255 - gray_img;
 
@@ -31,13 +28,7 @@ int main() {
     normalize(log_img, log_img, 0, 255, NORM_MINMAX);
     log_img = log_c * log_img;
     log_img.convertTo(log_img, CV_8UC1);
-    
-    // Mat input_img2, log_img2;
-    // gray_img.convertTo(input_img2, CV_32F);
-    // input_img2 = abs(input_img2) + 1;
-    // log(input_img2, input_img2);
-    // normalize(input_img2, input_img2, 0, 255, NORM_MINMAX);
-    // convertScaleAbs(input_img2, log_img2, c);
+
     
     // gamma image
     // s = cr^gamma c:constant, s:output, r:input
@@ -53,19 +44,6 @@ int main() {
     normalize(gamma_img, gamma_img, 0, 1.0, NORM_MINMAX, CV_32F);
     gamma_img.convertTo(gamma_img, CV_8UC1);
 
-    // Mat gamma_img2;
-    // MatIterator_<uchar> iterator, end;
-    // unsigned char pixel[256];
-    
-    // for (int i = 0; i < 256; i++) {
-    //     pixel[i] = saturate_cast<uchar>(pow((float)(i / 255.0), gamma) * 255.0f);
-    // }
-    // gamma_img2 = gray_img.clone();
-    
-    // end = gamma_img2.end<uchar>();
-    // for (iterator = gamma_img2.begin<uchar>(); iterator != end; iterator++)
-    //     *iterator = pixel[(*iterator)];
-
     imshow("gray image", gray_img);
     imshow("negative image", negative_img);
     imshow("log image", log_img);
@@ -74,3 +52,31 @@ int main() {
     waitKey(0);
     return 0;
 }
+
+/* negative */
+// negative_img = gray_img.clone();
+// for (int i = 0; i < gray_img.rows; i++)
+//     for (int j = 0; j < gray_img.cols; j++)
+//         negative_img.at<uchar>(i, j) = 255 - gray_img.at<uchar>(i, j);
+
+/* log */
+// Mat input_img2, log_img2;
+// gray_img.convertTo(input_img2, CV_32F);
+// input_img2 = abs(input_img2) + 1;
+// log(input_img2, input_img2);
+// normalize(input_img2, input_img2, 0, 255, NORM_MINMAX);
+// convertScaleAbs(input_img2, log_img2, c);
+
+/* gamma */
+// Mat gamma_img2;
+// MatIterator_<uchar> iterator, end;
+// unsigned char pixel[256];
+
+// for (int i = 0; i < 256; i++) {
+//     pixel[i] = saturate_cast<uchar>(pow((float)(i / 255.0), gamma) * 255.0f);
+// }
+// gamma_img2 = gray_img.clone();
+
+// end = gamma_img2.end<uchar>();
+// for (iterator = gamma_img2.begin<uchar>(); iterator != end; iterator++)
+//     *iterator = pixel[(*iterator)];

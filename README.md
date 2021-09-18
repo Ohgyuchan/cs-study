@@ -35,4 +35,7 @@
 
 ## Operating System
 
+## Computer Vision
+> [CV](./CV)  
+
 ## HTML/CSS

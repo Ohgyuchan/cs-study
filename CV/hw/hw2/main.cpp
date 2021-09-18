@@ -40,17 +40,13 @@ int main() {
     double g_min, g_max;
     minMaxLoc(gamma_input_img, &g_min, &g_max);
     double gamma_c = 255 / pow(g_max, gamma);
-
+    
+    // Normalize pixel values from 0 to 1.0
     gamma_input_img.convertTo(gamma_input_img, CV_32F);
+    
     pow(gamma_input_img, gamma, gamma_img);
     gamma_img = gamma_c * gamma_img;
     
-    //Normalize pixel values from 0 to 1.
-    for (int i = 0; i < gamma_img.rows; i++)
-        for (int j = 0; j < gamma_img.cols; j++)
-            if(gamma_img.at<float>(i, j) == 0)
-                gamma_img.at<uchar>(i, j) = 1.0;
-
     gamma_img.convertTo(gamma_img, CV_8UC1);
 
     imshow("gray image", gray_img);

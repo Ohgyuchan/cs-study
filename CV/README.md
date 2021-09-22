@@ -1,4 +1,5 @@
 # CV
+컴퓨터비전이란...
 ## Image Read
 ```c++
 #include "opencv/cv.hpp"

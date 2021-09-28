@@ -4,21 +4,42 @@ using namespace cv;
 using namespace std;
 
 int main() {
-	Mat image, AvgImg, GaussianImg;
-	image = imread("lena.png");
+	Mat lena, lena_filtered; 
+    Mat moon, moon_filtered;
+    Mat saltnpepper, saltnpepper_filtered;
 
-	// Blurs an image using the normalized box filter
-	// image: input image, AvgImg: output image, Size(7, 7): blurring kernel(filter) size
-	blur(image, AvgImg, Size(7, 7));
+	lena = imread("lena.png");
+    moon = imread("moon.png");
+    saltnpepper = imread("saltnpepper.png");
 
-	// Blurs an image using a Gaussian filter
-	// image: input image, GaussianImg: output image, Size(7, 7): Gaussian kernel(filter) size
-	// 1.5: Gaussian kernel standard deviation in X direction (중심 가중치)
-	GaussianBlur(image, GaussianImg, Size(7, 7), 1.5);
+    Rect lena_rect(0, 0, lena.cols/2, lena.rows);
+    Mat lena_rect_roi = lena(lena_rect);
+    
+	blur(lena_rect_roi, lena_filtered, Size(7, 7));
 
-	imshow("Input image", image);
-	imshow("Average image", AvgImg);
-	imshow("Gaussian blurred image", GaussianImg);
+    Rect moon_rect(moon.cols/2, 0, moon.cols/2, moon.rows);
+    Mat moon_rect_roi = moon(moon_rect);
+    
+    Rect moon_rect2(0, 0, moon.cols/2, moon.rows);
+    Mat moon_rect_roi2 = moon(moon_rect2);
+	
+    Laplacian(moon_rect_roi, moon_filtered, CV_16S);
+	convertScaleAbs(moon_filtered, moon_filtered);
+	moon_filtered = moon_filtered + moon_rect_roi;
+
+    medianBlur(saltnpepper, saltnpepper_filtered, 9);
+
+	// imshow("lena", lena);
+    // imshow("lena_filtered", lena_filtered);
+
+    imshow("moon", moon);
+	imshow("moon_filtered", moon_filtered);
+	imshow("moon_filtered2", moon_rect_roi2);
+
+	// imshow("saltnpepper", saltnpepper);
+	// imshow("saltnpepper_filtered", saltnpepper_filtered);
+	
 	waitKey(0);
+
 	return 0;
 }

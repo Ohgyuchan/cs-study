@@ -3,28 +3,28 @@
 
 char board[51][51];
 
-char whiteFirst[8][8] = {
-    { "WBWBWBWB" },
-    { "BWBWBWBW" },
-    { "WBWBWBWB" },
-    { "BWBWBWBW" },
-    { "WBWBWBWB" },
-    { "BWBWBWBW" },
-    { "WBWBWBWB" },
-    { "BWBWBWBW" }
+char whiteFirst[8][9] = {
+    "WBWBWBWB",
+    "BWBWBWBW",
+    "WBWBWBWB",
+    "BWBWBWBW",
+    "WBWBWBWB",
+    "BWBWBWBW",
+    "WBWBWBWB",
+    "BWBWBWBW"
 
 };
 
 //(0, 0)이 B인 체스보드
-char blackFirst[8][8] = {
-    { "BWBWBWBW" },
-    { "WBWBWBWB" },
-    { "BWBWBWBW" },
-    { "WBWBWBWB" },
-    { "BWBWBWBW" },
-    { "WBWBWBWB" },
-    { "BWBWBWBW" },
-    { "WBWBWBWB" }
+char blackFirst[8][9] = {
+    "BWBWBWBW",
+    "WBWBWBWB",
+    "BWBWBWBW",
+    "WBWBWBWB",
+    "BWBWBWBW",
+    "WBWBWBWB",
+    "BWBWBWBW",
+    "WBWBWBWB"
 };
 
 int whiteFirstChange(int y, int x) {

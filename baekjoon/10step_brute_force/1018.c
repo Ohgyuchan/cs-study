@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-char board[50][50];
+char board[51][51];
 
 char whiteFirst[8][8] = {
     { "WBWBWBWB" },
@@ -49,63 +49,48 @@ int blackFirstChange(int y, int x) {
         for (int j = x; j < x + 8; j++)
             if (board[i][j] != blackFirst[i - y][j - x])
                 count++;
-                
+
     return count;
 
 }
 
+int min(int a, int b, int c) {
+    int min;
+    min = a <= b ? a : b;
+    min = min <= c ? min : c;
+    return min;
+}
+
+// int check(int x,int y)
+// {
+// 	int cnt1 = 0;
+// 	int cnt2 = 0;
+
+// 	for (int i = x; i < x + 8; i++) {
+// 		for (int j = y; j < y + 8; j++) {
+// 			if ((i + j) % 2 == board[i][j]) cnt1++; // 탐색을 시작하는 첫번째 블록이 흰색 일때
+// 			if ((i + j + 1) % 2 == board[i][j]) cnt2++; // 탐색을 시작하는 첫번째 블록이 검정색 일때
+// 		}
+// 	}
+
+// 	return min(cnt1, cnt2); // 둘 중 최소값 반환
+// }
+
 int main() {
     int M, N;
-    int count = 0;
+    int count = 32;
 
     scanf("%d %d", &M, &N);
-
+    
     for(int i = 0; i < M; i++) {
-            scanf("%s", board[i]);
+        scanf("%s", board[i]);
     }
 
-    for(int i = 0; i < M-1; i++) {
-        for(int j = 0; j < N-1; j++) {
-            if(j == 0) {
-                if(board[i][j] == board[i-1][j] && board[i][j] == board[i][j+1] && board[i][j] == board[i+1][j]) {
-                    if(board[i][j] == 'B')
-                        board[i][j] = 'W';
-                    else 
-                        board[i][j] = 'B';
-                    count++;
-                }
-                if(board[i][j] == board[i+1][j-1]) {
-                    if(board[i][j] == 'B')
-                        board[i][j] = 'W';
-                    else 
-                        board[i][j] = 'B';
-                    count++;
-                }
-            } else {
-                if(board[i][j] == board[i][j-1] && board[i][j] == board[i-1][j] && board[i][j] == board[i][j+1] && board[i][j] == board[i+1][j]) {
-                    if(board[i][j] == 'B')
-                        board[i][j] = 'W';
-                    else 
-                        board[i][j] = 'B';
-                    count++;
-                }
-                if(board[i][j-1] == board[i-1][j] && board[i][j-1] == board[i][j+1] && board[i][j-1] == board[i+1][j]) {
-                    if(board[i][j] == 'B')
-                        board[i][j] = 'W';
-                    else 
-                        board[i][j] = 'B';
-                    count++;
-                }
-            }
-        }
-    }
-
-    printf("\n\n==================\n");
-
-    for(int i = 0; i < M; i++)
-        printf("%s\n", board[i]);
-
-    printf("%d\n", count/2);
+    for (int i = 0; i <= M-8; i++)
+		for (int j = 0; j <= N-8; j++)
+            count = min(count, blackFirstChange(i, j), whiteFirstChange(i, j));
+    
+    printf("%d", count);
 
     return 0;
 }

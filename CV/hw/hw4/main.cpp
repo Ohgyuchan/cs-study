@@ -42,16 +42,15 @@ Mat drawHistogram(Mat src){
 
 Mat getHist(Mat src) {
 		Mat hist;
-
+        
         // Set the number of bins to 8
         int histSize = 8;
         float range[] = { 0, 256 };
         const float* histRange = { range };
         int channels[] = {0};
-		
-        calcHist(&src, 1, channels, Mat(), hist, 1, &histSize, &histRange);
         
-        normalize(hist, hist, 0, src.rows, NORM_MINMAX, -1, Mat());
+        // Compute histogram
+        calcHist(&src, 1, channels, Mat(), hist, 1, &histSize, &histRange);
 
 		return hist;
 	}

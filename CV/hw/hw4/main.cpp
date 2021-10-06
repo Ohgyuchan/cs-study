@@ -51,7 +51,7 @@ Mat getHist(Mat src) {
 		
         calcHist(&src, 1, channels, Mat(), hist, 1, &histSize, &histRange);
         
-        normalize(hist, hist, 0, 512, NORM_MINMAX, -1, Mat());
+        normalize(hist, hist, 0, src.rows, NORM_MINMAX, -1, Mat());
 
 		return hist;
 	}

@@ -14,9 +14,10 @@ Mat drawHistogram(Mat src){
     const float* histRange = { range };
     int channels[] = {0};
 
+    // Set the number of bins to 16
+    histSize = 16;
     hist_w = 512;
     hist_h = 512;
-    histSize = 16;
     bin_w = cvRound((double)hist_w / histSize);
     
     //draw the histogram
@@ -39,15 +40,18 @@ Mat drawHistogram(Mat src){
     return histImage;
 }
 
-Mat getHistogramValue(Mat src) {
-
+Mat getHist(Mat src) {
 		Mat hist;
+
+        // Set the number of bins to 8
         int histSize = 8;
         float range[] = { 0, 256 };
         const float* histRange = { range };
         int channels[] = {0};
 		
         calcHist(&src, 1, channels, Mat(), hist, 1, &histSize, &histRange);
+        
+        normalize(hist, hist, 0, 512, NORM_MINMAX, -1, Mat());
 
 		return hist;
 	}
@@ -66,16 +70,16 @@ int main() {
 
     equalizeHist(moon, moon_hist_equalized_image); //histogram equlization
     
-
+    // Draw each histogram of the input and the result image
     h1 = drawHistogram(moon);
     h2 = drawHistogram(moon_hist_equalized_image);
 
+    // Display each histogram of the input and the result image
     imshow("h1", h1);
     imshow("h2", h2);
 
-    // Compute the value of each component of a normalized histogram of the input image
-    input_hist = getHistogramValue(h1);
-    output_hist = getHistogramValue(h2);
+    input_hist = getHist(moon);
+    output_hist = getHist(moon_hist_equalized_image);
 
     float input_hist_sum = 0;
     float output_hist_sum = 0;
@@ -85,16 +89,17 @@ int main() {
         output_hist_sum += output_hist.at<float>(i);
     }
 
-    //  Write all values on the input image; and display the result
+    //  Write all values on the input image(moon)
     for (int i = 0; i < 8; i++) {
         string result = "bin ";
         result += to_string(i+1);
         result += " = ";
+        // Compute the value of each component of a normalized histogram of the input image
         result += to_string(input_hist.at<float>(i) / input_hist_sum);
         putText(moon, result, Point(10, 20 * (i + 1)), 0, 0.5, Scalar(255, 255, 255), 1, 8);
     }
 
-    // Write all values on the input image; and display the result
+    // Write all values on the input image(moon_hist_equalized_image)
     for (int i = 0; i < 8; i++) {
         string result = "bin ";
         result += to_string(i+1);

@@ -1,0 +1,15 @@
+#lang plai
+;(define (infix-parse sexp)
+ ; (match sexp
+
+> (define (m x)
+    (match x
+      [(list a b c)
+       #:when (= 6 (+ a b c))
+       'sum-is-six]
+      [(list a b c) 'sum-is-not-six]))
+> (m '(1 2 3))
+'sum-is-six
+
+> (m '(2 3 4))
+'sum-is-not-six

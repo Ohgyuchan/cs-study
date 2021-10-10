@@ -2,18 +2,14 @@
 
 int a[1000] = {0, };
 
-void ascending_sort(int n) {
-  for(int i = 0; i < n; i++) {
-    for(int j = 0; j < n; j++) {
-      int temp;
-      if(a[i] < a[j]) {
-        temp = a[i];
-        a[i] = a[j];
-        a[j] = temp;
-      }
-    }
-  }
-}
+
+// void selection_sort;
+// void insertion_sort;
+// void bubble_sort;
+// void heap_sort;
+// void merge_sort;
+// void quick_sort;
+
 
 int main() {
   int N;
@@ -23,8 +19,6 @@ int main() {
   for(int i = 0; i < N; i++) {
     scanf("%d", &a[i]);
   }
-
-  ascending_sort(N);
 
   for(int i = 0; i < N; i++) {
     printf("%d\n", a[i]);

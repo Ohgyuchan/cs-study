@@ -14,7 +14,6 @@ int main(int argc, char *argv[])
 
 	while(true) {
 		s = to_string(title);
-        cout << s << endl;
 
 		if (s.find("666") != -1) { // if s have "666"
 			++count;

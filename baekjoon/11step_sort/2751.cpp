@@ -1,5 +1,5 @@
 // void merge_sort;
-#include <stdio.h>
+#include <iostream>
 #define MAX 1000001
 
 int num[MAX] = {0, };

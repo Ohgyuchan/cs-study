@@ -117,10 +117,47 @@ class Colorful {
         }
 };
 
-// class Balancing {
-//     public:
-//         void 
-// }
+class Balancing {
+    public:
+        void averageFiltering(Mat scr, Mat &dst) {
+            
+        }
+        
+        void whiteBalacing(Mat dst) {
+            Mat bgr_channels[3];
+            
+            split(dst, bgr_channels);
+            
+            double avg;
+            int sum,temp,i, j, c;
+            
+            for (c = 0; c < dst.channels(); c++) {
+                sum = 0;
+                avg = 0.0f;
+                for (i = 0; i < dst.rows; i++) {
+                    for (j = 0; j < dst.cols; j++) {
+                        sum += bgr_channels[c].at<uchar>(i, j);
+                    }
+                }
+                
+                avg = sum / (dst.rows * dst.cols);
+                
+                for (i = 0; i < dst.rows; i++) {
+                    for (j = 0; j < dst.cols; j++) {
+                        temp = (128 / avg) * bgr_channels[c].at<uchar>(i, j);
+                        
+                        if (temp>255)
+                            bgr_channels[c].at<uchar>(i, j) = 255;
+                        
+                        else
+                            bgr_channels[c].at<uchar>(i, j) = temp;
+                    }
+                }
+            }
+
+            merge(bgr_channels, 3, dst);
+        }
+};
 
 int main() {
     Mat lena, colorful, balancing;
@@ -129,6 +166,7 @@ int main() {
 
     Lena L1;
     Colorful C1;
+    Balancing B1;
 
     lena = imread("lena.png");
     colorful = imread("colorful.jpg");
@@ -140,8 +178,8 @@ int main() {
 
     while(1) {
         // imshow("lena", lena_output);
-        imshow("colorful", colorful_output);
-        // imshow("balancing", balancing_output);
+        // imshow("colorful", colorful_output);
+        imshow("balancing", balancing_output);
         int key = waitKey();
 
         if(key == 103) { // input 'g'
@@ -162,6 +200,14 @@ int main() {
 
         else if(key == 115) { // input 's'
             C1.colorSclicing(colorful_output, colorful_output);
+        }
+
+        else if(key == 97) { // input 'a'
+            B1.averageFiltering(balancing_output, balancing_output);
+        }
+
+        else if(key == 119) { // input 'w'
+            B1.whiteBalacing(balancing_output);
         }
 
         else if(key == 114) {

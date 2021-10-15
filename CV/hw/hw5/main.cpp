@@ -177,8 +177,8 @@ int main() {
     balancing_output = balancing.clone();
 
     while(1) {
-        // imshow("lena", lena_output);
-        // imshow("colorful", colorful_output);
+        imshow("lena", lena_output);
+        imshow("colorful", colorful_output);
         imshow("balancing", balancing_output);
         int key = waitKey();
 

@@ -1,3 +1,8 @@
+/*
+References
+Color Image Histogram https://newbedev.com/histogram-equalization-not-working-on-color-image-opencv
+*/
+
 #include <iostream>
 #include "opencv/cv.hpp"
 
@@ -31,7 +36,16 @@ class Lena {
         }
 
         void equalizeHistogram(Mat scr, Mat &dst) {
-            equalizeHist(scr, dst);
+            vector<Mat> channels; 
+            cvtColor(scr, dst, CV_BGR2YCrCb); 
+            //split the image into channels
+            split(dst,channels); 
+            //equalize histogram on the 1st channel (Y)
+            equalizeHist(channels[0], channels[0]); 
+            //merge 3 channels including the modified 1st channel into one image
+            merge(channels,dst); 
+            //change the color image from YCrCb to BGR format (to display image properly)
+            cvtColor(dst, dst, CV_YCrCb2BGR); 
         }
 };
 
@@ -47,13 +61,13 @@ int main() {
     balancing = imread("balancing.jpg");
 
     lena_output = lena.clone();
-    colorful_output = colorful;
-    balancing_output = balancing;
+    colorful_output = colorful.clone();
+    balancing_output = balancing.clone();
 
     while(1) {
         imshow("lena", lena_output);
-        // imshow("colorful", colorful_output);
-        // imshow("balancing", balancing_output);
+        imshow("colorful", colorful_output);
+        imshow("balancing", balancing_output);
         int key = waitKey();
 
         if(key == 103) {
@@ -69,7 +83,10 @@ int main() {
         }
 
         else if(key == 114) {
-            lena_output = lena.clone(); // Clone to reset (Deep copy)
+            // Clone to reset (Deep copy)
+            lena_output = lena.clone();
+            colorful_output = colorful.clone();
+            balancing_output = balancing.clone();
         }
 
         else if(key == 27) {

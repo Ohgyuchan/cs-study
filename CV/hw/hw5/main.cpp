@@ -29,6 +29,10 @@ class Lena {
             
             dst.convertTo(dst, CV_8UC1);
         }
+
+        void equalizeHistogram(Mat scr, Mat &dst) {
+            equalizeHist(scr, dst);
+        }
 };
 
 int main() {
@@ -57,7 +61,7 @@ int main() {
         }
 
         else if(key == 104) {
-            cout << key << endl;
+            L1.equalizeHistogram(lena_output, lena_output);
         }
 
         else if(key == 110) {

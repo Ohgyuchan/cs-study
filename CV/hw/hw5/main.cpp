@@ -120,7 +120,7 @@ class Colorful {
 class Balancing {
     public:
         void averageFiltering(Mat scr, Mat &dst) {
-            
+            blur(scr, dst, Size(9, 9));
         }
         
         void whiteBalacing(Mat dst) {

@@ -42,7 +42,7 @@ int main() {
     colorful = imread("colorful.jpg");
     balancing = imread("balancing.jpg");
 
-    lena_output = lena;
+    lena_output = lena.clone();
     colorful_output = colorful;
     balancing_output = balancing;
 
@@ -52,16 +52,20 @@ int main() {
         // imshow("balancing", balancing_output);
         int key = waitKey();
 
-        if(key == 71 || key == 103) {
+        if(key == 103) {
             L1.gamma(lena_output, lena_output);
         }
 
-        else if(key == 78 || key == 110) {
+        else if(key == 104) {
+            cout << key << endl;
+        }
+
+        else if(key == 110) {
             L1.negative(lena_output, lena_output);
         }
 
-        else if(key == 82 || key == 114) {
-            lena_output = lena;
+        else if(key == 114) {
+            lena_output = lena.clone(); // Clone to reset (Deep copy)
         }
 
         else if(key == 27) {

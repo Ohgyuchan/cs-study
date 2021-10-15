@@ -14,6 +14,21 @@ class Lena {
                 }
             }
         }
+
+        void gamma(Mat scr, Mat &dst) {
+            double gamma = 2.5;
+            double g_min, g_max;
+            minMaxLoc(scr, &g_min, &g_max);
+            double gamma_c = 255 / pow(g_max, gamma);
+            
+            // Normalize pixel values from 0 to 1.0
+            scr.convertTo(scr, CV_32F);
+            
+            pow(scr, gamma, dst);
+            dst = gamma_c * dst;
+            
+            dst.convertTo(dst, CV_8UC1);
+        }
 };
 
 int main() {
@@ -27,6 +42,7 @@ int main() {
     colorful = imread("colorful.jpg");
     balancing = imread("balancing.jpg");
 
+    lena_output = lena;
     colorful_output = colorful;
     balancing_output = balancing;
 
@@ -37,11 +53,11 @@ int main() {
         int key = waitKey();
 
         if(key == 71 || key == 103) {
-            cout << key << endl;
+            L1.gamma(lena_output, lena_output);
         }
 
         else if(key == 78 || key == 110) {
-            L1.negative(lena, lena_output);
+            L1.negative(lena_output, lena_output);
         }
 
         else if(key == 27) {

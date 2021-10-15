@@ -36,15 +36,13 @@ class Lena {
         }
 
         void equalizeHistogram(Mat scr, Mat &dst) {
-            vector<Mat> channels; 
+            Mat channels[3];
+            // Vector<Mat> channels
             cvtColor(scr, dst, CV_BGR2YCrCb); 
-            //split the image into channels
             split(dst,channels); 
-            //equalize histogram on the 1st channel (Y)
-            equalizeHist(channels[0], channels[0]); 
-            //merge 3 channels including the modified 1st channel into one image
-            merge(channels,dst); 
-            //change the color image from YCrCb to BGR format (to display image properly)
+            equalizeHist(channels[1], channels[1]); 
+            merge(channels, 3, dst);
+            // merge(channels, dst);
             cvtColor(dst, dst, CV_YCrCb2BGR); 
         }
 };
@@ -65,21 +63,29 @@ int main() {
     balancing_output = balancing.clone();
 
     while(1) {
-        imshow("lena", lena_output);
+        // imshow("lena", lena_output);
         imshow("colorful", colorful_output);
-        imshow("balancing", balancing_output);
+        // imshow("balancing", balancing_output);
         int key = waitKey();
 
-        if(key == 103) {
+        if(key == 103) { // input 'g'
             L1.gamma(lena_output, lena_output);
         }
 
-        else if(key == 104) {
+        else if(key == 104) { // input 'h'
             L1.equalizeHistogram(lena_output, lena_output);
         }
 
-        else if(key == 110) {
+        else if(key == 110) { // input 'n'
             L1.negative(lena_output, lena_output);
+        }
+
+        else if(key == 99) { // input 'c'
+            cout << key << endl;
+        }
+
+        else if(key == 115) { // input 's'
+            cout << key << endl;
         }
 
         else if(key == 114) {

@@ -60,6 +60,10 @@ int main() {
             L1.negative(lena_output, lena_output);
         }
 
+        else if(key == 82 || key == 114) {
+            lena_output = lena;
+        }
+
         else if(key == 27) {
             break;
         }

@@ -37,15 +37,20 @@ class Lena {
 
         void equalizeHistogram(Mat scr, Mat &dst) {
             Mat channels[3];
-            // vector<Mat> channels;
             cvtColor(scr, dst, CV_BGR2YUV);
-            // cvtColor(scr, dst, CV_BGR2YCrCb);
             split(dst,channels); 
             equalizeHist(channels[0], channels[0]); 
             merge(channels, 3, dst);
-            // merge(channels, dst);
             cvtColor(dst, dst, CV_YUV2BGR); 
-            // cvtColor(dst, dst, CV_YCrCb2BGR);
+        }
+
+        void equalizeHistogramYCrCb(Mat scr, Mat &dst) {
+            vector<Mat> channels;
+            cvtColor(scr, dst, CV_BGR2YCrCb);
+            split(dst,channels); 
+            equalizeHist(channels[0], channels[0]); 
+            merge(channels, dst);
+            cvtColor(dst, dst, CV_YCrCb2BGR);
         }
 };
 

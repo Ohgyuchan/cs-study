@@ -37,15 +37,90 @@ class Lena {
 
         void equalizeHistogram(Mat scr, Mat &dst) {
             Mat channels[3];
-            // Vector<Mat> channels
-            cvtColor(scr, dst, CV_BGR2YCrCb); 
+            // vector<Mat> channels;
+            cvtColor(scr, dst, CV_BGR2YUV);
+            // cvtColor(scr, dst, CV_BGR2YCrCb);
             split(dst,channels); 
-            equalizeHist(channels[1], channels[1]); 
+            equalizeHist(channels[0], channels[0]); 
             merge(channels, 3, dst);
             // merge(channels, dst);
-            cvtColor(dst, dst, CV_YCrCb2BGR); 
+            cvtColor(dst, dst, CV_YUV2BGR); 
+            // cvtColor(dst, dst, CV_YCrCb2BGR);
         }
 };
+
+class Colorful {
+    public:
+        void colorSclicing(Mat scr, Mat &dst) {
+            Mat HSV;
+
+            vector<Mat> mo(3);
+            
+            int rows = scr.rows;
+            int cols = scr.cols;
+            
+            uchar* h;
+            uchar* s;
+            uchar* v;
+            
+            cvtColor(scr, HSV, COLOR_BGR2HSV);
+            split(HSV, mo);
+            
+            // masking out except orange
+            for(int i = 0; i < rows; i++) {
+                h = mo[0].ptr<uchar>(i);
+                s = mo[1].ptr<uchar>(i);
+                for(int j = 0; j < cols; j++) {
+                    if(h[j] > 9 && h[j] < 23)
+                        s[j] = s[j];
+                    
+                    else
+                        s[j] = 0;
+                }
+            }
+            
+            merge(mo, dst);
+
+            cvtColor(dst, dst, COLOR_HSV2BGR);
+        }
+
+        void colorConversion(Mat scr, Mat &dst) {
+            Mat HSV;
+
+            vector<Mat> cc(3);
+            
+            int rows = scr.rows;
+            int cols = scr.cols;
+            
+            uchar* h;
+            uchar* s;
+            uchar* v;
+            
+            cvtColor(scr, HSV, COLOR_BGR2HSV);
+            split(HSV, cc);
+
+            // changing all colors
+            for(int i = 0; i < rows; i++) {
+                h = cc[0].ptr<uchar>(i);
+                s = cc[1].ptr<uchar>(i);
+                for(int j = 0; j < cols; j++) {
+                    if(h[j] + 50 > 129)
+                    h[j] = h[j] - 129;
+                    
+                    else h[j] += 50;
+                }
+            }
+
+            merge(cc, dst);
+
+            cvtColor(dst, dst, COLOR_HSV2BGR);
+        }
+};
+
+// class Balancing {
+//     public:
+//         void 
+// }
 
 int main() {
     Mat lena, colorful, balancing;
@@ -53,6 +128,7 @@ int main() {
     Mat lena_output, colorful_output, balancing_output;
 
     Lena L1;
+    Colorful C1;
 
     lena = imread("lena.png");
     colorful = imread("colorful.jpg");
@@ -81,11 +157,11 @@ int main() {
         }
 
         else if(key == 99) { // input 'c'
-            cout << key << endl;
+            C1.colorConversion(colorful_output, colorful_output);
         }
 
         else if(key == 115) { // input 's'
-            cout << key << endl;
+            C1.colorSclicing(colorful_output, colorful_output);
         }
 
         else if(key == 114) {

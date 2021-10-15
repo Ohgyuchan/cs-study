@@ -199,7 +199,7 @@ int main() {
         }
 
         else if(key == 115) { // input 's'
-            C1.colorSclicing(colorful_output, colorful_output);
+            C1.colorSlicing(colorful_output, colorful_output);
         }
 
         else if(key == 97) { // input 'a'

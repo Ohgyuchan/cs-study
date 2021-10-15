@@ -51,7 +51,7 @@ class Lena {
 
 class Colorful {
     public:
-        void colorSclicing(Mat scr, Mat &dst) {
+        void colorSlicing(Mat scr, Mat &dst) {
             Mat HSV;
 
             vector<Mat> mo(3);

@@ -32,6 +32,31 @@ void merge_sort(int data[], int p, int r) {
     }
 }
 
+void descending_merge (int data[], int p, int q, int r) {
+    int i = p, j = q+1, k = p;
+    int tmp[r]; // 새 배열
+    while(i<=q && j<=r) {
+        if(data[i] > data[j]) tmp[k++] = data[i++];
+        else tmp[k++] = data[j++];
+    }
+    while(i<=q)
+        tmp[k++] = data[i++];
+    while(j<=r)
+        tmp[k++] = data[j++];
+    for(int a = p; a <= r; a++)
+        data[a] = tmp[a];
+}
+
+void descending_merge_sort(int data[], int p, int r) {
+    int q;
+    if(p < r) {
+        q = (p+r)/2;
+        descending_merge_sort(data, p , q);
+        descending_merge_sort(data, q+1, r);
+        descending_merge(data, p, q,  r);
+    }
+}
+
 int main() {
     int n;
     float avg = 0;
@@ -53,8 +78,8 @@ int main() {
     }
 
     merge_sort(num, 1, n);
-    merge_sort(minus, 0, num[n]);
-    merge_sort(plus, 0, num[n]);
+    descending_merge_sort(minus, 0, num[n]);
+    descending_merge_sort(plus, 0, num[n]);
 
     avg = total / n;
     mid = num[(n / 2) + 1];

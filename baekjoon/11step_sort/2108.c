@@ -7,6 +7,8 @@
 #include <stdio.h>
 
 int num[500000] = {0, };
+int minus[4001] = {0, };
+int plus[4001] = {0, };
 
 void merge (int data[], int p, int q, int r) {
     int i = p, j = q+1, k = p;
@@ -32,10 +34,10 @@ void merge_sort(int data[], int p, int r) {
 
 int main() {
     int n;
-    int avg = 0;
+    float avg = 0;
     int mid = 0;
     int total = 0;
-    int min = 0;
+    int freq = 0;
     int range = 0;
     
     scanf("%d", &n);
@@ -43,20 +45,25 @@ int main() {
     for(int i = 1; i <= n; i++) {
         scanf("%d", &num[i]);
         total += num[i];
+        if(num[i] < 0) {
+            minus[num[i]]++;
+        } else {
+            plus[num[i]]++;
+        }
     }
 
     merge_sort(num, 1, n);
+    merge_sort(minus, 0, num[n]);
+    merge_sort(plus, 0, num[n]);
 
     avg = total / n;
     mid = num[(n / 2) + 1];
-    for(int i = 1; i < n; i++)
-        if(num[i] != num[i+1])
-            min = num[i];
+    freq = minus[n-1] >= plus[n-1] ? minus[n-1] : plus[n-1];
     range = num[n] - num[1];
 
-    printf("%d\n", avg);
+    printf("%.0f\n", avg);
     printf("%d\n", mid);
-    printf("%d\n", min);
+    printf("%d\n", freq);
     printf("%d\n", range);
 
     return 0;

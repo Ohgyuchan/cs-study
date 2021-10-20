@@ -4,7 +4,8 @@ using namespace cv;
 
 int main() {
     Mat lena, sobel, canny;
-    lena = imread("lena.png", 0);
+    // the different results with color, gray scale.
+    lena = imread("lena.png");
 
     imshow("Lena", lena);
     int ddepth = CV_8U;

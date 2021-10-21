@@ -29,6 +29,15 @@ int main() {
     log_img = log_c * log_img;
     log_img.convertTo(log_img, CV_8UC1);
 
+    Mat log_img_1;
+    Mat log_input_img_1 = gray_img.clone();
+
+    log_input_img_1.convertTo(log_input_img_1, CV_32F);
+    log_input_img_1 = abs(log_input_img_1) + 1;
+    log(log_input_img_1-1, log_img_1);
+    normalize(log_img_1, log_img_1, 0, 255, NORM_MINMAX);
+    log_img_1 = log_c * log_img_1;
+    log_img_1.convertTo(log_img_1, CV_8UC1);
     
     // gamma image
     // s = c * r^gamma c:constant, s:output, r:input
@@ -49,10 +58,11 @@ int main() {
     
     gamma_img.convertTo(gamma_img, CV_8UC1);
 
-    imshow("gray image", gray_img);
-    imshow("negative image", negative_img);
+    // imshow("gray image", gray_img);
+    // imshow("negative image", negative_img);
     imshow("log image", log_img);
-    imshow("gamma image", gamma_img);
+    imshow("log image_1", log_img_1);
+    // imshow("gamma image", gamma_img);
 
     waitKey(0);
     return 0;

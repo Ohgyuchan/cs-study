@@ -14,6 +14,8 @@
 ## Python
 > [python1](./python) Update: 21.Jul  
 
+## PLT
+
 ## 백준 단계별 문제풀기
 > [1단계: I/O](./baekjoon_step/1step_IO)  
 > [2단계: if](./baekjoon_step/2step_if-statement)  

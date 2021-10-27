@@ -1,30 +1,30 @@
 package edu.handong.csee.plt.ast;
 
 public class With extends AST{
-    AST id = new AST();
-	AST named = new AST();
-	AST body = new AST();
+    AST i = new AST();
+	AST v = new AST();
+	AST e = new AST();
 	
-	public With(AST id, AST named, AST body) {
-		this.id = id;
-        this.named = named;
-		this.body = body;
+	public With(AST i, AST v, AST e) {
+		this.i = i;
+        this.v = v;
+		this.e = e;
 	}
 
-	public AST getId() {
-		return id;
+	public AST getI() {
+		return i;
 	}
 
-    public AST getNamed() {
-		return named;
+    public AST getV() {
+		return v;
 	}
 
-    public AST getBody() {
-		return body;
+    public AST getE() {
+		return e;
 	}
 
 	public String getASTCode() {
 
-		return "(with " + id.getASTCode() + " (" + named.getASTCode()  + body.getASTCode() + "))";
+		return "(with " + i.getASTCode() + " (" + v.getASTCode()  + e.getASTCode() + "))";
 	}
 }

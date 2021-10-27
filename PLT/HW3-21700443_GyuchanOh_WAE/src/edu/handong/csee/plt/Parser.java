@@ -36,7 +36,7 @@ public class Parser {
 		// with
 		if(subExpressions.get(0).equals("with")) {
 			ArrayList<String> withEx = splitExpressionAsSubExpressions(subExpressions.get(1));
-			System.out.println(withEx);
+			
 			return new With(parse(withEx.get(0)), parse(withEx.get(1)), parse(subExpressions.get(2)));
 		}
 		

@@ -29,8 +29,6 @@ public class Parser {
 			
 			return new Sub(parse(subExpressions.get(1)),parse(subExpressions.get(2)));
 		}
-		
-		// TODO implement all other cases....
 
 		
 		return null;
@@ -52,16 +50,6 @@ public class Parser {
 		return getSubExpressions(exampleCode);
 	}
 
-
-
-	/**
-	 * This method return a list of sub-expression from the given expression.
-	 * For example, {+ 3 {+ 3 4}  -> +, 2, {+ 3 4}
-	 * TODO JC was sleepy while implementing this method...it has complex logic and might be buggy...
-	 * You can do better or find an external library.
-	 * @param exampleCode
-	 * @return list of sub expressions 
-	 */
 	private ArrayList<String> getSubExpressions(String exampleCode) {
 
 		ArrayList<String> sexpressions = new ArrayList<String>();

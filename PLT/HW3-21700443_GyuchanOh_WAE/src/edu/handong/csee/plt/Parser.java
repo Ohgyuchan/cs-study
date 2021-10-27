@@ -103,7 +103,6 @@ public class Parser {
 			strBuffer = strBuffer + exampleCode.charAt(i);
 		}
 		
-		// System.out.println(sexpressions);
 		sexpressions.add(strBuffer);
 		return sexpressions;
 	}

@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import edu.handong.csee.plt.ast.AST;
 import edu.handong.csee.plt.ast.Add;
 import edu.handong.csee.plt.ast.Sub;
+import edu.handong.csee.plt.ast.With;
 import edu.handong.csee.plt.ast.Num;
+import edu.handong.csee.plt.ast.Id;
 
 public class Parser {
 
@@ -18,19 +20,32 @@ public class Parser {
 			return new Num(subExpressions.get(0));
 		}
 
+		
 		// add
 		if(subExpressions.get(0).equals("+")) {
 			
 			return new Add(parse(subExpressions.get(1)),parse(subExpressions.get(2)));
 		}
-
+		
 		// sub
 		if(subExpressions.get(0).equals("-")) {
 			
 			return new Sub(parse(subExpressions.get(1)),parse(subExpressions.get(2)));
 		}
-
 		
+		// with
+		if(subExpressions.get(0).equals("with")) {
+			ArrayList<String> withEx = splitExpressionAsSubExpressions(subExpressions.get(1));
+			System.out.println(withEx);
+			return new With(parse(withEx.get(0)), parse(withEx.get(1)), parse(subExpressions.get(2)));
+		}
+		
+		// id
+		if(isAlphabetic(subExpressions.get(0))) {
+			
+			return new Id(subExpressions.get(0));
+		}
+
 		return null;
 	}
 
@@ -45,7 +60,6 @@ public class Parser {
 
 		if(exampleCode.startsWith("{"))
 			exampleCode = exampleCode.substring(1, exampleCode.length()-1);
-
 
 		return getSubExpressions(exampleCode);
 	}
@@ -89,6 +103,7 @@ public class Parser {
 			strBuffer = strBuffer + exampleCode.charAt(i);
 		}
 		
+		// System.out.println(sexpressions);
 		sexpressions.add(strBuffer);
 		return sexpressions;
 	}
@@ -96,6 +111,11 @@ public class Parser {
 	public static boolean isNumeric(String str)
 	{
 		return str.matches("-?\\d+(\\.\\d+)?");  //match a number with optional '-' and decimal.
+	}
+	
+	public static boolean isAlphabetic(String str)
+	{
+		return str.matches("^[a-zA-Z]*$");  //match a number with optional '-' and decimal.
 	}
 
 }

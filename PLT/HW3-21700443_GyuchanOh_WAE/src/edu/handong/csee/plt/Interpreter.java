@@ -3,6 +3,7 @@ package edu.handong.csee.plt;
 import edu.handong.csee.plt.ast.AST;
 import edu.handong.csee.plt.ast.Add;
 import edu.handong.csee.plt.ast.Sub;
+import edu.handong.csee.plt.ast.With;
 import edu.handong.csee.plt.ast.Num;
 
 public class Interpreter {

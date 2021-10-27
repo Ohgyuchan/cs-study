@@ -32,7 +32,8 @@ public class Interpreter {
 		}
 		
 		if(ast instanceof Id) {
-			return ((Id)ast).getStrName();
+			System.out.println("Free identifier");
+			System.exit(0);
 		}
 
 		return null;

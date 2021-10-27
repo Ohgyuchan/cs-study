@@ -8,18 +8,28 @@ public class Main {
 	
 	public static void main(String[] args) {
 		
-		// This is just an example code. Use args to get -p option and actuall code from CLI
-		String exampleCode = "{+ {+ 2 {+ 3 4}} {+ 1 2}}";
+		String input = "";
+		
+		if(args[0].compareTo("-p") == 0) {
+			input = args[1];
+			onlyParser = true;
+		} else {
+			input = args[0];
+		}
 		
 		// Parser
 		Parser parser = new Parser();
-		AST ast = parser.parse(exampleCode);
+		AST ast = parser.parse(input);
 		
-		if(ast == null)
+		if(ast == null) {
 			System.out.println("Syntax Error!");
+			System.exit(0);
+		}
 		
-		//if(onlyParser)
+		if(onlyParser) {
 			System.out.println(ast.getASTCode());
+			return;
+		}
 		
 		// interpreter
 		Interpreter interpreter = new Interpreter();

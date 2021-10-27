@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import edu.handong.csee.plt.ast.AST;
 import edu.handong.csee.plt.ast.Add;
+import edu.handong.csee.plt.ast.Sub;
 import edu.handong.csee.plt.ast.Num;
 
 public class Parser {
@@ -21,6 +22,12 @@ public class Parser {
 		if(subExpressions.get(0).equals("+")) {
 			
 			return new Add(parse(subExpressions.get(1)),parse(subExpressions.get(2)));
+		}
+
+		// sub
+		if(subExpressions.get(0).equals("-")) {
+			
+			return new Sub(parse(subExpressions.get(1)),parse(subExpressions.get(2)));
 		}
 		
 		// TODO implement all other cases....
@@ -60,7 +67,7 @@ public class Parser {
 		ArrayList<String> sexpressions = new ArrayList<String>();
 		int openingParenthesisCount = 0;
 		String strBuffer = "";
-		for(int i=0; i < exampleCode.length()  ;i++) {
+		for(int i=0; i < exampleCode.length(); i++) {
 			if(i==0 || (i==0 && exampleCode.charAt(i) == '{')) {
 				strBuffer = strBuffer + exampleCode.charAt(i);
 				continue;
@@ -95,7 +102,6 @@ public class Parser {
 		}
 		
 		sexpressions.add(strBuffer);
-
 		return sexpressions;
 	}
 

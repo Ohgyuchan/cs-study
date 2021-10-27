@@ -6,6 +6,9 @@ public class AST {
 		String astCode="";
 		if(this instanceof Add)
 			astCode = ((Add)this).getASTCode();
+
+		if(this instanceof Sub)
+			astCode = ((Sub)this).getASTCode();
 		
 		if(this instanceof Num)
 			astCode = ((Num)this).getASTCode();

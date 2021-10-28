@@ -1,6 +1,7 @@
 package edu.handong.csee.plt;
 
 import edu.handong.csee.plt.ast.AST;
+import edu.handong.csee.plt.defrdSub.DefrdSub;
 
 public class Main {
 	
@@ -33,8 +34,10 @@ public class Main {
 		
 		// interpreter
 		Interpreter interpreter = new Interpreter();
+
+		DefrdSub ds = new DefrdSub();
 		
-		String result = interpreter.interp(ast);
+		String result = interpreter.interp(ast, ds);
 		
 		System.out.println(result);
 	}

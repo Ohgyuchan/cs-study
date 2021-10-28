@@ -9,11 +9,11 @@ public class App extends AST{
 		this.a = a;
 	}
 	
-	public AST getParam() {
+	public AST getF() {
 		return f;
 	}
 
-    public AST getBody() {
+    public AST getA() {
 		return a;
 	}
 	

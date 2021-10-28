@@ -49,7 +49,7 @@ public class Parser {
 		}
 		
 		if(subExpressions.size() > 1) {
-			System.out.println(subExpressions);
+			
 			return new App(parse(subExpressions.get(0)), parse(subExpressions.get(1)));
 		}
 			

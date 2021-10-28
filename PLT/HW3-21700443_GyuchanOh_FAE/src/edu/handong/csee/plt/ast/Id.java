@@ -1,7 +1,7 @@
 package edu.handong.csee.plt.ast;
 
 public class Id extends AST{
-    String name = "0";
+    String name = "";
 	
 	public Id(String name){
 		this.name = name;

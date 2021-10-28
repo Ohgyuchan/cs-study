@@ -10,9 +10,6 @@ public class AST {
 		if(this instanceof Sub)
 			astCode = ((Sub)this).getASTCode();
 		
-		if(this instanceof With)
-			astCode = ((With)this).getASTCode();
-		
 		if(this instanceof Num)
 			astCode = ((Num)this).getASTCode();
 		

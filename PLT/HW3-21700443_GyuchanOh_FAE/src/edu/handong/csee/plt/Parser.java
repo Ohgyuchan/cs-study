@@ -14,13 +14,13 @@ public class Parser {
 
 	AST parse(String exampleCode) {
 		ArrayList<String> subExpressions = splitExpressionAsSubExpressions(exampleCode);
-
+		
 		// num
 		if(subExpressions.size() == 1 && isNumeric(subExpressions.get(0))) {
-			System.out.println(subExpressions.get(0));
+			
 			return new Num(subExpressions.get(0));
 		}
-
+		
 		
 		// add
 		if(subExpressions.get(0).equals("+")) {
@@ -38,28 +38,28 @@ public class Parser {
 		if(subExpressions.get(0).equals("with")) {
 			ArrayList<String> withEx = splitExpressionAsSubExpressions(subExpressions.get(1));
 			
-			return new App(new Fun(withEx.get(0), parse(subExpressions.get(2))), parse(withEx.get(1)));
+			return new App(new Fun(parse(withEx.get(0)), parse(subExpressions.get(2))), parse(withEx.get(1)));
 		}
 		
+		
+		// fun
+		if(subExpressions.get(0).equals("fun")) {
+			
+			return new Fun(parse(subExpressions.get(1)), parse(subExpressions.get(2)));
+		}
+		
+		if(subExpressions.size() != 1) {
+			return new App(parse(subExpressions.get(0)), parse(subExpressions.get(1)));
+		}
+			
 		// id
 		if(isAlphabetic(subExpressions.get(0))) {
 			
 			return new Id(subExpressions.get(0));
 		}
-		
-		// fun
-		if(subExpressions.get(0).contains("fun")) {
 			
-			return new Fun(subExpressions.get(1), parse(subExpressions.get(2)));
-		}
-		
-		// app
-		if(subExpressions.get(0) != null && subExpressions.get(1) != null) {
-		
-			return new App(parse(subExpressions.get(0)), parse(subExpressions.get(1)));
-		}
-		
 		return null;
+
 	}
 
 	private ArrayList<String> splitExpressionAsSubExpressions(String exampleCode) {
@@ -83,8 +83,13 @@ public class Parser {
 		int openingParenthesisCount = 0;
 		String strBuffer = "";
 		for(int i=0; i < exampleCode.length(); i++) {
+			
 			if(i==0 || (i==0 && exampleCode.charAt(i) == '{')) {
 				strBuffer = strBuffer + exampleCode.charAt(i);
+				if(exampleCode.charAt(i) == '{') {
+					openingParenthesisCount++;
+					continue;
+				}
 				continue;
 			} else if(exampleCode.charAt(i)==' ' && openingParenthesisCount==0){
 				// buffer is ready to be a subexpression
@@ -117,7 +122,6 @@ public class Parser {
 		}
 		
 		sexpressions.add(strBuffer);
-		// System.out.println(sexpressions);
 		return sexpressions;
 	}
 
@@ -128,7 +132,7 @@ public class Parser {
 	
 	public static boolean isAlphabetic(String str)
 	{
-		return str.matches("^[a-zA-Z]*$");  //match a number with optional '-' and decimal.
+		return str.matches("^[a-zA-Z]*$");
 	}
 
 }

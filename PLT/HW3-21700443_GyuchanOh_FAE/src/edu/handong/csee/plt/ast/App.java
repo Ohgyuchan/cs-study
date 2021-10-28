@@ -17,6 +17,7 @@ public class App extends AST{
 	}
 	
 	public String getASTCode() {
+		System.out.println("(app " + f.getASTCode() + a.getASTCode() + ")");
 		return "(app " + f.getASTCode() + a.getASTCode() + ")";
 	}
 }

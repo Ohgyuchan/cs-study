@@ -1,15 +1,15 @@
 package edu.handong.csee.plt.ast;
 
 public class Fun extends AST{
-	AST p;
+	String p ="";
 	AST b = new AST();
 	
-	public Fun(AST p, AST b){
+	public Fun(String p, AST b){
 		this.p = p;
         this.b = b;
 	}
 	
-	public AST getParam() {
+	public String getParam() {
 		return p;
 	}
 	
@@ -18,6 +18,6 @@ public class Fun extends AST{
 	}
 	
 	public String getASTCode() {
-		return "(fun '" + p.getASTCode() + b.getASTCode() + ")";
+		return "(fun '" + p + b.getASTCode() + ")";
 	}
 }

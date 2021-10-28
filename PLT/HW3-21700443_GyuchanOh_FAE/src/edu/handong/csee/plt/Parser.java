@@ -38,14 +38,13 @@ public class Parser {
 		if(subExpressions.get(0).equals("with")) {
 			ArrayList<String> withEx = splitExpressionAsSubExpressions(subExpressions.get(1));
 			
-			return new App(new Fun(parse(withEx.get(0)), parse(subExpressions.get(2))), parse(withEx.get(1)));
+			return new App(new Fun(withEx.get(0), parse(subExpressions.get(2))), parse(withEx.get(1)));
 		}
-		
 		
 		// fun
 		if(subExpressions.get(0).equals("fun")) {
 			
-			return new Fun(parse(subExpressions.get(1)), parse(subExpressions.get(2)));
+			return new Fun(subExpressions.get(1), parse(subExpressions.get(2)));
 		}
 		
 		if(subExpressions.size() != 1) {

@@ -37,8 +37,7 @@ public class Substitution {
 		}
 		
 		if(ast instanceof Id) {
-			Id id = (Id)ast;
-			if(id instanceof Id && idtf instanceof Id) {
+			if(ast instanceof Id && idtf instanceof Id) {
 				return new Num(val);
 			} else {
 				return ast;

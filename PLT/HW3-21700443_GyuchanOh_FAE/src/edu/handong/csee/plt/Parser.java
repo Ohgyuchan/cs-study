@@ -17,7 +17,7 @@ public class Parser {
 
 		// num
 		if(subExpressions.size() == 1 && isNumeric(subExpressions.get(0))) {
-
+			System.out.println(subExpressions.get(0));
 			return new Num(subExpressions.get(0));
 		}
 
@@ -38,26 +38,25 @@ public class Parser {
 		if(subExpressions.get(0).equals("with")) {
 			ArrayList<String> withEx = splitExpressionAsSubExpressions(subExpressions.get(1));
 			
-			return new App(new Fun(parse(withEx.get(0)), parse(subExpressions.get(2))), parse(withEx.get(1)));
-		}
-		
-		
-		// fun
-		if(subExpressions.get(0).equals("fun")) {
-			
-			return new Fun(parse(subExpressions.get(1)), parse(subExpressions.get(2)));
-		}
-		
-		// app
-		if(subExpressions.get(0).equals("app")) {
-			
-			return new App(parse(subExpressions.get(0)), parse(subExpressions.get(1)));
+			return new App(new Fun(withEx.get(0), parse(subExpressions.get(2))), parse(withEx.get(1)));
 		}
 		
 		// id
 		if(isAlphabetic(subExpressions.get(0))) {
 			
 			return new Id(subExpressions.get(0));
+		}
+		
+		// fun
+		if(subExpressions.get(0).contains("fun")) {
+			
+			return new Fun(subExpressions.get(1), parse(subExpressions.get(2)));
+		}
+		
+		// app
+		if(subExpressions.get(0) != null && subExpressions.get(1) != null) {
+		
+			return new App(parse(subExpressions.get(0)), parse(subExpressions.get(1)));
 		}
 		
 		return null;
@@ -118,6 +117,7 @@ public class Parser {
 		}
 		
 		sexpressions.add(strBuffer);
+		// System.out.println(sexpressions);
 		return sexpressions;
 	}
 

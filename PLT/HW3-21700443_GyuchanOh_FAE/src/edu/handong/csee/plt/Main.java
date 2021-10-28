@@ -34,10 +34,8 @@ public class Main {
 		
 		// interpreter
 		Interpreter interpreter = new Interpreter();
-
-		DefrdSub ds = new DefrdSub();
 		
-		String result = interpreter.interp(ast, ds);
+		String result = interpreter.interp(ast, new DefrdSub());
 		
 		System.out.println(result);
 	}

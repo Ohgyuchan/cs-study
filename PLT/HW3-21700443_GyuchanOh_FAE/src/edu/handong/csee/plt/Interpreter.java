@@ -17,41 +17,38 @@ public class Interpreter {
 	public String interp(AST ast, DefrdSub ds) {
 		
 		if(ast instanceof Num) {
-			String n = ((Num)ast).getStrNum();
-			System.out.println(new Num(n).getASTCode());
-			return new Num(n).getASTCode();
+			return ((Num)ast).getStrNum();
 		}
 		
 		if(ast instanceof Add) {
 			Add add = (Add)ast;
-			return "" + (Integer.parseInt(interp(add.getLhs(), ds)) + Integer.parseInt(interp(add.getRhs(), ds)));
+			return "" + new NumV(Integer.toString(Integer.parseInt(interp(add.getLhs(), ds)) + Integer.parseInt(interp(add.getRhs(), ds)))).getASTCode();
 		}
 
 		if(ast instanceof Sub) {
 			Sub sub = (Sub)ast;
-			return "" + (Integer.parseInt(interp(sub.getLhs(), ds)) - Integer.parseInt(interp(sub.getRhs(), ds)));
+			return "" + new NumV(Integer.toString(Integer.parseInt(interp(sub.getLhs(), ds)) - Integer.parseInt(interp(sub.getRhs(), ds)))).getASTCode();
 		}
 		
 		if(ast instanceof Id) {
 			Id id = (Id)ast;
 			Lookup lookUp = new Lookup();
-			System.out.println(lookUp.lookup(id.getStrName(), ds));
-			System.exit(0);
+			return lookUp.lookup(id.getStrName(), ds);
 		}
 
 		if(ast instanceof Fun) {
 			Fun fun = (Fun)ast;
-			System.out.println("" + new ClosureV(fun.getParam(), fun.getBody(), ds).getASTCode());
-			return "" + new ClosureV(fun.getParam(), fun.getBody(), ds);
+
+			return "" + new ClosureV(fun.getParam(), fun.getBody(), ds).getASTCode();
 		}
 
 		if(ast instanceof App) {
 			App app = (App)ast;
 			
-			ClosureV f_val = new ClosureV(interp(app.getF(), ds), ast, ds);
-			NumV a_val = new NumV(interp(app.getA(), ds));
+			String f_val = interp(app.getF(), ds);
+			ClosureV a_val = new ClosureV(interp(app.getF(), ds), app.getA(), ds);
 
-			// return "" + interp(f_val.getBody(), new Asub(f_val.getParam(), a_val, f_val.getDefrdSub()));
+			return "" + interp(ast, new Asub(f_val, a_val, ds));
 		}
 
 		return null;

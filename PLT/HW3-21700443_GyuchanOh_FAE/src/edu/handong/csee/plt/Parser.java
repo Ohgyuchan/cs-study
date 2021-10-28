@@ -43,11 +43,13 @@ public class Parser {
 		
 		// fun
 		if(subExpressions.get(0).equals("fun")) {
+			ArrayList<String> withEx = splitExpressionAsSubExpressions(subExpressions.get(1));
 			
-			return new Fun(subExpressions.get(1), parse(subExpressions.get(2)));
+			return new Fun(withEx.get(0), parse(subExpressions.get(2)));
 		}
 		
-		if(subExpressions.size() != 1) {
+		if(subExpressions.size() > 1) {
+			System.out.println(subExpressions);
 			return new App(parse(subExpressions.get(0)), parse(subExpressions.get(1)));
 		}
 			
@@ -81,13 +83,11 @@ public class Parser {
 		ArrayList<String> sexpressions = new ArrayList<String>();
 		int openingParenthesisCount = 0;
 		String strBuffer = "";
-		for(int i=0; i < exampleCode.length(); i++) {
-			
+		for(int i=0; i < exampleCode.length()  ;i++) {
 			if(i==0 || (i==0 && exampleCode.charAt(i) == '{')) {
 				strBuffer = strBuffer + exampleCode.charAt(i);
 				if(exampleCode.charAt(i) == '{') {
 					openingParenthesisCount++;
-					continue;
 				}
 				continue;
 			} else if(exampleCode.charAt(i)==' ' && openingParenthesisCount==0){
@@ -121,8 +121,10 @@ public class Parser {
 		}
 		
 		sexpressions.add(strBuffer);
+
 		return sexpressions;
 	}
+
 
 	public static boolean isNumeric(String str)
 	{

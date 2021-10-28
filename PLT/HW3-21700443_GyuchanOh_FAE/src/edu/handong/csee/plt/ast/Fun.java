@@ -18,6 +18,6 @@ public class Fun extends AST{
 	}
 	
 	public String getASTCode() {
-		return "(fun '" + p + b.getASTCode() + ")";
+		return "(fun '" + p + " " + b.getASTCode() + ")";
 	}
 }

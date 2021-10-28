@@ -6,6 +6,7 @@ public class App extends AST{
 	
 	public App(AST f, AST a){
 		this.f = f;
+		this.a = a;
 	}
 	
 	public AST getParam() {

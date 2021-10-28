@@ -58,6 +58,9 @@ public class Parser {
 		for(int i=0; i < exampleCode.length(); i++) {
 			if(i==0 || (i==0 && exampleCode.charAt(i) == '{')) {
 				strBuffer = strBuffer + exampleCode.charAt(i);
+				if(exampleCode.charAt(i) == '{') {
+					openingParenthesisCount++;
+				}
 				continue;
 			} else if(exampleCode.charAt(i)==' ' && openingParenthesisCount==0){
 				// buffer is ready to be a subexpression

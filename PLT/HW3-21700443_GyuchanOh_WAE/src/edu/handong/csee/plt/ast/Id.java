@@ -12,6 +12,6 @@ public class Id extends AST{
 	}
 	
 	public String getASTCode() {
-		return "(id " + name +")";
+		return "(id '" + name +")";
 	}
 }

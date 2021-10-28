@@ -4,8 +4,9 @@ import java.util.ArrayList;
 
 import edu.handong.csee.plt.ast.AST;
 import edu.handong.csee.plt.ast.Add;
+import edu.handong.csee.plt.ast.App;
+import edu.handong.csee.plt.ast.Fun;
 import edu.handong.csee.plt.ast.Sub;
-import edu.handong.csee.plt.ast.With;
 import edu.handong.csee.plt.ast.Num;
 import edu.handong.csee.plt.ast.Id;
 
@@ -37,7 +38,20 @@ public class Parser {
 		if(subExpressions.get(0).equals("with")) {
 			ArrayList<String> withEx = splitExpressionAsSubExpressions(subExpressions.get(1));
 			
-			return new With(parse(withEx.get(0)), parse(withEx.get(1)), parse(subExpressions.get(2)));
+			return new App(new Fun(parse(withEx.get(0)), parse(subExpressions.get(2))), parse(withEx.get(1)));
+		}
+		
+		
+		// fun
+		if(subExpressions.get(0).equals("fun")) {
+			
+			return new Fun(parse(subExpressions.get(1)), parse(subExpressions.get(2)));
+		}
+		
+		// app
+		if(subExpressions.get(0).equals("app")) {
+			
+			return new App(parse(subExpressions.get(0)), parse(subExpressions.get(1)));
 		}
 		
 		// id
@@ -45,7 +59,7 @@ public class Parser {
 			
 			return new Id(subExpressions.get(0));
 		}
-
+		
 		return null;
 	}
 

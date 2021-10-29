@@ -17,23 +17,27 @@ public class Interpreter {
 	public String interp(AST ast, DefrdSub ds) {
 		
 		if(ast instanceof Num) {
-			return ((Num)ast).getStrNum();
+			Num n = (Num)ast;
+			return n.getStrNum();
+			// return new NumV(n.getStrNum()).getASTCode();
 		}
 		
 		if(ast instanceof Add) {
 			Add add = (Add)ast;
-			return "" + new NumV(Integer.toString(Integer.parseInt(interp(add.getLhs(), ds)) + Integer.parseInt(interp(add.getRhs(), ds)))).getASTCode();
+			return "" + (Integer.toString(Integer.parseInt(interp(add.getLhs(), ds)) + Integer.parseInt(interp(add.getRhs(), ds))));
 		}
 
 		if(ast instanceof Sub) {
 			Sub sub = (Sub)ast;
-			return "" + new NumV(Integer.toString(Integer.parseInt(interp(sub.getLhs(), ds)) - Integer.parseInt(interp(sub.getRhs(), ds)))).getASTCode();
+			return "" + (Integer.toString(Integer.parseInt(interp(sub.getLhs(), ds)) - Integer.parseInt(interp(sub.getRhs(), ds))));
 		}
 		
 		if(ast instanceof Id) {
 			Id id = (Id)ast;
-			Lookup lookUp = new Lookup();
-			return lookUp.lookup(id.getStrName(), ds);
+
+			System.out.println('x');
+			
+			return new Lookup().lookup(id.getStrName(), ds);
 		}
 
 		if(ast instanceof Fun) {
@@ -45,10 +49,10 @@ public class Interpreter {
 		if(ast instanceof App) {
 			App app = (App)ast;
 			
-			String f_val = interp(app.getF(), ds);
-			ClosureV a_val = new ClosureV(interp(app.getF(), ds), app.getA(), ds);
-
-			return "" + interp(ast, new Asub(f_val, a_val, ds));
+			ClosureV f_val = new ClosureV(interp(app.getF(), ds), app.getF(), ds);
+			ClosureV a_val = new ClosureV(interp(app.getA(), ds), app.getA(), ds);
+			Asub asub = new Asub(f_val.getParam(), a_val, f_val.getDefrdSub());
+			return "" + interp(f_val.getBody(), asub);
 		}
 
 		return null;

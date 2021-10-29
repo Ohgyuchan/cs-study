@@ -14,7 +14,7 @@ public class Parser {
 
 	AST parse(String exampleCode) {
 		ArrayList<String> subExpressions = splitExpressionAsSubExpressions(exampleCode);
-		
+
 		// num
 		if(subExpressions.size() == 1 && isNumeric(subExpressions.get(0))) {
 			
@@ -48,17 +48,19 @@ public class Parser {
 			return new Fun(withEx.get(0), parse(subExpressions.get(2)));
 		}
 		
+		
+		// id
+		if(subExpressions.size() == 1 && isAlphabetic(subExpressions.get(0))) {
+			
+			return new Id(subExpressions.get(0));
+		}
+		
+		// app
 		if(subExpressions.size() > 1) {
 			
 			return new App(parse(subExpressions.get(0)), parse(subExpressions.get(1)));
 		}
-			
-		// id
-		if(isAlphabetic(subExpressions.get(0))) {
-			
-			return new Id(subExpressions.get(0));
-		}
-			
+
 		return null;
 
 	}
@@ -86,9 +88,9 @@ public class Parser {
 		for(int i=0; i < exampleCode.length()  ;i++) {
 			if(i==0 || (i==0 && exampleCode.charAt(i) == '{')) {
 				strBuffer = strBuffer + exampleCode.charAt(i);
-				if(exampleCode.charAt(i) == '{') {
-					openingParenthesisCount++;
-				}
+				// if(exampleCode.charAt(i) == '{') {
+				// 	openingParenthesisCount++;
+				// }
 				continue;
 			} else if(exampleCode.charAt(i)==' ' && openingParenthesisCount==0){
 				// buffer is ready to be a subexpression

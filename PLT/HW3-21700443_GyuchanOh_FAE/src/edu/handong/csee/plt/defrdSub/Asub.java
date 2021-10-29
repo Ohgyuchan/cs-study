@@ -26,6 +26,6 @@ public class Asub extends DefrdSub{
 	}
 	
     public String getASTCode() {
-		return "(Asub " + i + " " + v.getASTCode() +  " " + saved.getASTCode() + ")";
+		return "(Asub " + i + " " + v.getASTCode() + ")";
 	}
 }

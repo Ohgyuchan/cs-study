@@ -12,6 +12,6 @@ public class Num extends AST {
 	}
 	
 	public String getASTCode() {
-		return "(num " + num +")";
+		return "(num " + num + ")";
 	}
 }

@@ -7,6 +7,7 @@ import edu.handong.csee.plt.ast.Asub;
 import edu.handong.csee.plt.ast.ClosureV;
 import edu.handong.csee.plt.ast.Fun;
 import edu.handong.csee.plt.ast.Id;
+import edu.handong.csee.plt.ast.MtSub;
 import edu.handong.csee.plt.ast.Sub;
 import edu.handong.csee.plt.ast.Num;
 import edu.handong.csee.plt.ast.NumV;
@@ -34,7 +35,7 @@ public class Interpreter {
 		if(ast instanceof Id) {
 			Id id = (Id)ast;
 			
-			return new Lookup().lookup(id.getStrName(), ds);
+			return lookup(id.getStrName(), ds);
 		}
 
 		if(ast instanceof Fun) {
@@ -45,23 +46,34 @@ public class Interpreter {
 		
 		if(ast instanceof App) {
 			App app = (App)ast;
-
-			AST f_ast = interp(app.getF(), ds);
-			AST a_ast = interp(app.getA(), ds);
-
-			System.out.println(ast.getASTCode());
-			System.out.println(f_ast.getASTCode());
-			System.out.println(a_ast.getASTCode());
 			
-			Fun f_fun = (Fun)f_ast;
-			Fun a_fun = (Fun)a_ast;
-			
-			ClosureV f_val = new ClosureV(f_fun.getParam(), f_fun.getBody(), ds);
-			ClosureV a_val = new ClosureV(a_fun.getParam(), a_fun.getBody(), ds);
+			ClosureV f_val = (ClosureV) interp(app.getF(), ds);
+			AST a_val = interp(app.getA(), ds);
 			
 			return interp(f_val.getBody(), new Asub(f_val.getParam(), a_val, f_val.getDefrdSub()));
 		}
 
 		return null;
+	}
+
+	private AST lookup(String name, AST ds) {
+		if(ds instanceof MtSub) {
+            System.out.println("free identifier");
+            System.exit(0);
+        }
+        
+        if(ds instanceof Asub) {
+            Asub aSub = (Asub)ds;
+
+            if(aSub.getI().equals(name)) {
+                return aSub.getV();
+            } else {
+                return (lookup(name, aSub.getDefrdSub()));    
+            }
+        }
+        
+
+		return null;
+        
 	}
 }

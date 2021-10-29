@@ -11,7 +11,7 @@ public class Asub extends AST{
         this.saved = saved;
 	}
 	
-	public String getStrName() {
+	public String getI() {
 		return i;
 	}
 

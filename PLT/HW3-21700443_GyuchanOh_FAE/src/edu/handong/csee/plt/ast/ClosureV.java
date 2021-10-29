@@ -2,7 +2,7 @@ package edu.handong.csee.plt.ast;
 
 
 public class ClosureV extends AST{
-    String p = "0";
+    String p = "";
 	AST b = new AST();
 	AST defrdSub = new AST();
 	

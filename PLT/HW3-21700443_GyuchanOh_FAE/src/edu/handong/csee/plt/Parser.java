@@ -43,9 +43,9 @@ public class Parser {
 		
 		// fun
 		if(subExpressions.get(0).equals("fun")) {
-			ArrayList<String> withEx = splitExpressionAsSubExpressions(subExpressions.get(1));
+			ArrayList<String> funEx = splitExpressionAsSubExpressions(subExpressions.get(1));
 			
-			return new Fun(withEx.get(0), parse(subExpressions.get(2)));
+			return new Fun(funEx.get(0), parse(subExpressions.get(2)));
 		}
 		
 		
@@ -56,7 +56,7 @@ public class Parser {
 		}
 		
 		// app
-		if(subExpressions.size() > 1) {
+		if(subExpressions.size() == 2) {
 			
 			return new App(parse(subExpressions.get(0)), parse(subExpressions.get(1)));
 		}

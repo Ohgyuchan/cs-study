@@ -1,9 +1,3 @@
-package edu.handong.csee.plt;
-
-import edu.handong.csee.plt.ast.AST;
-import edu.handong.csee.plt.ast.Asub;
-import edu.handong.csee.plt.ast.MtSub;
-
 public class Lookup {
     public AST lookup(String name, AST ds) {
 		if(ds instanceof MtSub) {
@@ -14,7 +8,7 @@ public class Lookup {
         if(ds instanceof Asub) {
             Asub aSub = (Asub)ds;
 
-            if(aSub.getStrName() instanceof String && name instanceof String) {
+            if(aSub.getI() == name) {
                 return aSub.getV();
             } else {
                 return (lookup(name, aSub.getDefrdSub()));    
@@ -26,4 +20,3 @@ public class Lookup {
         
 	}
 }
-

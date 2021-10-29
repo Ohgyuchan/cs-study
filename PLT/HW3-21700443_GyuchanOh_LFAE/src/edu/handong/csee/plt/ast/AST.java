@@ -4,6 +4,7 @@ public class AST {
 	
 	public String getASTCode() {
 		String astCode="";
+		
 		if(this instanceof Add)
 			astCode = ((Add)this).getASTCode();
 
@@ -27,6 +28,9 @@ public class AST {
 		
 		if(this instanceof App)
 			astCode = ((App)this).getASTCode();
+
+		if(this instanceof ExprV)
+			astCode = ((ExprV)this).getASTCode();
 
 		return astCode;
 	}

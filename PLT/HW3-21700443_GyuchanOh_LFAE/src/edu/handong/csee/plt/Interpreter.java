@@ -5,6 +5,7 @@ import edu.handong.csee.plt.ast.Add;
 import edu.handong.csee.plt.ast.App;
 import edu.handong.csee.plt.ast.Asub;
 import edu.handong.csee.plt.ast.ClosureV;
+import edu.handong.csee.plt.ast.ExprV;
 import edu.handong.csee.plt.ast.Fun;
 import edu.handong.csee.plt.ast.Id;
 import edu.handong.csee.plt.ast.MtSub;
@@ -73,5 +74,17 @@ public class Interpreter {
         }
 		
 		return null;
+	}
+	
+	private AST strict(AST v) {
+		if(v instanceof ExprV) {
+			ExprV expr = (ExprV)v;
+			
+			return strict(interp(expr.getExpr(), expr.getDefrdSub()));
+		
+		} else {
+			
+			return v;
+		}
 	}
 }

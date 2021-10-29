@@ -1,3 +1,9 @@
+package edu.handong.csee.plt;
+
+import edu.handong.csee.plt.ast.AST;
+import edu.handong.csee.plt.ast.Asub;
+import edu.handong.csee.plt.ast.MtSub;
+
 public class Lookup {
     public AST lookup(String name, AST ds) {
 		if(ds instanceof MtSub) {

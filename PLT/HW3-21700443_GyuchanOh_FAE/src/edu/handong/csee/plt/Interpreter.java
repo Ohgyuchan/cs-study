@@ -24,12 +24,12 @@ public class Interpreter {
 		
 		if(ast instanceof Add) {
 			Add add = (Add)ast;
-			return new NumV(Integer.toString(Integer.parseInt(interp(add.getLhs(), ds).getASTCode()) + Integer.parseInt(interp(add.getRhs(), ds).getASTCode())));
+			return new NumV(Integer.toString(Integer.parseInt( ((NumV)interp(add.getLhs(), ds)).getStrNumV() ) + Integer.parseInt( ((NumV)interp(add.getRhs(), ds)).getStrNumV() )));
 		}
 
 		if(ast instanceof Sub) {
 			Sub sub = (Sub)ast;
-			return new NumV(Integer.toString(Integer.parseInt(interp(sub.getLhs(), ds).getASTCode()) - Integer.parseInt(interp(sub.getRhs(), ds).getASTCode())));
+			return new NumV(Integer.toString(Integer.parseInt( ((NumV)interp(sub.getLhs(), ds)).getStrNumV() ) - Integer.parseInt( ((NumV)interp(sub.getRhs(), ds)).getStrNumV() )));
 		}
 		
 		if(ast instanceof Id) {

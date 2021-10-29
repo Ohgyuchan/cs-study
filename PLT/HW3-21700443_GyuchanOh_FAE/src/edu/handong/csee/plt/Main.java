@@ -34,14 +34,10 @@ public class Main {
 		
 		// interpreter
 		Interpreter interpreter = new Interpreter();
-		try {
-			String result = interpreter.interp(ast, new MtSub()).getASTCode();
-			System.out.println(result);
-		} catch (NumberFormatException e ) {
-			
-		} catch (Exception e) {
-			System.out.println(e);
-		}
+		
+		String result = interpreter.interp(ast, new MtSub()).getASTCode();
+		
+		System.out.println(result);
 		
 	}
 }

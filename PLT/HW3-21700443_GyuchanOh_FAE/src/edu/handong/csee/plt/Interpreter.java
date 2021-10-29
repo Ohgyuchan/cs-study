@@ -16,8 +16,6 @@ public class Interpreter {
 
 	public String interp(AST ast, DefrdSub ds) {
 		
-		System.out.println(ast.getASTCode());
-		
 		if(ast instanceof Num) {
 			Num n = (Num)ast;
 			return n.getStrNum();

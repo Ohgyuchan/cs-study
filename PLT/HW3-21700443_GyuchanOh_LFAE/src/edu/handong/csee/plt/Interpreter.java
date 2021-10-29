@@ -25,12 +25,26 @@ public class Interpreter {
 		
 		if(ast instanceof Add) {
 			Add add = (Add)ast;
-			return new NumV(Integer.toString(Integer.parseInt( ((NumV)interp(add.getLhs(), ds)).getStrNumV() ) + Integer.parseInt( ((NumV)interp(add.getRhs(), ds)).getStrNumV() )));
+			
+			Num lhs = (Num)((ExprV)interp(add.getLhs(), ds)).getExpr();
+			AST lds = ((ExprV)interp(add.getLhs(), ds)).getDefrdSub();
+			
+			Num rhs = (Num)((ExprV)interp(add.getRhs(), ds)).getExpr();
+			AST rds = ((ExprV)interp(add.getRhs(), ds)).getDefrdSub();
+			
+			return new NumV(Integer.toString(Integer.parseInt( ((NumV)interp(lhs, lds)).getStrNumV() ) + Integer.parseInt( ((NumV)interp(rhs, rds)).getStrNumV() )));
 		}
 
 		if(ast instanceof Sub) {
 			Sub sub = (Sub)ast;
-			return new NumV(Integer.toString(Integer.parseInt( ((NumV)interp(sub.getLhs(), ds)).getStrNumV() ) - Integer.parseInt( ((NumV)interp(sub.getRhs(), ds)).getStrNumV() )));
+			
+			Num lhs = (Num)((ExprV)interp(sub.getLhs(), ds)).getExpr();
+			AST lds = ((ExprV)interp(sub.getLhs(), ds)).getDefrdSub();
+			
+			Num rhs = (Num)((ExprV)interp(sub.getRhs(), ds)).getExpr();
+			AST rds = ((ExprV)interp(sub.getRhs(), ds)).getDefrdSub();
+
+			return new NumV(Integer.toString(Integer.parseInt( ((NumV)interp(lhs, lds)).getStrNumV() ) - Integer.parseInt( ((NumV)interp(rhs, rds)).getStrNumV() )));
 		}
 		
 		if(ast instanceof Id) {
@@ -49,7 +63,7 @@ public class Interpreter {
 			App app = (App)ast;
 			
 			ClosureV f_val = ((ClosureV) strict(interp(app.getF(), ds)));
-			AST a_val = new ExprV(app.getA(), ds);
+			ExprV a_val = new ExprV(app.getA(), ds);
 			
 			return interp(f_val.getBody(), new Asub(f_val.getParam(), a_val, f_val.getDefrdSub()));
 		}

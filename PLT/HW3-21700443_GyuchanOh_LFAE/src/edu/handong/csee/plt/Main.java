@@ -35,8 +35,8 @@ public class Main {
 		// interpreter
 		Interpreter interpreter = new Interpreter();
 		
-		String result = interpreter.interp(ast, new MtSub()).getASTCode();
 		
+		String result = interpreter.interp(ast, new MtSub()).getASTCode();
 		System.out.println(result);
 		
 	}

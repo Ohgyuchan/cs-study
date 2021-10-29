@@ -48,8 +48,8 @@ public class Interpreter {
 		if(ast instanceof App) {
 			App app = (App)ast;
 			
-			ClosureV f_val = (ClosureV) interp(app.getF(), ds);
-			AST a_val = interp(app.getA(), ds);
+			ClosureV f_val = ((ClosureV) strict(interp(app.getF(), ds)));
+			AST a_val = new ExprV(app.getA(), ds);
 			
 			return interp(f_val.getBody(), new Asub(f_val.getParam(), a_val, f_val.getDefrdSub()));
 		}

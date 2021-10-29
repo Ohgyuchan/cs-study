@@ -1,9 +1,7 @@
 package edu.handong.csee.plt;
 
 import edu.handong.csee.plt.ast.AST;
-import edu.handong.csee.plt.defrdSub.DefrdSub;
-// import edu.handong.csee.plt.defrdSub.DefrdSub;
-import edu.handong.csee.plt.defrdSub.MtSub;
+import edu.handong.csee.plt.ast.MtSub;
 
 public class Main {
 	
@@ -37,7 +35,7 @@ public class Main {
 		// interpreter
 		Interpreter interpreter = new Interpreter();
 		
-		String result = interpreter.interp(ast, new MtSub());
+		String result = interpreter.interp(ast, new MtSub()).getASTCode();
 		
 		System.out.println(result);
 	}

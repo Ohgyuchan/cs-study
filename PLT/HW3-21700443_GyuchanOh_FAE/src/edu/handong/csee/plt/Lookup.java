@@ -1,11 +1,11 @@
 package edu.handong.csee.plt;
 
-import edu.handong.csee.plt.defrdSub.Asub;
-import edu.handong.csee.plt.defrdSub.DefrdSub;
-import edu.handong.csee.plt.defrdSub.MtSub;
+import edu.handong.csee.plt.ast.AST;
+import edu.handong.csee.plt.ast.Asub;
+import edu.handong.csee.plt.ast.MtSub;
 
 public class Lookup {
-    public String lookup(String name, DefrdSub ds) {
+    public AST lookup(String name, AST ds) {
 		if(ds instanceof MtSub) {
             System.out.println("free identifier");
             System.exit(0);
@@ -15,9 +15,9 @@ public class Lookup {
             Asub aSub = (Asub)ds;
 
             if(aSub.getStrName() instanceof String && name instanceof String) {
-                return "" + aSub.getV();
+                return aSub.getV();
             } else {
-                return "" + (lookup(name, aSub.getDefrdSub()));    
+                return (lookup(name, aSub.getDefrdSub()));    
             }
         }
         

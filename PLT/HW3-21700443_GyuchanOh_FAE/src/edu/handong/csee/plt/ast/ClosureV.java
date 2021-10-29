@@ -1,15 +1,12 @@
-package edu.handong.csee.plt.value;
-
-import edu.handong.csee.plt.ast.AST;
-import edu.handong.csee.plt.defrdSub.DefrdSub;
+package edu.handong.csee.plt.ast;
 
 
-public class ClosureV extends Value{
+public class ClosureV extends AST{
     String p = "0";
 	AST b = new AST();
-	DefrdSub defrdSub = new DefrdSub();
+	AST defrdSub = new AST();
 	
-	public ClosureV(String p, AST b, DefrdSub defrdSub){
+	public ClosureV(String p, AST b, AST defrdSub){
 		this.p = p;
 		this.b = b;
 		this.defrdSub = defrdSub;
@@ -23,7 +20,7 @@ public class ClosureV extends Value{
 		return b;
 	}
 
-	public DefrdSub getDefrdSub() {
+	public AST getDefrdSub() {
 		return defrdSub;
 	}
 	

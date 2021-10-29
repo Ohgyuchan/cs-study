@@ -1,6 +1,6 @@
-package edu.handong.csee.plt.value;
+package edu.handong.csee.plt.ast;
 
-public class NumV extends Value {
+public class NumV extends AST {
 	String numV = "0";
 	
 	public NumV(String numV){

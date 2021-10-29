@@ -15,7 +15,7 @@ public class Lookup {
             Asub aSub = (Asub)ds;
 
             if(aSub.getStrName() instanceof String && name instanceof String) {
-                return "" + aSub.getV().getASTCode();
+                return "" + aSub.getV();
             } else {
                 return "" + (lookup(name, aSub.getDefrdSub()));    
             }

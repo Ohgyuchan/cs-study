@@ -34,25 +34,31 @@ public class Interpreter {
 		
 		if(ast instanceof Id) {
 			Id id = (Id)ast;
-
-			System.out.println('x');
 			
-			return new Lookup().lookup(id.getStrName(), ds);
+			return "" + new Lookup().lookup(id.getStrName(), ds);
+		}
+
+		if(ast instanceof ClosureV) {
+			ClosureV cv = (ClosureV)ast;
+
+			return "" + interp(cv, ds);
 		}
 
 		if(ast instanceof Fun) {
 			Fun fun = (Fun)ast;
 
-			return "" + new ClosureV(fun.getParam(), fun.getBody(), ds).getASTCode();
+			return "" + interp(new ClosureV(fun.getParam(), fun.getBody(), ds), ds);
 		}
-
+		
 		if(ast instanceof App) {
 			App app = (App)ast;
-			
+
+			System.out.println(app.getF().getASTCode());
+
 			ClosureV f_val = new ClosureV(interp(app.getF(), ds), app.getF(), ds);
-			ClosureV a_val = new ClosureV(interp(app.getA(), ds), app.getA(), ds);
-			Asub asub = new Asub(f_val.getParam(), a_val, f_val.getDefrdSub());
-			return "" + interp(f_val.getBody(), asub);
+			ClosureV a_val = new ClosureV(interp(app.getA(), ds), app.getF(), ds);
+
+			return "" + interp(f_val.getBody(), new Asub(f_val.getParam(), a_val, f_val.getDefrdSub()));
 		}
 
 		return null;

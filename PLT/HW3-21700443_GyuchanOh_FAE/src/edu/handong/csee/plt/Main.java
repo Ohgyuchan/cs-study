@@ -38,7 +38,7 @@ public class Main {
 			String result = interpreter.interp(ast, new MtSub()).getASTCode();
 			System.out.println(result);
 		} catch (NumberFormatException e ) {
-			System.out.println(e);
+			
 		} catch (Exception e) {
 			System.out.println(e);
 		}

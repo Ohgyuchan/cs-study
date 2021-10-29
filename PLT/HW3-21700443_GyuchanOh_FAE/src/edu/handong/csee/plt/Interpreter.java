@@ -71,9 +71,7 @@ public class Interpreter {
                 return (lookup(name, aSub.getDefrdSub()));    
             }
         }
-        
-
+		
 		return null;
-        
 	}
 }

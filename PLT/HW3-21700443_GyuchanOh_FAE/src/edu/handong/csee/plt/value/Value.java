@@ -1,8 +1,6 @@
 package edu.handong.csee.plt.value;
 
-import edu.handong.csee.plt.ast.AST;
-
-public class Value extends AST{
+public class Value {
 	
 	public String getASTCode() {
 		String astCode="";

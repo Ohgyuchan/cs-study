@@ -16,6 +16,8 @@ public class Interpreter {
 
 	public String interp(AST ast, DefrdSub ds) {
 		
+		System.out.println(ast.getASTCode());
+		
 		if(ast instanceof Num) {
 			Num n = (Num)ast;
 			return n.getStrNum();
@@ -38,22 +40,20 @@ public class Interpreter {
 			return "" + new Lookup().lookup(id.getStrName(), ds);
 		}
 
-		if(ast instanceof ClosureV) {
-			ClosureV cv = (ClosureV)ast;
+		// if(ast instanceof ClosureV) {
+		// 	ClosureV cv = (ClosureV)ast;
 
-			return "" + interp(cv, ds);
-		}
-
+		// 	return "" + interp(cv.getBody(), ds);
+		// }
+		
 		if(ast instanceof Fun) {
 			Fun fun = (Fun)ast;
 
-			return "" + interp(new ClosureV(fun.getParam(), fun.getBody(), ds), ds);
+			return "" + new ClosureV(fun.getParam(), fun.getBody(), ds).getASTCode();
 		}
 		
 		if(ast instanceof App) {
 			App app = (App)ast;
-
-			System.out.println(app.getF().getASTCode());
 
 			ClosureV f_val = new ClosureV(interp(app.getF(), ds), app.getF(), ds);
 			ClosureV a_val = new ClosureV(interp(app.getA(), ds), app.getF(), ds);

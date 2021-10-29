@@ -28,6 +28,6 @@ public class ClosureV extends Value{
 	}
 	
 	public String getASTCode() {
-		return "(closureV " + p + " " + b.getASTCode() + " " + defrdSub.getASTCode() + ")";
+		return "(closureV '" + p + " " + b.getASTCode() + " " + defrdSub.getASTCode() + ")";
 	}
 }

@@ -108,6 +108,6 @@ git commit --amend --no-edit --date "$(date)"
 
 2. 마지막 Commit 날짜를 임의의 날짜로 설정
 ```
-git commit --amend --no-edit --date "Mon 20 Aug 2018 20:19:19 KST"
+git commit --amend --no-edit --date "Sun 31 Oct 2021 16:45:41 KST"
 ```
 ## 4 Import repository

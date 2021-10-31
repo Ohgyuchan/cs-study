@@ -1,4 +1,3 @@
-남 주기 전에 나부터 알자: Git & Github(1) - 맛보기
 ## 1.1. git과 github에 대하여
 #### 1.1.1. git에 대하여
 + 로컬에서 관리되는 버전 관리 시스템 (VCS : Version Control System)

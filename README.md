@@ -17,7 +17,7 @@
 ## PLT
 
 ## 워게임
-> [](./war_game) 
+> [Suninatas](http://suninatas.com/) 
 
 ## 백준 단계별 문제풀기
 > [1단계: I/O](./baekjoon_step/1step_IO)  

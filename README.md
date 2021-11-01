@@ -12,11 +12,12 @@
 ## JAVA
 
 ## Python
-> [python1](./python) Update: 21.Jul  
+> [python1](./python)   
 
 ## PLT
 
 ## 워게임
+> [](./war_game) 
 
 ## 백준 단계별 문제풀기
 > [1단계: I/O](./baekjoon_step/1step_IO)  

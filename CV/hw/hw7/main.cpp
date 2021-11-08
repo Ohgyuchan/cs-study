@@ -19,7 +19,6 @@ int main() {
     result2 = adaptive_1.clone();
     
     int blockSize = 3;
-    int C = 5;
 
     while(1) {
         // OTSU Algorithm
@@ -41,27 +40,17 @@ int main() {
         }
         if(key == 'r') {
             blockSize = 3;
-            C = 1;
         }
         if(key == 'f') {
             blockSize = 27475;
             cout << blockSize << endl;
         }
-
-        if(key == 'c') {
-            C += 2;
-            cout << C << endl;
-        }
-        if(key == 'C') {
-            C -= 2;
-            cout << C << endl;
-        }
+        
         if(key == 'p') {
-            cout << "C: " << C << endl;
             cout << "blockSize: " << blockSize << endl;
         }
-        adaptiveThreshold(adaptive_1, result1, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, blockSize, C);
-        adaptiveThreshold(adaptive_1, result2, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, blockSize, C);
+        adaptiveThreshold(adaptive_1, result1, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, blockSize, 11);
+        adaptiveThreshold(adaptive_1, result2, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, blockSize, 11);
 
         // adaptiveThreshold(adaptive, result2, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, blockSize, C);
     }

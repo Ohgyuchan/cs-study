@@ -17,6 +17,9 @@ Mat drawHistogram(Mat src);
 int main() {
     Mat finger_print, adaptive_1, adaptive, result1, result2;
 
+    Mat finget_hist;
+    finget_hist = drawHistogram(finger_print);
+
     finger_print = imread("finger_print.png", 0);
     adaptive_1 = imread("adaptive_1.jpg", 0);
     adaptive = imread("adaptive.png", 0);

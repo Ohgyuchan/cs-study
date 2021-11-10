@@ -17,76 +17,26 @@ Mat drawHistogram(Mat src);
 
 
 int main() {
-    Mat finger_print, adaptive_1, adaptive, result1, result2;
-
-    Mat finger_hist;
+    Mat finger_print, adaptive_1, adaptive;
     
-
     finger_print = imread("finger_print.png");
     cvtColor(finger_print, finger_print, CV_BGR2GRAY);
-    adaptive_1 = imread("adaptive_1.jpg", 0);
-    adaptive = imread("adaptive.png", 0);
-
-    finger_hist = drawHistogram(finger_print);
-
-    result1 = finger_print.clone();
-    result2 = adaptive.clone();
+    adaptive_1 = imread("adaptive_1.jpg");
+    cvtColor(adaptive_1, adaptive_1, CV_BGR2GRAY);
+    adaptive = imread("adaptive.png");
+    cvtColor(adaptive, adaptive, CV_BGR2GRAY);
     
-    int blockSize = 3;
-    int C = 0;
-    int t = 160;
+    threshold(finger_print, finger_print, 159, 255, THRESH_BINARY);
+    imshow("finger_print", finger_print);
+    
+    adaptiveThreshold(adaptive_1, adaptive_1, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 49, 11);
+    imshow("adaptive_1", adaptive_1);
 
-    while(1) {
-        // OTSU Algorithm
-        imshow("finger_print", finger_print);
-        // imshow("finger_hist", finger_hist);
-        // imshow("original", adaptive);
-        // imshow("adaptive_1_G", result1);
-        // imshow("adaptive_1", result2);
-
-        
-        int key = waitKey();
-        if(key == 'a') {
-            blockSize += 2;
-            // t += 1;
-            cout << blockSize << endl;
-        }
-        if(key == 's') {
-            if(blockSize > 3) blockSize -= 2;;
-            cout << blockSize << endl;
-        }
-        if(key == 'r') {
-            blockSize = 3;
-            C = 0;
-        }
-        if(key == 'f') {
-            blockSize = 27475;
-            cout << blockSize << endl;
-        }
-        
-        if(key == 'p') {
-            cout << "blockSize: " << blockSize << endl;
-            cout << C << endl;
-        }
-
-        if(key == 'c') {
-            C++;
-            cout << C << endl;
-        }
-
-        if(key == 'C') {
-            C--;
-            cout << C << endl;
-        }
-        threshold(finger_print, finger_print, 159.5, 255, THRESH_OTSU);
-        // adaptiveThreshold(finger_print, result1, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, blockSize, C);
-        // adaptiveThreshold(adaptive, result1, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, blockSize, C);
-        // adaptiveThreshold(adaptive, result2, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, blockSize, C);
-
-        // adaptiveThreshold(adaptive, result2, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, blockSize, C);
-    }
-
-
+    adaptiveThreshold(adaptive, adaptive, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 11, 15);
+    imshow("adaptive", adaptive);
+    
+    waitKey(0);
+    
     return 0;
 }
 
@@ -126,37 +76,3 @@ Mat drawHistogram(Mat src) {
 
     return histImage;
 }
-
-float mean(int arr[], int n) { 
-    float sum = 0, mean = 0; 
-    // sum of arr 
-    for (int i = 0; i < n; i++) { 
-        sum += arr[i]; 
-    } 
-    mean = sum / n; //printf("sum : %lf, mean : %lf\n", sum, mean); 
-    return mean; 
-}
-
-void leastSquare(int arr1[], int arr2[], int n) { 
-    // Calculate mean of arr1, arr2
-    float x_bar = mean(arr1, n);
-    float y_bar = mean(arr2, n);
-    
-    // y = ax + b
-    float a, b; 
-    float sum1 = 0, sum2 = 0; 
-    
-    // Calculate sum1 , sum2 
-    for (int i = 0; i < n; i++) { 
-        sum1 += (arr1[i] - x_bar) * (arr2[i] - y_bar); sum2 += pow((arr1[i] - x_bar), 2); 
-    } 
-    //printf("sum1 : %lf, sum2 : %lf\n", sum1, sum2);
-    // Calculate a 
-    a = sum1 / sum2;
-    // Calculate b 
-    b = y_bar - a * x_bar; 
-    printf("y = %lfx + %lf\n", a, b);
-}
-
-// 113
-// 206

@@ -22,25 +22,24 @@ int main() {
     Mat finger_hist;
     
 
-    finger_print = imread("finger_print.png", 0);
+    finger_print = imread("finger_print.png");
+    cvtColor(finger_print, finger_print, CV_BGR2GRAY);
     adaptive_1 = imread("adaptive_1.jpg", 0);
     adaptive = imread("adaptive.png", 0);
 
     finger_hist = drawHistogram(finger_print);
 
-    result1 = adaptive.clone();
+    result1 = finger_print.clone();
     result2 = adaptive.clone();
     
     int blockSize = 3;
     int C = 0;
-    threshold(result1, result1, 0, 255, THRESH_BINARY | THRESH_OTSU);
-    threshold(result2, result2, 0, 255, THRESH_BINARY | THRESH_OTSU);
+    int t = 160;
 
     while(1) {
         // OTSU Algorithm
-
         imshow("finger_print", finger_print);
-        imshow("finger_hist", finger_hist);
+        // imshow("finger_hist", finger_hist);
         // imshow("original", adaptive);
         // imshow("adaptive_1_G", result1);
         // imshow("adaptive_1", result2);
@@ -49,6 +48,7 @@ int main() {
         int key = waitKey();
         if(key == 'a') {
             blockSize += 2;
+            // t += 1;
             cout << blockSize << endl;
         }
         if(key == 's') {
@@ -78,8 +78,10 @@ int main() {
             C--;
             cout << C << endl;
         }
-        adaptiveThreshold(adaptive, result1, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY_INV, blockSize, C);
-        adaptiveThreshold(adaptive, result2, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV, blockSize, C);
+        threshold(finger_print, finger_print, 0, 255, THRESH_BINARY || THRESH_OTSU);
+        // adaptiveThreshold(finger_print, result1, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, blockSize, C);
+        // adaptiveThreshold(adaptive, result1, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, blockSize, C);
+        // adaptiveThreshold(adaptive, result2, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, blockSize, C);
 
         // adaptiveThreshold(adaptive, result2, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, blockSize, C);
     }
@@ -98,7 +100,7 @@ Mat drawHistogram(Mat src) {
 
     // Set the number of bins to 16
     histSize = 256;
-    hist_w = 512;
+    hist_w = 1024;
     hist_h = 512;
     bin_w = cvRound((double)hist_w / histSize);
     
@@ -117,6 +119,9 @@ Mat drawHistogram(Mat src) {
 
     for (i = 0; i < histSize; i++) {
         rectangle(histImage, Point(bin_w * i, hist_h), Point(bin_w * i+hist_w/histSize, hist_h - cvRound(hist.at<float>(i))), Scalar(0, 0, 0), -1);
+        if(i % 10 == 0) rectangle(histImage, Point(hist_w * i / histSize, hist_h - 10), Point(0,hist_h), Scalar(0, 0, 255));
+        if(i % 10 == 0) putText(histImage, to_string(i), Point(hist_w * i / histSize, 30), 0, 0.3, Scalar(0, 0, 0), 1, 7);
+        cout << i << ": " << hist.at<float>(i) << endl;
     }
 
     return histImage;
@@ -152,3 +157,6 @@ void leastSquare(int arr1[], int arr2[], int n) {
     b = y_bar - a * x_bar; 
     printf("y = %lfx + %lf\n", a, b);
 }
+
+// 113
+// 206

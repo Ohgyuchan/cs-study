@@ -1,6 +1,8 @@
 #include <iostream>
 #include "opencv/cv.hpp"
 
+int count_pixel[256] = {0, };
+
 using namespace cv;
 using namespace std;
 
@@ -69,4 +71,35 @@ Mat drawHistogram(Mat src) {
     }
 
     return histImage;
+}
+
+float mean(int arr[], int n) { 
+    float sum = 0, mean = 0; 
+    // sum of arr 
+    for (int i = 0; i < n; i++) { 
+        sum += arr[i]; 
+    } 
+    mean = sum / n; //printf("sum : %lf, mean : %lf\n", sum, mean); 
+    return mean; 
+}
+
+void leastSquare(int arr1[], int arr2[], int n) { 
+    // Calculate mean of arr1, arr2
+    float x_bar = mean(arr1, n);
+    float y_bar = mean(arr2, n);
+    
+    // y = ax + b
+    float a, b; 
+    float sum1 = 0, sum2 = 0; 
+    
+    // Calculate sum1 , sum2 
+    for (int i = 0; i < n; i++) { 
+        sum1 += (arr1[i] - x_bar) * (arr2[i] - y_bar); sum2 += pow((arr1[i] - x_bar), 2); 
+    } 
+    //printf("sum1 : %lf, sum2 : %lf\n", sum1, sum2);
+    // Calculate a 
+    a = sum1 / sum2;
+    // Calculate b 
+    b = y_bar - a * x_bar; 
+    printf("y = %lfx + %lf\n", a, b);
 }

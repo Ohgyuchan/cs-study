@@ -78,7 +78,7 @@ int main() {
             C--;
             cout << C << endl;
         }
-        threshold(finger_print, finger_print, 0, 255, THRESH_BINARY || THRESH_OTSU);
+        threshold(finger_print, finger_print, 159.5, 255, THRESH_OTSU);
         // adaptiveThreshold(finger_print, result1, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, blockSize, C);
         // adaptiveThreshold(adaptive, result1, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, blockSize, C);
         // adaptiveThreshold(adaptive, result2, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, blockSize, C);

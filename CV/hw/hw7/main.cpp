@@ -1,11 +1,5 @@
 #include <iostream>
 #include "opencv/cv.hpp"
-/*
-C: 23
-blockSize: 123
-*/
-
-int count_pixel[256] = {0, };
 
 using namespace cv;
 using namespace std;

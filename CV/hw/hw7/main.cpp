@@ -17,12 +17,14 @@ Mat drawHistogram(Mat src);
 int main() {
     Mat finger_print, adaptive_1, adaptive, result1, result2;
 
-    Mat finget_hist;
-    finget_hist = drawHistogram(finger_print);
+    Mat finger_hist;
+    
 
     finger_print = imread("finger_print.png", 0);
     adaptive_1 = imread("adaptive_1.jpg", 0);
     adaptive = imread("adaptive.png", 0);
+
+    finger_hist = drawHistogram(finger_print);
 
     result1 = adaptive.clone();
     result2 = adaptive.clone();
@@ -36,9 +38,10 @@ int main() {
         // OTSU Algorithm
 
         imshow("finger_print", finger_print);
-        imshow("original", adaptive);
-        imshow("adaptive_1_G", result1);
-        imshow("adaptive_1", result2);
+        imshow("finger_hist", finger_hist);
+        // imshow("original", adaptive);
+        // imshow("adaptive_1_G", result1);
+        // imshow("adaptive_1", result2);
 
         
         int key = waitKey();

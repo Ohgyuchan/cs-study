@@ -5,6 +5,8 @@ C: 23
 blockSize: 123
 */
 
+int count_pixel[256] = {0, };
+
 using namespace cv;
 using namespace std;
 
@@ -95,7 +97,7 @@ Mat drawHistogram(Mat src) {
     int channels[] = {0};
 
     // Set the number of bins to 16
-    histSize = 16;
+    histSize = 256;
     hist_w = 512;
     hist_h = 512;
     bin_w = cvRound((double)hist_w / histSize);

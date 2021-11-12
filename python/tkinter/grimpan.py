@@ -166,7 +166,8 @@ def save():
                                             filetypes = (("PPTX files", "*.pptx"), ("akk files", "*.*")))
 
 def open():
-    global im, tk_imgfname = fd.askopenfilename()
+    global im, tk_img
+    fname = fd.askopenfilename()
     im = Image.open(fanme)
     tk_img = ImageTk.PhotoImage(im)
     canvas.create_image(250, 250, image = tk_img)

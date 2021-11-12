@@ -168,7 +168,7 @@ def save():
 def open():
     global im, tk_img
     fname = fd.askopenfilename()
-    im = Image.open(fanme)
+    im = Image.open(fname)
     tk_img = ImageTk.PhotoImage(im)
     canvas.create_image(250, 250, image = tk_img)
     window.update()

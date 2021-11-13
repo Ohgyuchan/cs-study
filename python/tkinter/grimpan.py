@@ -47,12 +47,13 @@ def draw(event):
     x1 = event.x
     y1 = event.y
     canvas.create_line(x1, y1, x1+1, y1+1, width = myWidth, fill = myColor)
+    
 
 def draw2(event):
     global x1, y1
+    canvas.create_line(x1, y1, x1+1, y1+1, width = myWidth, fill = color[1])
     x1 = event.x
     y1 = event.y
-    canvas.create_line(x1, y1, x1+1, y1+1, width = myWidth, fill = color[1])
 
 def draw_rectangle(event):
     global x1, y1
@@ -80,12 +81,12 @@ def rectangle():
 def circle():
     global color
     color = askcolor()
-    canvas.bind("<Double-Button-1>", draw_circle)
+    canvas.bind("<Double-Button-2>", draw_circle)
 
 def triangle():
     global color
     color = askcolor()
-    canvas.bind("<Double-Button-1>", draw_triangle)
+    canvas.bind("<Double-Button-3>", draw_triangle)
 
 def eraser(event):
     global x1, y1
@@ -210,8 +211,8 @@ canvas.create_text(350, 80, text="그려 그려 그림판", fill="white")
 canvas.create_text(350, 80, text="우클릭 = 기본색상선택\n\n휠 클릭 = 다른 색상 선택\n\n좌클릭 = 지우개\n\n 우더블클릭 = 도형 삽입", fill="white")
 
 canvas.create_rectangle(130, 160, 250, 330, outline="white")
-canvas.create_line(130, 220, 250, 220, outline="white")
-canvas.create_rectangle(130, 160, 190, 220, outline="white")
+canvas.create_line(130, 220, 250, 220, fill="white")
+canvas.create_rectangle(130, 160, 190, 220, fill="gray22", outline='white')
 canvas.grid()
 
 frame=Frame(window)
@@ -237,8 +238,8 @@ menubar.add_cascade(label='특수효과', menu=ipmenu)
 ipmenu.add_command(label='흐리게', command=image_blur)
 
 canvas.bind('<B1-Motion>', draw)
-canvas.bind('<B2-Motion>', draw2)
-canvas.bind('<B3-Motion>', eraser)
+canvas.bind('<B2-Motion>', eraser)
+canvas.bind('<B3-Motion>', draw2)
 
 clear=Button(frame, text="=====ALL CLEAR=====", fg='darkblue', bg='skyblue', command=clearCanvas)
 clear.grid(row=1, column=2)
@@ -251,19 +252,17 @@ button2=Button(window, text='    ', bg='orange', command=change_colorOrange)
 button2.place(x=730, y=90)
 button3=Button(window, text='    ', bg='yellow', command=change_colorYellow)
 button3.place(x=755, y=90)
-button4=Button(window, text='    ', bg='red', command=change_colorRed)
-button4.place(x=705, y=90)
-user=Button(window, text='생상 선택', fg='black', command=colorASK)
+user=Button(window, text='다른 색 선택', fg='black', command=colorASK)
 user.place(x=705, y=190)
 
 l2=Label(window, text="도형 찍기: ")
 l2.place(x=705, y=270)
-button=Button(window, text='사각형', fg='black', command=rectangle)
+button1=Button(window, text='사각형', fg='black', command=rectangle)
 button1.grid(row=0, column=1)
-button=Button(window, text='사각형', fg='black', command=circle)
+button1=Button(window, text='사각형', fg='black', command=circle)
 button1.grid(row=0, column=2)
-button=Button(window, text='삼각형', fg='black', command=triangle)
-button1.grid(x=750, y=320)
+button1=Button(window, text='삼각형', fg='black', command=triangle)
+button1.place(x=750, y=320)
 
 l1 = Label(window, text='선 굵기: ')
 l1.place(x=705, y=380)

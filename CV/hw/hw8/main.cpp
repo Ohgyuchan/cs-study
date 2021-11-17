@@ -14,33 +14,48 @@ int main() {
 
     // set background as the average of the first 10 frames.
     while(1) {
-        int frames =  cap.get(CAP_PROP_POS_FRAMES);
-        int fps = cap.get(CAP_PROP_FPS);
-        
         if(!cap.read(frame)) break;
 
-        cvtColor(frame, frame, COLOR_BGR2GRAY);
+        cvtColor(frame, frame, CV_BGR2GRAY);
         
         add(frame / count, background*(count - 1) / count, background);
 
-        if(frames == 10) break;
-
-        waitKey(1000/fps);
+        if(cap.get(CAP_PROP_POS_FRAMES) == 10) break;
+        
+        count++;
     }
 
+    // reset position of frame
     cap.set(CAP_PROP_POS_FRAMES, 0);
 
+    Mat background_img = background.clone();
+    Mat background_temp, previous_frame;
+
     while(1) {
-        int fps = cap.get(CAP_PROP_FPS);
         if(cap.grab() == 0) break;
 
         cap.retrieve(frame);
+        int frames = cap.get(CAP_PROP_POS_FRAMES);
+        
         cvtColor(frame, current_frame_as_gray, CV_BGR2GRAY);
 
+        if(frames != 1 && frames % 2 == 1)
+            background = background_temp.clone();
+
         absdiff(current_frame_as_gray, background, result);
+        
+        if(frames >= 2) {
+            add(current_frame_as_gray / count, background_temp * (count - 1) / count, background_temp);
+        } else {
+            background_temp = current_frame_as_gray.clone();
+        }
+        
+        threshold(result, result, 20, 255, CV_THRESH_BINARY);
+        
         final_result = result.clone();
-        medianBlur(final_result, final_result, 11);
-        threshold(final_result, final_result, 20, 255, CV_THRESH_BINARY);
+        Mat element = getStructuringElement(MORPH_ELLIPSE, Size(10, 10));
+        medianBlur(final_result, final_result, 7);
+        dilate(final_result, final_result, element);
         
         vector<vector<Point> > contours;
         vector<Vec4i> hierarchy;
@@ -48,21 +63,29 @@ int main() {
         
         int count_400px = 0;
         vector<Rect> boundRect(contours.size());
-        for (int i = 0; i < contours.size(); i++)
-            if(contourArea(Mat(contours[i])) >= 400) {
+        for (int i = 0; i < contours.size(); i++) {
+            
+            if(contourArea(Mat(contours[i])) > 400) {
                 boundRect[i] = boundingRect(Mat(contours[i]));
                 count_400px++;
             }
-            
-        //draw rectangles on the contours
-        for (int i = 0; i < contours.size(); i++) {
-            rectangle(final_result, boundRect[i].tl(), boundRect[i].br(), Scalar(255, 255, 255), 2, 8, 0);
-            putText(final_result, format("contour count: %d", count_400px), Point(50, 80), FONT_HERSHEY_SIMPLEX, 1, Scalar(128), 4);
         }
 
-        imshow("Background", background);
+        for (int i = 0; i < contours.size(); i++) {
+            //draw rectangles on the contours
+                rectangle(frame, boundRect[i].tl(), boundRect[i].br(), Scalar(255, 255, 255), 2, 8, 0);
+            putText(frame, format("boundRect count bigger than 400px: %d", count_400px), Point(50, 80), FONT_HERSHEY_SIMPLEX, 1, Scalar(255, 255, 255), 4);
+        }
+
+        if(contours.size() == 0) {
+            putText(frame, format("boundRect count bigger than 400px: %d", count_400px), Point(50, 80), FONT_HERSHEY_SIMPLEX, 1, Scalar(255, 255, 255), 4);
+        }
+
+        int fps = cap.get(CAP_PROP_FPS);
+        
+        imshow("final_result", frame);
+        imshow("Background", background_img);
         imshow("Result(x, y)", result);
-        imshow("final_result", final_result);
 
         waitKey(1000/fps);
     }

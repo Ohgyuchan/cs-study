@@ -7,7 +7,7 @@ using namespace std;
 int main() {
     VideoCapture cap("background.mp4");
     int count = 2;
-    Mat background, image, gray, result, foregroundMask,foregroundImg;
+    Mat background, image, gray, result;
     
     cap >> background;
     cvtColor(background, background, COLOR_BGR2GRAY);
@@ -16,7 +16,6 @@ int main() {
     while(1) {
         int frames =  cap.get(CAP_PROP_POS_FRAMES);
         int fps = cap.get(CAP_PROP_FPS);
-        cout << "frames: " << frames << endl;
         
         if(!cap.read(image)) break;
 
@@ -32,16 +31,23 @@ int main() {
     cap.set(CAP_PROP_POS_FRAMES, 0);
 
     while(1) {
+        int fps = cap.get(CAP_PROP_FPS);
         if(cap.grab() == 0) break;
-        waitKey(0);
+
         cap.retrieve(image);
         cvtColor(image, gray, CV_BGR2GRAY);
 
-        absdiff(background, gray, foregroundMask);
-        threshold(foregroundMask, foregroundMask, 20, 255, CV_THRESH_BINARY);
-        foregroundMask.copyTo(foregroundImg);
-        gray.copyTo(foregroundImg, foregroundMask);
+        absdiff(background, gray, result);
+        threshold(result, result, 20, 255, CV_THRESH_BINARY);
+        
+        vector<vector<Point>> contours;
+        vector<Vec4i> hierarchy;
+        findContours(result, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
 
+        imshow("Result(x, y)", result);
+
+
+        waitKey(1000/fps);
     }
 
     return 0;

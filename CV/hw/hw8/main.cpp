@@ -39,7 +39,7 @@ int main() {
         
         cvtColor(frame, current_frame_as_gray, CV_BGR2GRAY);
 
-        if(frames != 1 && frames % 2 == 1)
+        if(frames != 1 && frames % 10 == 1)
             background = background_temp.clone();
 
         absdiff(current_frame_as_gray, background, result);
@@ -67,6 +67,7 @@ int main() {
             
             if(contourArea(Mat(contours[i])) > 400) {
                 boundRect[i] = boundingRect(Mat(contours[i]));
+
                 count_400px++;
             }
         }
@@ -92,4 +93,3 @@ int main() {
 
     return 0;
 }
-

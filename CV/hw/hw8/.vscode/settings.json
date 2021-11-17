@@ -5,6 +5,7 @@
         "tuple": "cpp",
         "utility": "cpp",
         "bitset": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "vector": "cpp"
     }
 }

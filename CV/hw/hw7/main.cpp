@@ -25,16 +25,19 @@ int main() {
     threshold(finger_print, finger_print, 159, 255, THRESH_BINARY);
     imshow("finger_print", finger_print);
     
-    adaptiveThreshold(adaptive_1, adaptive_1, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 49, 11);
+    adaptiveThreshold(adaptive_1, adaptive_1, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 85, 15);
     imshow("adaptive_1", adaptive_1);
 
-    adaptiveThreshold(adaptive, adaptive, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 11, 15);
+    adaptiveThreshold(adaptive, adaptive, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 7, 6);
     imshow("adaptive", adaptive);
     
     waitKey(0);
     
     return 0;
 }
+
+// 85 15
+// 7 6
 
 Mat drawHistogram(Mat src) {
     Mat hist, histImage;

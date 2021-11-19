@@ -63,21 +63,6 @@ def paint5(event):
     y1=event.y
     canvas.create_polygon(x1,y1,x1,y1+140,x1+140,y1+60,fill=color[1]) #(x1,y1),(x2,y2),(x3,y3)을 꼭짓점으로 하는 삼각형 그리기 
 
-def rectangle():
-    global color
-    color=askcolor()
-    canvas.bind("<Double-Button-1>",paint3)
-
-def oval():
-    global color
-    color=askcolor()
-    canvas.bind("<Double-Button-1>",paint4)
-
-def triangle():
-    global color
-    color=askcolor()
-    canvas.bind("<Double-Button-1>",paint5)
-
 #지우기 함수
 def eraser(event):
     global x1,y1

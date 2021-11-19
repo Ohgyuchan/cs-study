@@ -20,27 +20,7 @@ def colorASK():
 def penWidth1():
     global mywidth
     mywidth=1
-    
-def penWidth5():
-    global mywidth
-    mywidth=5
 
-def penWidth10():
-    global mywidth
-    mywidth=10
-
-def penWidth20():
-    global mywidth
-    mywidth=20
-
-def penWidth30():
-    global mywidth
-    mywidth=30
-
-def penWidth50():
-    global mywidth
-    mywidth=50
-    
 mycolor = "white"
 mywidth = 5
 
@@ -54,6 +34,13 @@ def paint(event):
     canvas.create_line(x1, y1, event.x, event.y, width=mywidth, fill=mycolor)
     x1=event.x
     y1=event.y
+
+# 휠 클릭
+def paint2(event):
+    global x1,y1
+    x1=event.x
+    y1=event.y
+    canvas.create_line(x1,y1,x1+1,y1+1,width=mywidth,fill=color[1])
 
 #사각형 그리기 함수
 def paint3(event):
@@ -162,59 +149,6 @@ def change_colorSkyblue():
 def change_colorDarkblue():
     global mycolor
     mycolor="darkblue"
-    
-def paint2(event):
-    global x1,y1
-    x1=event.x
-    y1=event.y
-    canvas.create_line(x1,y1,x1+1,y1+1,width=mywidth,fill=color[1])
-
-#화면을 다 지우는 함수 
-def clearCanvas():
-    canvas.delete("all")
-    
-#파일 메뉴에서 "저장"을 선택했을 때 호출되는 함수
-def Save():
-    filename = filedialog.asksaveasfilename(initialdir="/", title="Select file",
-                                          filetypes=(("PPTX files", "*.pptx"), ("all files", "*.*")))
-
-
-# 파일 메뉴에서 “열기”를 선택하였을 때 호출되는 함수
-def open():
-    global im, tk_img
-    fname = fd.askopenfilename()
-    im = Image.open(fname)
-    tk_img = ImageTk.PhotoImage(im)
-    canvas.create_image(250,250,image=tk_img)
-    window.update()
-
-# 파일 메뉴에서 “종료”를 선택하였을 때 호출되는 함수
-def quit():
-    window.quit()
-    window.destroy()
-    
-# 영상처리 메뉴에서 “회전”을 선택하였을 때 호출되는 함수
-def image_rotateR():
-    global im, tk_img
-    out = im.rotate(90) 
-    tk_img = ImageTk.PhotoImage(out)
-    canvas.create_image(250, 250, image=tk_img)
-    window.update()
-
-def image_rotateL():
-    global im, tk_img
-    out = im.rotate(-90) 
-    tk_img = ImageTk.PhotoImage(out)
-    canvas.create_image(250, 250, image=tk_img)
-    window.update()
-
-# 영상처리 메뉴에서 “열기”를 선택하였을 때 호출되는 함수
-def image_blur():
-    global im, tk_img
-    out = im.filter(ImageFilter.BLUR)
-    tk_img = ImageTk.PhotoImage(out)
-    canvas.create_image(250, 250, image=tk_img)
-    window.update()
 
 # 윈도우를 생성한다. 
 window=Tk()
@@ -242,19 +176,6 @@ filemenu = tk.Menu(menubar)
 rotatemenu = tk.Menu(menubar)
 ipmenu = tk.Menu(menubar)
 
-menubar.add_cascade(label="파일", menu=filemenu)
-filemenu.add_command(label="열기(O)", command=open)
-filemenu.add_command(label="저장(S)", command=Save)
-filemenu.add_command(label="다른 이름으로 저장(A)", command=Save)
-filemenu.add_command(label="끝내기(X)", command=quit)
-
-menubar.add_cascade(label="그림 회전", menu=rotatemenu)
-rotatemenu.add_command(label="오른쪽으로 90도 회전(R)", command=image_rotateR)
-rotatemenu.add_command(label="왼쪽으로 90도 회전(L)", command=image_rotateL)
-
-menubar.add_cascade(label="특수효과", menu=ipmenu)
-ipmenu.add_command(label="흐리게", command=image_blur)
-
 
 #우클릭시 함수가 호출됨
 canvas.bind("<Button-1>", dot)
@@ -264,69 +185,69 @@ canvas.bind("<B2-Motion>",paint2)
 #좌클릭시 함수가 호출됨
 canvas.bind("<B3-Motion>",eraser)
 
-clear=Button(frame,text="====ALL CLEAR====",fg="darkblue",bg="skyblue",command=clearCanvas, font=("둥근모꼴",20))
+clear=Button(frame,text="====ALL CLEAR====",fg="darkblue",bg="skyblue", font=("둥근모꼴",20))
 clear.grid(row=1,column=2)
 l2=Label(window,text="색상 선택: ")
 l2.place(x=705,y=70)
 
 #화면에 위젯을 위치하게하는 코드
-button1=Button(window,text="    ",bg="red",command=change_colorRed)
+button1=Button(window,text="    ")
 button1.place(x=705,y=90)
-button2=Button(window,text="    ",bg="orange",command=change_colorOrange)
+button2=Button(window,text="    ")
 button2.place(x=730,y=90)
-button3=Button(window,text="    ",bg="yellow",command=change_colorYellow)
+button3=Button(window,text="    ")
 button3.place(x=755,y=90)
-button3=Button(window,text="    ",bg="gray80",command=change_colorGray80)
+button3=Button(window,text="    ")
 button3.place(x=780,y=90)
-button4=Button(window,text="    ",bg="skyblue",command=change_colorSkyblue)
+button4=Button(window,text="    ")
 button4.place(x=705,y=115)
-button5=Button(window,text="    ",bg="pink",command=change_colorPink)
+button5=Button(window,text="    ")
 button5.place(x=730,y=115)
-button6=Button(window,text="    ",bg="lawngreen",command=change_colorLawngreen)
+button6=Button(window,text="    ")
 button6.place(x=755,y=115)
-button3=Button(window,text="    ",bg="gray60",command=change_colorGray60)
+button3=Button(window,text="    ")
 button3.place(x=780,y=115)
-button7=Button(window,text="    ",bg="purple",command=change_colorPurple)
+button7=Button(window,text="    ")
 button7.place(x=705,y=140)
-button8=Button(window,text="    ",bg="white",command=change_colorWhite)
+button8=Button(window,text="    ")
 button8.place(x=730,y=140)
-button9=Button(window,text="    ",bg="green",command=change_colorGreen)
+button9=Button(window,text="    ")
 button9.place(x=755,y=140)
-button3=Button(window,text="    ",bg="gray30",command=change_colorGray30)
+button3=Button(window,text="    ")
 button3.place(x=780,y=140)
-button10=Button(window,text="    ",bg="brown",command=change_colorBrown)
+button10=Button(window,text="    ")
 button10.place(x=705,y=165)
-button11=Button(window,text="    ",bg="blue",command=change_colorBlue)
+button11=Button(window,text="    ")
 button11.place(x=730,y=165)
-button12=Button(window,text="    ",bg="darkblue",command=change_colorDarkblue)
+button12=Button(window,text="    ")
 button12.place(x=755,y=165)
-button3=Button(window,text="    ",bg="gray10",command=change_colorGray10)
+button3=Button(window,text="    ")
 button3.place(x=780,y=165)
 user=Button(window,text=" 그 외 색상선택 ",fg="black",command=colorASK)
 user.place(x=705,y=190)
 
 l2=Label(window,text="도형 찍기: ")
 l2.place(x=705,y=270)
-button=Button(window,text=" 사각형 ",fg="black",command=rectangle)
+button=Button(window,text=" 사각형 ",fg="black")
 button.grid(row=0,column=1)
-button=Button(window,text="  원 형  ",fg="black",command=oval)
+button=Button(window,text="  원 형  ",fg="black")
 button.grid(row=0,column=2)
-button=Button(window,text=" 삼각형 ",fg="black",command=triangle)
+button=Button(window,text=" 삼각형 ",fg="black")
 button.place(x=705,y=320)
 
 l1=Label(window,text="선 굵기: ")
 l1.place(x=705,y=380)
 button1=Button(window,text=" 굵기 1 ",fg="black",command=penWidth1)
 button1.place(x=705,y=400)
-button1=Button(window,text=" 굵기 5 ",fg="black",command=penWidth5)
+button1=Button(window,text=" 굵기 5 ",fg="black")
 button1.place(x=760,y=400)
-button2=Button(window,text="굵기 10",fg="black",command=penWidth10)
+button2=Button(window,text="굵기 10",fg="black")
 button2.place(x=705,y=430)
-button2=Button(window,text=" 굵기 20",fg="black",command=penWidth20)
+button2=Button(window,text=" 굵기 20",fg="black")
 button2.place(x=760,y=430)
-button2=Button(window,text="굵기 30",fg="black",command=penWidth30)
+button2=Button(window,text="굵기 30",fg="black")
 button2.place(x=705,y=460)
-button2=Button(window,text=" 굵기 50",fg="black",command=penWidth50)##
+button2=Button(window,text=" 굵기 50",fg="black")
 button2.place(x=760,y=460)
 
 window.config(menu=menubar)

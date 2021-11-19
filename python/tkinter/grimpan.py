@@ -44,12 +44,16 @@ def penWidth50():
 mycolor = "white"
 mywidth = 5
 
+def xy(event):
+    global x1, y1
+    x1, y1 = event.x, event.y
+
 #그리기 함수
 def paint(event):
     global x1,y1
+    canvas.create_line(x1, y1, event.x, event.y, width=mywidth, fill=mycolor)
     x1=event.x
     y1=event.y
-    canvas.create_line(x1,y1,x1+1,y1+1,width=mywidth,fill=mycolor)
 
 #사각형 그리기 함수
 def paint3(event):
@@ -253,6 +257,7 @@ ipmenu.add_command(label="흐리게", command=image_blur)
 
 
 #우클릭시 함수가 호출됨
+canvas.bind("<Button-1>", xy)
 canvas.bind("<B1-Motion>",paint)
 #마우스휠 클릭시 함수가 호출됨 
 canvas.bind("<B2-Motion>",paint2)

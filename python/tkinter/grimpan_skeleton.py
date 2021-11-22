@@ -1,3 +1,13 @@
+"""
+TODO:
+1. ALL CLEAR 완성
+2. 펜 굵기 메뉴 완성
+3. 펜 색깔 메뉴 완성
+4. 도형 그리기 완성
+5. 마우스 인터렉션 완성
+6. 화면 회전
+7. 화면 흐리게
+"""
 from tkinter import *
 from PIL import Image, ImageTk, ImageFilter  
 import tkinter as tk
@@ -40,30 +50,47 @@ def paint2(event):
     global x1,y1
     x1=event.x
     y1=event.y
-    canvas.create_line(x1,y1,x1+1,y1+1,width=mywidth,fill=color[1])
+    canvas.create_line(x1,y1,x1+1,y1+1,width=mywidth, fill=color[1])
 
 #사각형 그리기 함수
 def paint3(event):
     global x1,y1
     x1=event.x
     y1=event.y
-    canvas.create_rectangle(x1-10,y1-10,x1+100,y1+100,fill=color[1])
+    canvas.create_rectangle(x1-10,y1-10,x1+100,y1+100, fill=color[1])
 
 #원 그리기 함수
 def paint4(event):
     global x1,y1
     x1=event.x
     y1=event.y
-    canvas.create_oval(x1-10,y1-10,x1+100,y1+100,fill=color[1])
+    canvas.create_oval(x1-10,y1-10,x1+100,y1+100, fill=color[1])
 
 #삼각형 그리기 함수
 def paint5(event):
     global x1,y1
     x1=event.x
     y1=event.y
-    canvas.create_polygon(x1,y1,x1,y1+140,x1+140,y1+60,fill=color[1]) #(x1,y1),(x2,y2),(x3,y3)을 꼭짓점으로 하는 삼각형 그리기 
+    # (x1,y1), (x2,y2), (x3,y3)을 꼭짓점으로 하는 삼각형 그리기 
+    canvas.create_polygon(x1,y1,x1,y1+140,x1+140,y1+60, fill=color[1])
 
-#지우기 함수
+# TODO: Add CLICK EVENT(좌클릭 더블클릭)
+def rectangle():
+    global color
+    color=askcolor()
+    canvas.bind("<Double-Button-1>",paint3)
+
+def oval():
+    global color
+    color=askcolor()
+    canvas.bind("<Double-Button-1>",paint4)
+
+def triangle():
+    global color
+    color=askcolor()
+    canvas.bind("<Double-Button-1>",paint5)
+
+# 지우개 함수
 def eraser(event):
     global x1,y1
     x1=event.x
@@ -135,7 +162,7 @@ def change_colorDarkblue():
     global mycolor
     mycolor="darkblue"
 
-# 윈도우를 생성한다. 
+# 윈도우를 생성한다.
 window=Tk()
 window.title("그려 그려 그림판")
 canvas=Canvas(window,width=700,height=600,bg="black")
@@ -145,7 +172,7 @@ canvas.create_text(350,430, text="마우스를 이용하여 여러 기능을 활
 canvas.create_text(350,500, text="== ALL CLEAR를 눌러 시작하세요! ==",fill="white", font=("둥근모꼴",14))
 
 canvas.create_text(410,150, text="==<실행설명>==",fill="red", font=("둥근모꼴",15))
-canvas.create_text(420,250, text="우클릭 = 기본색상선택\n\n휠 클릭 = 그 외 색상선택\n\n좌클릭 = 지우개\n\n우더블클릭 = 도형 삽입",fill="white", font=("둥근모꼴",16))
+canvas.create_text(420,250, text="좌클릭 = 기본색상으로 선 그리기\n\n휠 클릭 = 그 외 색상으로 선그리고\n\n우클릭 = 지우개\n\n우더블클릭 = 도형 삽입",fill="white", font=("둥근모꼴",16))
 
 canvas.create_rectangle(130,160,250,330,outline="white")
 canvas.create_line(130,220,250,220,fill="white")
@@ -161,21 +188,34 @@ filemenu = tk.Menu(menubar)
 rotatemenu = tk.Menu(menubar)
 ipmenu = tk.Menu(menubar)
 
+menubar.add_cascade(label="파일", menu=filemenu)
+# TODO: Add command
+filemenu.add_command(label="열기(O)")
+filemenu.add_command(label="저장(S)")
+filemenu.add_command(label="다른 이름으로 저장(A)")
+filemenu.add_command(label="끝내기(X)")
 
-#우클릭시 함수가 호출됨
-canvas.bind("<Button-1>", dot)
-canvas.bind("<B1-Motion>",paint)
-#마우스휠 클릭시 함수가 호출됨 
-canvas.bind("<B2-Motion>",paint2)
-#좌클릭시 함수가 호출됨
-canvas.bind("<B3-Motion>",eraser)
+menubar.add_cascade(label="그림 회전", menu=rotatemenu)
+# TODO: Add command
+rotatemenu.add_command(label="오른쪽으로 90도 회전(R)")
+rotatemenu.add_command(label="왼쪽으로 90도 회전(L)")
+
+menubar.add_cascade(label="특수효과", menu=ipmenu)
+# TODO: Add command
+ipmenu.add_command(label="흐리게")
+
+
+# TODO: Add MOUSE CLICK EVENT
+
+# TODO: Add ALL CLEAR EVENT
 
 clear=Button(frame,text="====ALL CLEAR====",fg="darkblue",bg="skyblue", font=("둥근모꼴",20))
 clear.grid(row=1,column=2)
 l2=Label(window,text="색상 선택: ")
 l2.place(x=705,y=70)
 
-#화면에 위젯을 위치하게하는 코드
+# 화면에 위젯을 위치하게하는 코드
+# TODO: Add command & Background  Color
 button1=Button(window,text="    ")
 button1.place(x=705,y=90)
 button2=Button(window,text="    ")
@@ -208,11 +248,12 @@ button12=Button(window,text="    ")
 button12.place(x=755,y=165)
 button3=Button(window,text="    ")
 button3.place(x=780,y=165)
-user=Button(window,text=" 그 외 색상선택 ",fg="black",command=colorASK)
+user=Button(window,text=" 그 외 색상선택 ",fg="black")
 user.place(x=705,y=190)
 
 l2=Label(window,text="도형 찍기: ")
 l2.place(x=705,y=270)
+# TODO: Add command
 button=Button(window,text=" 사각형 ",fg="black")
 button.grid(row=0,column=1)
 button=Button(window,text="  원 형  ",fg="black")
@@ -222,6 +263,7 @@ button.place(x=705,y=320)
 
 l1=Label(window,text="선 굵기: ")
 l1.place(x=705,y=380)
+# TODO: Add command
 button1=Button(window,text=" 굵기 1 ",fg="black",command=penWidth1)
 button1.place(x=705,y=400)
 button1=Button(window,text=" 굵기 5 ",fg="black")

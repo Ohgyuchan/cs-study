@@ -116,3 +116,10 @@ void DisplayVector(Vector *vec)
 	printf("(dim = %d)\n", vec->dim);
 }
 ```
+
+#### 결과 화면
+`Replit`에서 실행해본 결과 항상 빠르지는 않았다. 이유는 잘 모르겠다.
+
+<img src="./assets/1.png" width="400" height="100">  
+<img src="./assets/2.png" width="400" height="100">  
+<img src="./assets/3.png" width="400" height="100">  

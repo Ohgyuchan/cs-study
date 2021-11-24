@@ -28,7 +28,7 @@ int main() {
         count++;
     }
 
-    int key;
+    int key = -1;
     int command = 0;
     cap.set(CAP_PROP_POS_FRAMES, 0);
 

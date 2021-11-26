@@ -11,27 +11,19 @@ int main() {
     
     cap >> frame;
     
-    // while(1) {
-    //     if(cap.grab() == 0) break;
+    while(1) {
+        if(cap.grab() == 0) break;
         
-    //     cap.retrieve(background);
+        cap.retrieve(background);
         
-    //     if(count == cap.get(CV_CAP_PROP_FRAME_COUNT)) break;
+        if(count == 10) break;
         
-    //     count++;
-    // }
-
-    // imshow("123", background);
-    cvtColor(frame, frame, COLOR_BGR2GRAY);
-    GaussianBlur(frame, frame, Size(7, 7), 0);
-    imshow("1", frame);
-
-    waitKey(0);
+        count++;
+    }
     
     cvtColor(background, background, COLOR_BGR2GRAY);
 
     cap.set(CAP_PROP_POS_FRAMES, 0);
-
 
     Mat background_img = background.clone();
     Mat background_temp;
@@ -45,7 +37,7 @@ int main() {
         
         cvtColor(frame, current_frame_as_gray, CV_BGR2GRAY);
         
-        if(frames != 1 && ((frames - previous_frame) == 1)) {
+        if(frames != 1 && ((frames - previous_frame) == 10)) {
             background = background_temp.clone();
         }
 
@@ -63,7 +55,6 @@ int main() {
         
         int count_people = 0;
         vector<Rect> boundRect_people(contours.size());
-        vector<Rect> boundRect_white_people(contours.size());
         for (int i = 0; i < contours.size(); i++) {
             
             if(contourArea(Mat(contours[i])) > 2500) {
@@ -80,12 +71,12 @@ int main() {
         }
 
         if(contours.size() == 0) {
-            putText(frame, format("boundRect_people count bigger than 400px: %d", count_people), Point(50, 80), FONT_HERSHEY_SIMPLEX, 1, Scalar(255, 255, 255), 4);
+            putText(frame, format("how many people: %d", count_people), Point(50, 80), FONT_HERSHEY_SIMPLEX, 1, Scalar(255, 255, 255), 4);
         }
 
         int fps = cap.get(CAP_PROP_FPS);
         
-        imshow("final_result", background);
+        imshow("final_result", frame);
 
         waitKey(33);
         previous_frame = frames;

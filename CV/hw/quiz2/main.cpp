@@ -6,23 +6,30 @@ using namespace std;
 
 int main() {
     VideoCapture cap("Quiz2 Video.mp4");
-    int count = 2;
     Mat background, frame, current_frame_as_gray, result, final_result;
+    int count = 1;
     
-    cap >> background;
+    cap >> frame;
+    
+    // while(1) {
+    //     if(cap.grab() == 0) break;
+        
+    //     cap.retrieve(background);
+        
+    //     if(count == cap.get(CV_CAP_PROP_FRAME_COUNT)) break;
+        
+    //     count++;
+    // }
+
+    // imshow("123", background);
+    cvtColor(frame, frame, COLOR_BGR2GRAY);
+    GaussianBlur(frame, frame, Size(7, 7), 0);
+    imshow("1", frame);
+
+    waitKey(0);
+    
     cvtColor(background, background, COLOR_BGR2GRAY);
 
-    // set background as the average of the first 10 frames.
-    while(1) {
-        if(!cap.read(frame)) break;
-
-        cvtColor(frame, frame, CV_BGR2GRAY);
-        
-        add(frame / count, background*(count - 1) / count, background);
-        
-        count++;
-    }
-    // reset position of frame
     cap.set(CAP_PROP_POS_FRAMES, 0);
 
 
@@ -43,13 +50,6 @@ int main() {
         }
 
         absdiff(current_frame_as_gray, background, result);
-        
-        if(frames >= 2) {
-            add(current_frame_as_gray / count, background_temp * (count - 1) / count, background_temp);
-        } else {
-            background_temp = current_frame_as_gray.clone();
-        }
-        
         threshold(result, result, 20, 255, CV_THRESH_BINARY);
         
         final_result = result.clone();
@@ -85,7 +85,7 @@ int main() {
 
         int fps = cap.get(CAP_PROP_FPS);
         
-        imshow("final_result", frame);
+        imshow("final_result", background);
 
         waitKey(33);
         previous_frame = frames;

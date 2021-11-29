@@ -49,7 +49,7 @@ if (event == EVENT_LBUTTONUP){
 }
 
 int main(int argc, char *argv[]){
-    VideoCapture cap(0);
+    VideoCapture cap("Quiz2 Video.mp4");
     CallbackParam param;
     
     Mat frame, m_backproj, hsv;
@@ -78,7 +78,6 @@ int main(int argc, char *argv[]){
     param.drag = false;
     param.updated = false;
     
-    setMouseCallback("person1", onMouse, &param);
     setMouseCallback("Tracker", onMouse, &param);
     
     bool tracking = false;

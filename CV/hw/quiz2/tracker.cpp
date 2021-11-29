@@ -1,4 +1,4 @@
-#include "opencv/cv.hpp"
+#include <opencv2/opencv.hpp>
 #include <iostream>
 
 using namespace cv;
@@ -78,7 +78,6 @@ int main(int argc, char *argv[]){
     param.drag = false;
     param.updated = false;
     
-    setMouseCallback("person1", onMouse, &param);
     setMouseCallback("Tracker", onMouse, &param);
     
     bool tracking = false;

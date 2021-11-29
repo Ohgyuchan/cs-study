@@ -1,49 +1,66 @@
 #include "opencv/cv.hpp"
 #include <iostream>
+#include <opencv2/dnn.hpp>
+#include <fstream>
 
 using namespace cv;
 using namespace std;
+using namespace dnn;
 
 int main() {
-    Mat frame, gray, foregroundMask, background;
-    Mat element = getStructuringElement(MORPH_ELLIPSE, Size(10, 10));
+    Ptr<BackgroundSubtractor> bg_model = createBackgroundSubtractorMOG2();
+    Mat frame, gray, foregroundImg, foregroundMask, backgroundImg;
+    Mat element = getStructuringElement(MORPH_ELLIPSE, Size(11, 11));
+
     VideoCapture cap;
     
     if (cap.open("Faces.mp4") == 0) {
-        cout << "no such file!" << endl;    
+        cout << "no such file!" << endl;
         waitKey(0);
-    }
-
-    int count = 2;
-    cap >> background;
-    cvtColor(background, background, COLOR_BGR2GRAY);
-
-    // set background as the average of the first 10 frames.
-    while(1) {
-        if(!cap.read(frame)) break;
-        cvtColor(frame, frame, CV_BGR2GRAY);
-
-        add(frame / count, background*(count - 1) / count, background);
-        
-        count++;
     }
 
     int key = -1;
     int command = 0;
-    cap.set(CAP_PROP_POS_FRAMES, 0);
     
-    int blockSize = 3;
-    int c = 1;
+    while (1) {
+        if(!cap.read(frame)) {
+            break;
+        }
+
+        if (foregroundMask.empty())
+            foregroundMask.create(frame.size(), frame.type());
+        
+        bg_model->apply(frame, foregroundMask);
+        GaussianBlur(foregroundMask, foregroundMask, Size(11, 11), 81, 11);
+        threshold(foregroundMask, foregroundMask, 20, 255, THRESH_BINARY);
+        erode(foregroundMask, foregroundMask, element);
+        morphologyEx(foregroundMask, foregroundMask, MORPH_OPEN, element);
+
+        foregroundImg = Scalar::all(0);
+        frame.copyTo(foregroundImg, foregroundMask);
+        // backgroundImg: The output background image.
+        bg_model->getBackgroundImage(backgroundImg);
+    }
 
     while (1) {
         if(!cap.read(frame)) {
             cap.set(CAP_PROP_POS_FRAMES, 0);
             cap.read(frame);
         }
+
+        if (foregroundMask.empty())
+            foregroundMask.create(frame.size(), frame.type());
         
-        cvtColor(frame, gray, CV_BGR2GRAY);
-        absdiff(gray, background, foregroundMask);
-        threshold(foregroundMask, foregroundMask, 10, 255, THRESH_BINARY);
+        bg_model->apply(frame, foregroundMask);
+        GaussianBlur(foregroundMask, foregroundMask, Size(11, 11), 81, 11);
+        threshold(foregroundMask, foregroundMask, 20, 255, THRESH_BINARY);
+        erode(foregroundMask, foregroundMask, element);
+        morphologyEx(foregroundMask, foregroundMask, MORPH_OPEN, element);
+
+        foregroundImg = Scalar::all(0);
+        frame.copyTo(foregroundImg, foregroundMask);
+        // backgroundImg: The output background image.
+        bg_model->getBackgroundImage(backgroundImg);
         
         if(key == -1) {
             imshow("Face", frame);
@@ -55,17 +72,15 @@ int main() {
                 command = key;
         }
         if(command == 'b') {
+            // foreground = Mat(frame.size(), CV_8UC3, Scalar(255, 255, 255));
+            // make_foreground(frame, foreground);
             while(1) {
-                imshow("Face", foregroundMask);
-                if(waitKey(0) == 'b') break;
+                imshow("Face", foregroundImg);
+                if(waitKey(0) == 'b') {
+                    break;
+                }
             }
-        }
-
-        if(command == 'c') {
-            blockSize += 2;
-        }
-        if(command == 'C') {
-            blockSize -= 2;
+            continue;
         }
         key = waitKey(33);
     }

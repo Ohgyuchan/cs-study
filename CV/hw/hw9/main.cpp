@@ -24,8 +24,6 @@ int main() {
         cvtColor(frame, frame, CV_BGR2GRAY);
 
         add(frame / count, background*(count - 1) / count, background);
-
-        if(cap.get(CAP_PROP_POS_FRAMES) == cap.get(CAP_PROP_FRAME_COUNT)) break;
         
         count++;
     }
@@ -46,11 +44,9 @@ int main() {
         cvtColor(frame, gray, CV_BGR2GRAY);
         absdiff(gray, background, foregroundMask);
         threshold(foregroundMask, foregroundMask, 10, 255, THRESH_BINARY);
-        erode(foregroundMask, foregroundMask, element);
-        adaptiveThreshold(foregroundMask, foregroundMask, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, blockSize, 11);
         
         if(key == -1) {
-            imshow("Face", foregroundMask);
+            imshow("Face", frame);
         }
         if(key != -1) {
             if(command == key)
@@ -58,8 +54,11 @@ int main() {
             else 
                 command = key;
         }
-        if(command == 98) {
-            imshow("Face", foregroundMask);
+        if(command == 'b') {
+            while(1) {
+                imshow("Face", foregroundMask);
+                if(waitKey(0) == 'b') break;
+            }
         }
 
         if(command == 'c') {

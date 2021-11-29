@@ -26,41 +26,35 @@ int main() {
     return 0;
 }
 
-void quick_sort(Point *data, int start, int end) {
-    if(start >= end) {
-        // 원소가 1개인 경우
-        return;
+void swap(twod arr[], int a, int b) { twod temp = arr[a]; arr[a] = arr[b]; arr[b] = temp; }
+int partition(twod arr[], int left, int right) { int pivot = left; int low = left + 1; int high = right;
+// 교차되기 전까지 반복 
+    while (low <= high) { 
+        // pivot보다 큰 값을 찾는 과정 
+        while (arr[pivot].y >= arr[low].y) { 
+            if (arr[pivot].y == arr[low].y) { 
+                if (arr[pivot].x > arr[low].x) 
+                    low++; 
+                else 
+                    break;
+                    // ★핵심!★ 
+            }
+            else
+                low++;
+            }
+            // pivot보다 작은 값을 찾는 과정
+            while (arr[pivot].y <= arr[high].y) { 
+                if (arr[pivot].y == arr[high].y) { 
+                    if (arr[pivot].x < arr[high].x)
+                    high--;
+                    else
+                    break; // ★핵심!!★
+                }
+                else
+                    high--;
+            }
+            if (low <= high) // 교차되지 않은 상태이면 swap
+                swap(arr, low, high);
     }
-    int pivot = start;
-    int i = pivot + 1;
-    
-    // 왼쪽 출발 지점
-    int j = end;
-    
-    // 오른쪽 출발 지점
-    int temp;
-    
-    while(i <= j) {
-        // 포인터가 엇갈릴때까지 반복
-        while(i <= end && data[i] <= data[pivot]) {
-            i++;
-        }
-        while(j > start && data[j] >= data[pivot]) {
-            j--;
-        }
-        if(i > j) {
-            // 엇갈림
-            temp = data[j];
-            data[j] = data[pivot];
-            data[pivot] = temp;
-        } else {
-            // i번째와 j번째를 스왑
-            temp = data[i];
-            data[i] = data[j];
-            data[j] = temp;
-        }
-    }
-    // 분할 계산
-    quick_sort(data, start, j - 1);
-    quick_sort(data, j + 1, end);
+    swap(arr, left, high); // pivot과 high교환 return high; // 옮겨진 pivot의 위치정보 반환 } void quicksort(twod arr[], int left, int right) { if (left <= right) { int pivot = partition(arr, left, right); quicksort(arr, left, pivot - 1); // 왼쪽 정렬 quicksort(arr, pivot + 1, right); // 오른쪽 정렬 }
 }

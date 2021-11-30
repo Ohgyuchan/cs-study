@@ -57,7 +57,6 @@ int main() {
 
             foregroundImg = Scalar::all(0);
             frame.copyTo(foregroundImg, foregroundMask);
-            // backgroundImg: The output background image.
             bg_model->getBackgroundImage(backgroundImg);
             
             while(1) {

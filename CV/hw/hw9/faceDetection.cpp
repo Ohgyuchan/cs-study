@@ -10,7 +10,7 @@ int main() {
     vector<Rect> faces;
     int i;
     // open the webcam
-    VideoCapture cap(0);
+    VideoCapture cap("Faces.mp4");
     // check if we succeeded
     if (!cap.isOpened()) {
     cout << "Could not open camera" << endl;

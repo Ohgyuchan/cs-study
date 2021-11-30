@@ -18,7 +18,7 @@ void morphOps(Mat &thresh) {
 
 int main() {
     Ptr<BackgroundSubtractor> bg_model = createBackgroundSubtractorMOG2();
-    Mat frame, gray, foregroundImg, foregroundMask, backgroundImg;
+    Mat frame, foregroundImg, foregroundMask, backgroundImg;
     Mat element = getStructuringElement(MORPH_ELLIPSE, Size(11, 11));
 
     VideoCapture cap;
@@ -48,9 +48,12 @@ int main() {
                 command = key;
         }
         if(command == 'b') {
+            Mat HSV;
+            cvtColor(frame, HSV, COLOR_BGR2HSV);
+
             if (foregroundMask.empty())
                 foregroundMask.create(frame.size(), frame.type());
-        
+
             bg_model->apply(frame, foregroundMask);
             threshold(foregroundMask, foregroundMask, 20, 255, THRESH_BINARY);
             morphOps(foregroundMask);
@@ -58,7 +61,7 @@ int main() {
             foregroundImg = Scalar::all(0);
             frame.copyTo(foregroundImg, foregroundMask);
             bg_model->getBackgroundImage(backgroundImg);
-            
+
             while(1) {
                 imshow("Face", foregroundImg);
                 if(waitKey(0) == 'b') {

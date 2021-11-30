@@ -14,7 +14,7 @@ int main(int argc, char** argv)
     
     Net net = readNetFromDarknet(modelConfiguration, modelBinary);
     
-    VideoCapture cap("Quiz2 Video.mp4");
+    VideoCapture cap("Faces.mp4");
     
     vector<String> classNamesVec;
     
@@ -75,7 +75,7 @@ int main(int argc, char** argv)
             }
         }
         putText(frame, format("how many people: %d", count_people), Point(50, 80), FONT_HERSHEY_SIMPLEX, 1, Scalar(255, 255, 255), 4);
-        imshow("Quiz2", frame);
+        imshow("HW9", frame);
         if (waitKey(1) >= 0) break;
     }
     return 0;

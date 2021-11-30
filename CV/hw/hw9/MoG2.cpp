@@ -4,34 +4,59 @@
 using namespace cv;
 using namespace std;
 
+void morphOps(Mat &thresh) {
+	Mat element = getStructuringElement(MORPH_CROSS, Size(22,22));
+	Mat delement = getStructuringElement(MORPH_CROSS, Size(31,31));
+
+	// morphologyEx(thresh, thresh, MORPH_CLOSE, element);
+    // morphologyEx(thresh, thresh, MORPH_OPEN, element);
+    erode(thresh,thresh,element);
+    erode(thresh,thresh,element);
+
+	dilate(thresh,thresh,delement);
+	dilate(thresh,thresh,delement);
+}
+
+void equalizeHistogram(Mat scr, Mat &dst) {
+    Mat channels[3];
+    cvtColor(scr, dst, CV_BGR2YUV);
+    split(dst,channels); 
+    equalizeHist(channels[0], channels[0]); 
+    merge(channels, 3, dst);
+    cvtColor(dst, dst, CV_YUV2BGR); 
+}
+
 int main() {
     Ptr<BackgroundSubtractor> bg_model = createBackgroundSubtractorMOG2();
-    Mat image, foregroundMask, backgroundImg, foregroundImg;
+    Mat frame, foregroundMask, backgroundImg, foregroundImg, HSV;
     VideoCapture cap("Faces.mp4");
+
     while (true) {
-        cap >> image;
-        resize(image, image, Size(640, 480));
+        cap >> frame;
         
         if (foregroundMask.empty())
-            foregroundMask.create(image.size(), image.type());
+            foregroundMask.create(frame.size(), frame.type());
         
-        bg_model->apply(image, foregroundMask);
-        
-        GaussianBlur(foregroundMask, foregroundMask, Size(11, 11), 51, 11);
+        bg_model->apply(frame, foregroundMask);
         threshold(foregroundMask, foregroundMask, 20, 255, THRESH_BINARY);
+        morphOps(foregroundMask);
+        medianBlur(foregroundMask, foregroundMask, 55);
         
-        Mat element = getStructuringElement(MORPH_ELLIPSE, Size(11, 11));
-        morphologyEx(foregroundMask, foregroundMask, MORPH_CLOSE, element);
         
         foregroundImg = Scalar::all(0);
-        image.copyTo(foregroundImg, foregroundMask);
-        // backgroundImg: The output background image.
+        frame.copyTo(foregroundImg, foregroundMask);
+        // backgroundImg: The output background frame.
         bg_model->getBackgroundImage(backgroundImg);
+
+        imshow("foreground frame", foregroundImg);
         imshow("foreground mask", foregroundMask);
-        imshow("foreground image", foregroundImg);
+        
         if (!backgroundImg.empty()) {
-            imshow("mean background image", backgroundImg);
+            // imshow("mean background frame", backgroundImg);
         }
-        waitKey(33);
+
+        waitKey(1);
+        if (cap.get(CAP_PROP_POS_FRAMES) == 300)
+            cap.set(CAP_PROP_POS_FRAMES, 1);
     }
 }

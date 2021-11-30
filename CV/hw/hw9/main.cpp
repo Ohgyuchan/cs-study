@@ -2,6 +2,7 @@
 #include <iostream>
 #include <opencv2/dnn.hpp>
 #include <fstream>
+#include <algorithm>
 
 using namespace cv;
 using namespace std;
@@ -13,8 +14,8 @@ void morphOps_backSub(Mat &thresh);
 void only_people_deep(Mat src, Mat &dst);
 void only_people_backSub(Mat src, Mat background, Mat &dst);
 
-void fadeDetection(Mat src, Mat &dst);
-void onlyFace(Mat src, Mat &dst);
+void face_detection(Mat src, Mat &dst);
+void only_face(Mat src, Mat &dst);
 
 int main() {
     Mat frame, onlyPeople, faceDetection, onlyFace, background;
@@ -30,11 +31,13 @@ int main() {
     int count = 2;
 
     cap >> background;
+    resize(background, background, Size(1100, 600));
     cvtColor(background, background, COLOR_BGR2GRAY);
 
     // set background as the average of the first 10 frames.
     while(1) {
         if(!cap.read(frame)) break;
+        resize(frame, frame, Size(1100, 600));
 
         cvtColor(frame, frame, CV_BGR2GRAY);
         
@@ -53,7 +56,7 @@ int main() {
             cap.set(CAP_PROP_POS_FRAMES, 0);
             cap.read(frame);
         }
-
+        resize(frame, frame, Size(1100, 600));
         
         if(key == -1) {
             imshow("Face", frame);
@@ -72,7 +75,6 @@ int main() {
                     break;
                 }
             }
-            continue;
         }
         
         if(command == 'B') {
@@ -83,18 +85,21 @@ int main() {
                     break;
                 }
             }
-            continue;
         }
 
         if(command == 'f') {
-            
+            face_detection(frame, faceDetection);
+            imshow("Face", faceDetection);
+        }
+        
+        if(command == 'g') {
+            only_face(frame, onlyFace);
             while(1) {
                 imshow("Face", onlyFace);
-                if(waitKey(0) == 'f') {
+                if(waitKey(0) == 'g') {
                     break;
                 }
             }
-            continue;
         }
         
         key = waitKey(33);
@@ -217,4 +222,93 @@ void only_people_backSub(Mat src, Mat background, Mat &dst) {
     if(contours.size() == 0) {
         putText(dst, format("how many people: %d", cout_people), Point(50, 80), FONT_HERSHEY_SIMPLEX, 1, Scalar(255, 255, 255), 4);
     }
+}
+
+void face_detection(Mat src, Mat &dst) {
+    CascadeClassifier face_classifier;
+    Mat grayframe;
+    vector<Rect> faces;
+    vector<double> face_sizes;
+    int i;
+    
+    face_classifier.load("haarcascade_frontalface_alt.xml");
+    
+    cvtColor(src, grayframe, COLOR_BGR2GRAY);
+    face_classifier.detectMultiScale(
+                grayframe,
+                faces,
+                1.1, // increase search scale by 10% each pass
+                3, // merge groups of three detections
+                0, // not used for a new cascade
+                Size(30, 30), //min size
+                Size(80, 80) //max ize
+    );
+
+    for (i = 0; i < faces.size(); i++) {
+        face_sizes.push_back(faces[i].area());
+    }
+
+    int neareast = max_element(face_sizes.begin(), face_sizes.end()) - face_sizes.begin();
+    int farthest = min_element(face_sizes.begin(), face_sizes.end()) - face_sizes.begin();
+
+    for (i = 0; i < faces.size(); i++) {
+        Point lb(faces[i].x + faces[i].width, faces[i].y + faces[i].height);
+        Point tr(faces[i].x, faces[i].y);
+        if(i == neareast) 
+            rectangle(src, lb, tr, Scalar(0, 255, 0), 3, 4, 0);
+        
+        else if(i == farthest)
+            rectangle(src, lb, tr, Scalar(255, 0, 0), 3, 4, 0);
+
+        else
+            rectangle(src, lb, tr, Scalar(30, 255, 255), 3, 4, 0);
+    }
+    src.copyTo(dst);
+}
+
+void only_face(Mat src, Mat &dst) {
+    CascadeClassifier face_classifier;
+    Mat grayframe;
+    vector<Rect> faces;
+    Mat faceGrabCut[3];
+    int i;
+    
+    face_classifier.load("haarcascade_frontalface_alt.xml");
+    
+    cvtColor(src, grayframe, COLOR_BGR2GRAY);
+    face_classifier.detectMultiScale(
+                grayframe,
+                faces,
+                1.1, // increase search scale by 10% each pass
+                3, // merge groups of three detections
+                0, // not used for a new cascade
+                Size(30, 30), //min size
+                Size(80, 80) //max ize
+    );
+    
+    Mat mask = Mat(src.size(), CV_8UC1, Scalar(0, 0, 0));
+
+    for (i = 0; i < faces.size(); i++) {
+        Point lb(faces[i].x + faces[i].width, faces[i].y + faces[i].height);
+        Point tr(faces[i].x, faces[i].y);
+        Mat bgModel, fgModel, result;
+
+        grabCut(src, result, Rect(lb, tr), bgModel, fgModel, 10, GC_INIT_WITH_RECT);
+        compare(result, GC_PR_FGD, result, CMP_EQ);
+        add(result, mask, mask);
+        
+        faceGrabCut[i] = Mat(src.size(), CV_8UC3, Scalar(0, 0, 0));
+        src.copyTo(faceGrabCut[i], result);
+    }
+    dst = Mat(src.size(), CV_8UC3, Scalar(0, 0, 0));
+    
+    for(int i = 0; i < faces.size(); i++)
+        add(dst, faceGrabCut[i], dst);
+    
+    Mat bg = imread("virtualBackground.png");
+    resize(bg, bg, Size(1100, 600));
+    threshold(mask, mask, 20, 255, THRESH_BINARY_INV);
+
+    bg.copyTo(dst, mask);
+    
 }

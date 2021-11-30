@@ -18,7 +18,7 @@ int main() {
         bg_model->apply(image, foregroundMask);
         
         GaussianBlur(foregroundMask, foregroundMask, Size(11, 11), 51, 11);
-        threshold(foregroundMask, foregroundMask, 10, 255, THRESH_BINARY);
+        threshold(foregroundMask, foregroundMask, 20, 255, THRESH_BINARY);
         
         Mat element = getStructuringElement(MORPH_ELLIPSE, Size(11, 11));
         morphologyEx(foregroundMask, foregroundMask, MORPH_CLOSE, element);

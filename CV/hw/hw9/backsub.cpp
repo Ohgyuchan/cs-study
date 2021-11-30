@@ -7,7 +7,7 @@ using namespace std;
 int main() {
     VideoCapture cap("Faces.mp4");
     int count = 2;
-    Mat background, frame, current_frame_as_gray, result, final_result;
+    Mat background, frame, current_frame_as_gray, result;
     
     cap >> background;
     cvtColor(background, background, COLOR_BGR2GRAY);
@@ -20,7 +20,7 @@ int main() {
         
         add(frame / count, background*(count - 1) / count, background);
 
-        if(cap.get(CAP_PROP_POS_FRAMES) == 20) break;
+        if(cap.get(CAP_PROP_POS_FRAMES) == 5) break;
         
         count++;
     }
@@ -39,7 +39,7 @@ int main() {
         
         cvtColor(frame, current_frame_as_gray, CV_BGR2GRAY);
 
-        if(frames != 1 && frames % 20 == 1)
+        if(frames != 1 && frames % 5 == 1)
         // if(frames != 1)
             background = background_temp.clone();
 
@@ -53,15 +53,14 @@ int main() {
         
         threshold(result, result, 20, 255, CV_THRESH_BINARY);
         
-        final_result = result.clone();
-        Mat element = getStructuringElement(MORPH_ELLIPSE, Size(10, 10));
-        medianBlur(final_result, final_result, 7);
-        morphologyEx(final_result, final_result, MORPH_CLOSE, element);
-        // dilate(final_result, final_result, element);
+        Mat element = getStructuringElement(MORPH_CROSS, Size(3, 3));
+        medianBlur(result, result, 7);
+        morphologyEx(result, result, MORPH_CLOSE, element);
+        dilate(result, result, element);
         
         vector<vector<Point> > contours;
         vector<Vec4i> hierarchy;
-        findContours(final_result, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+        findContours(result, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
         
         int count_400px = 0;
         vector<Rect> boundRect(contours.size());
@@ -86,7 +85,7 @@ int main() {
 
         int fps = cap.get(CAP_PROP_FPS);
         
-        imshow("final_result", frame);
+        imshow("Frame", frame);
         imshow("Background", background);
         imshow("Result(x, y)", result);
 

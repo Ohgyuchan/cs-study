@@ -16,8 +16,13 @@ int main() {
             foregroundMask.create(image.size(), image.type());
         
         bg_model->apply(image, foregroundMask);
+        
         GaussianBlur(foregroundMask, foregroundMask, Size(11, 11), 51, 11);
         threshold(foregroundMask, foregroundMask, 10, 255, THRESH_BINARY);
+        
+        Mat element = getStructuringElement(MORPH_ELLIPSE, Size(11, 11));
+        morphologyEx(foregroundMask, foregroundMask, MORPH_CLOSE, element);
+        
         foregroundImg = Scalar::all(0);
         image.copyTo(foregroundImg, foregroundMask);
         // backgroundImg: The output background image.

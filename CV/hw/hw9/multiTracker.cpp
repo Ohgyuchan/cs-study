@@ -27,10 +27,14 @@ const string windowName1 = "HSV Image";
 const string windowName2 = "Thresholded Image";
 const string windowName3 = "After Morphological Operations";
 const string trackbarWindowName = "Trackbars";
+void on_trackbar( int, void* )
+{//This function gets called whenever a
+	// trackbar position is changed
 
-void on_trackbar( int, void* ) {
-    // Mat trackbar(FRAME_HEIGHT, FRAME_WIDTH, CV_8UC1, Scalar(0,0,255));
-    imshow(trackbarWindowName, 0);
+
+
+
+
 }
 string intToString(int number){
 
@@ -152,13 +156,12 @@ void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed){
 		}else putText(cameraFeed,"TOO MUCH NOISE! ADJUST FILTER",Point(0,50),1,2,Scalar(0,0,255),2);
 	}
 }
-
 int main(int argc, char* argv[])
 {
 	//some boolean variables for different functionality within this
 	//program
-    bool trackObjects = true;
-    bool useMorphOps = true;
+    bool trackObjects = false;
+    bool useMorphOps = false;
 	//Matrix to store each frame of the webcam feed
 	Mat cameraFeed;
 	//matrix storage for HSV image
@@ -172,7 +175,7 @@ int main(int argc, char* argv[])
 	//video capture object to acquire webcam feed
 	VideoCapture capture;
 	//open capture object at location zero (default location for webcam)
-	capture.open(0);
+	capture.open("Faces.mp4");
 	//set height and width of capture frame
 	capture.set(CV_CAP_PROP_FRAME_WIDTH,FRAME_WIDTH);
 	capture.set(CV_CAP_PROP_FRAME_HEIGHT,FRAME_HEIGHT);
@@ -204,8 +207,12 @@ int main(int argc, char* argv[])
 
 		//delay 30ms so that screen can refresh.
 		//image will not appear without this waitKey() command
-		waitKey(33);
+		waitKey(30);
 	}
+
+
+
+
 
 
 	return 0;

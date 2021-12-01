@@ -7,6 +7,16 @@ using namespace cv;
 using namespace std;
 using namespace dnn;
 
+void morphOps_backSub(Mat &thresh) {
+    Mat element = getStructuringElement(MORPH_CROSS, Size(3,3));
+	Mat delement = getStructuringElement(MORPH_CROSS, Size(8,8));
+
+    erode(thresh,thresh,element);
+    erode(thresh,thresh,element);
+    
+	dilate(thresh,thresh,delement);
+}
+
 int main(int argc, char** argv)
 {
     String modelConfiguration = "deep/yolov2-tiny.cfg";
@@ -26,7 +36,7 @@ int main(int argc, char** argv)
     
     while (1)
     {
-        Mat frame;
+        Mat frame, thresh;
         cap >> frame; // get a new frame from camera/video or read image
         if (frame.empty()) {
             waitKey();
@@ -62,20 +72,15 @@ int main(int argc, char** argv)
                 Rect object(p1, p2);
                 Scalar object_roi_color(0, 255, 0);
                 
-                rectangle(frame, object, object_roi_color);
-                String className = objectClass < classNamesVec.size() ?
-                classNamesVec[objectClass] : cv::format("unknown(%d)", objectClass);
+                String className = objectClass < classNamesVec.size() ? classNamesVec[objectClass] : cv::format("unknown(%d)", objectClass);
                 if(className.compare("person?")) count_people++;
-                String label = format("%s: %.2f", className.c_str(), confidence);
-                int baseLine = 0;
-
-                Size labelSize = getTextSize(label, FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
-                rectangle(frame, Rect(p1, Size(labelSize.width, labelSize.height + baseLine)), object_roi_color, FILLED);
-                putText(frame, label, p1 + Point(0, labelSize.height), FONT_HERSHEY_SIMPLEX,0.5, Scalar(0, 0, 0));
+                cvtColor(frame, thresh, COLOR_BGR2GRAY);
+                threshold(thresh, thresh, 100, 255, CV_THRESH_BINARY);
+                morphOps_backSub(thresh);
             }
         }
-        putText(frame, format("how many people: %d", count_people), Point(50, 80), FONT_HERSHEY_SIMPLEX, 1, Scalar(255, 255, 255), 4);
-        imshow("HW9", frame);
+        putText(thresh, format("how many people: %d", count_people), Point(50, 80), FONT_HERSHEY_SIMPLEX, 1, Scalar(255, 255, 255), 4);
+        imshow("HW9", thresh);
         if (waitKey(1) >= 0) break;
     }
     return 0;

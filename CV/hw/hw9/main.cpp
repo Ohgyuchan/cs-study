@@ -11,7 +11,7 @@ using namespace dnn;
 void morphOps_deep(Mat &thresh);
 void morphOps_backSub(Mat &thresh);
 
-void only_people_deep(Mat src, Mat &dst);
+void only_people_deep_grabCut(Mat src, Mat &dst);
 void only_people_backSub(Mat src, Mat background, Mat &dst);
 
 void face_detection(Mat src, Mat &dst);
@@ -34,7 +34,6 @@ int main() {
     resize(background, background, Size(1100, 600));
     cvtColor(background, background, COLOR_BGR2GRAY);
 
-    // set background as the average of the first 10 frames.
     while(1) {
         if(!cap.read(frame)) break;
         resize(frame, frame, Size(1100, 600));
@@ -42,6 +41,8 @@ int main() {
         cvtColor(frame, frame, CV_BGR2GRAY);
         
         add(frame / count, background*(count - 1) / count, background);
+
+        if(count == 3) break;
         
         count++;
     }
@@ -67,24 +68,15 @@ int main() {
             else 
                 command = key;
         }
+
         if(command == 'b') {
-            only_people_deep(frame, onlyPeople);
-            while(1) {
-                imshow("Face", onlyPeople);
-                if(waitKey(0) == 'b') {
-                    break;
-                }
-            }
+            only_people_deep_grabCut(frame, onlyPeople);
+            imshow("Face", onlyPeople);
         }
         
         if(command == 'B') {
             only_people_backSub(frame, background, onlyPeople);
-            while(1) {
-                imshow("Face", onlyPeople);
-                if(waitKey(0) == 'B') {
-                    break;
-                }
-            }
+            imshow("Face", onlyPeople);
         }
 
         if(command == 'f') {
@@ -94,12 +86,7 @@ int main() {
         
         if(command == 'g') {
             only_face(frame, onlyFace);
-            while(1) {
-                imshow("Face", onlyFace);
-                if(waitKey(0) == 'g') {
-                    break;
-                }
-            }
+            imshow("Face", onlyFace);
         }
         
         key = waitKey(33);
@@ -114,7 +101,7 @@ void morphOps_deep(Mat &thresh) {
 	dilate(thresh,thresh,dilateElement);
 }
 
-void only_people_deep(Mat src, Mat &dst) {
+void only_people_deep_grabCut(Mat src, Mat &dst) {
     Mat people[5];
 
     String modelConfiguration = "deep/yolov2-tiny.cfg";
@@ -193,9 +180,10 @@ void only_people_backSub(Mat src, Mat background, Mat &dst) {
     cvtColor(src, gray, CV_BGR2GRAY);
     absdiff(gray, background, result);
     
+    GaussianBlur(result, result, Size(11, 11), 3.5, 3.5);
     threshold(result, result, 20, 255, CV_THRESH_BINARY);
     morphOps_backSub(result);
-    medianBlur(result, result, 71);
+    medianBlur(result, result, 11);
 
     dst = Scalar::all(0);
     src.copyTo(dst, result);

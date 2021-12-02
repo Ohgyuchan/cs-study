@@ -2,7 +2,6 @@
 #include <iostream>
 #include <opencv2/dnn.hpp>
 #include <fstream>
-#include <algorithm>
 
 using namespace cv;
 using namespace std;

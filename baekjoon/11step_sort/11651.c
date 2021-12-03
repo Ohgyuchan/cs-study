@@ -1,60 +1,67 @@
-/*
-입력: int
-출력: 좌표(y좌표순)
-*/
 #include <stdio.h>
+#include <stdlib.h>
 
-typedef struct _Point {
+typedef struct {
     int x;
     int y;
-} Point;
+} point;
 
-Point p[100000];
+point sort[100001];
 
-void quick_sort(Point *data, int start, int end);
+void merge(point* arr, int first, int mid, int last)
+{
+    int i, j, k;
+    i = first;
+    j = mid + 1;
+    k = first;
 
-int main() {
-    int N;
-    scanf("%d", &N);
-    
-    for(int i = 0; i < N; i++) {
-        scanf("%d %d", &p[i].x, &p[i].y);
+    while (i <= mid && j <= last) {
+        if (arr[i].y < arr[j].y)
+            sort[k++] = arr[i++];
+        else if (arr[i].y > arr[j].y)
+            sort[k++] = arr[j++];
+        else {
+            if (arr[i].x < arr[j].x)
+                sort[k++] = arr[i++];
+            else if (arr[i].x > arr[j].x)
+                sort[k++] = arr[j++];
+        }
     }
 
-    quick_sort(p, 0, N);
-
-    return 0;
+    if (i <= mid) {
+        while (i <= mid) 
+            sort[k++] = arr[i++];
+    }
+    else {
+        while (j <= last) 
+            sort[k++] = arr[j++];
+    }
+    for (k = first; k <= last; k++)
+        arr[k] = sort[k];
 }
 
-void swap(twod arr[], int a, int b) { twod temp = arr[a]; arr[a] = arr[b]; arr[b] = temp; }
-int partition(twod arr[], int left, int right) { int pivot = left; int low = left + 1; int high = right;
-// 교차되기 전까지 반복 
-    while (low <= high) { 
-        // pivot보다 큰 값을 찾는 과정 
-        while (arr[pivot].y >= arr[low].y) { 
-            if (arr[pivot].y == arr[low].y) { 
-                if (arr[pivot].x > arr[low].x) 
-                    low++; 
-                else 
-                    break;
-                    // ★핵심!★ 
-            }
-            else
-                low++;
-            }
-            // pivot보다 작은 값을 찾는 과정
-            while (arr[pivot].y <= arr[high].y) { 
-                if (arr[pivot].y == arr[high].y) { 
-                    if (arr[pivot].x < arr[high].x)
-                    high--;
-                    else
-                    break; // ★핵심!!★
-                }
-                else
-                    high--;
-            }
-            if (low <= high) // 교차되지 않은 상태이면 swap
-                swap(arr, low, high);
+void merge_sort(point* arr, int first, int last) {
+    int mid;
+    if (first < last) {
+        mid = (first + last) / 2;
+        merge_sort(arr, first, mid);
+        merge_sort(arr, mid + 1, last);
+        merge(arr, first, mid, last);
     }
-    swap(arr, left, high); // pivot과 high교환 return high; // 옮겨진 pivot의 위치정보 반환 } void quicksort(twod arr[], int left, int right) { if (left <= right) { int pivot = partition(arr, left, right); quicksort(arr, left, pivot - 1); // 왼쪽 정렬 quicksort(arr, pivot + 1, right); // 오른쪽 정렬 }
+}
+
+int main(void)
+{
+    int n;
+    scanf("%d", &n);
+
+    point* arr = (point*)malloc(sizeof(point)*n);
+    for(int i = 0; i < n; i++)
+        scanf("%d %d", &arr[i].x, &arr[i].y);
+    
+    merge_sort(arr, 0, n-1);
+    for (int i = 0; i < n; i++)
+        printf("%d %d\n", arr[i].x, arr[i].y);
+
+    return 0;
 }

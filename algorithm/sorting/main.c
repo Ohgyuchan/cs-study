@@ -10,7 +10,7 @@ int main() {
     srand(time(NULL)); // 매번 다른 시드값 생성
     
     for(int i = 0; i < MAX; i++)
-        arr[i] = rand()%MAX + 1;
+        arr[i] = rand() % MAX + 1;
 
     start = clock();
     selection_sort(arr, MAX);

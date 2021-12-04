@@ -24,9 +24,9 @@ void swap(int *a, int *b) {
 
 void selection_sort(int *arr, int size) {
     for(int i = 0; i < size-1; i++) {
-        int min_idx = arr[i];
+        int min_idx;
         for(int j = i + 1; j < size; j++)
-            if(min_idx > arr[j]) min_idx = j;
+            if(arr[i] > arr[j]) min_idx = j;
 
         swap(&arr[i], &arr[min_idx]);
     }

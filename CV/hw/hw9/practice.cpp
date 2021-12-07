@@ -7,7 +7,6 @@ using namespace cv;
 using namespace std;
 using namespace dnn;
 
-void morphOps_deep(Mat &thresh);
 void morphOps_backSub(Mat &thresh);
 
 void only_people_deep_grabCut(Mat src, Mat &dst);
@@ -17,9 +16,8 @@ void face_detection(Mat src, Mat &dst);
 void only_face(Mat src, Mat &dst);
 
 int main() {
-    Ptr<BackgroundSubtractor> bg_model = createBackgroundSubtractorMOG2();
+    Ptr<BackgroundSubtractor> bg_model = createBackgroundSubtractorMOG2(700, 20, false);
     Mat frame, onlyPeople, faceDetection, onlyFace, background, foreground, foregroundMask;
-    Mat element = getStructuringElement(MORPH_ELLIPSE, Size(11, 11));
 
     VideoCapture cap;
     
@@ -29,7 +27,7 @@ int main() {
     }
 
     int key = -1;
-    int command = 0;
+    int command = -1;
 
     while (1) {
         if(!cap.read(frame)) {
@@ -43,18 +41,14 @@ int main() {
 
         bg_model->apply(frame, foregroundMask);
         GaussianBlur(foregroundMask, foregroundMask, Size(11, 11), 3.5, 3.5);
-        threshold(foregroundMask, foregroundMask, 10, 255, THRESH_BINARY);
-        foreground = Scalar::all(0);
-        frame.copyTo(foreground, foregroundMask);
+        threshold(foregroundMask, foregroundMask, 20, 255, THRESH_BINARY);
 
-        bg_model->getBackgroundImage(background);
-
-        if(key == -1) {
+        if(key == -1 || command == -1) {
             imshow("Face", frame);
         }
         if(key != -1) {
             if(command == key)
-                command = 0;
+                command = -1;
             else 
                 command = key;
         }
@@ -65,8 +59,11 @@ int main() {
         }
         
         if(command == 'B') {
-            only_people_backSub(frame, background, onlyPeople);
-            imshow("Face", onlyPeople);
+            // only_people_backSub(frame, background, onlyPeople);
+            morphOps_backSub(foregroundMask);
+            foreground = Scalar::all(0);
+            frame.copyTo(foreground, foregroundMask);
+            imshow("Face", foreground);
         }
 
         if(command == 'f') {
@@ -78,17 +75,11 @@ int main() {
             only_face(frame, onlyFace);
             imshow("Face", onlyFace);
         }
-        
         key = waitKey(33);
+        cout << key << endl;
     }
 
     return 0;
-}
-
-void morphOps_deep(Mat &thresh) {
-	Mat dilateElement = getStructuringElement(MORPH_CROSS, Size(5,5));
-
-	dilate(thresh,thresh,dilateElement);
 }
 
 void only_people_deep_grabCut(Mat src, Mat &dst) {
@@ -140,7 +131,6 @@ void only_people_deep_grabCut(Mat src, Mat &dst) {
             Mat bgModel, fgModel, result;
             grabCut(src, result, object, bgModel, fgModel, 10, GC_INIT_WITH_RECT);
             compare(result, GC_PR_FGD, result, CMP_EQ);
-            morphOps_deep(result);
     
             people[count_people - 1] = Mat(src.size(), CV_8UC3, Scalar(0, 0, 0));
             src.copyTo(people[count_people - 1], result);
@@ -155,13 +145,14 @@ void only_people_deep_grabCut(Mat src, Mat &dst) {
 }
 
 void morphOps_backSub(Mat &thresh) {
-    Mat element = getStructuringElement(MORPH_CROSS, Size(27,27));
-	Mat delement = getStructuringElement(MORPH_CROSS, Size(8,45));
+    Mat element = getStructuringElement(MORPH_ELLIPSE, Size(11,11));
 
-    erode(thresh,thresh,element);
-    erode(thresh,thresh,element);
+    erode(thresh, thresh, element);
+    erode(thresh, thresh, element);
     
-	dilate(thresh,thresh,delement);
+	dilate(thresh, thresh, element);
+
+    medianBlur(thresh, thresh, 11);
 }
 
 void only_people_backSub(Mat src, Mat background, Mat &dst) {
@@ -219,7 +210,7 @@ void face_detection(Mat src, Mat &dst) {
                 3, // merge groups of three detections
                 0, // not used for a new cascade
                 Size(30, 30), //min size
-                Size(80, 80) //max ize
+                Size(70, 70) //max ize
     );
 
     for (i = 0; i < faces.size(); i++) {
@@ -261,7 +252,7 @@ void only_face(Mat src, Mat &dst) {
                 3, // merge groups of three detections
                 0, // not used for a new cascade
                 Size(30, 30), //min size
-                Size(80, 80) //max ize
+                Size(70, 70) //max ize
     );
     
     Mat mask = Mat(src.size(), CV_8UC1, Scalar(0, 0, 0));

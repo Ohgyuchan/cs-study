@@ -43,23 +43,23 @@ bool sort(int a[], int cnt)
 
 int main()
 {
-    srand(time(NULL));
-    
-    int size;
-    printf("input number of data: ");
-    scanf("%d", &size);
-    int *arr = (int *)malloc(sizeof(int) * size);
-    
-    input_array(arr, size);
-    output_array(arr, size);
+   srand(time(NULL));
+   
+   int size;
+   printf("input number of data: ");
+   scanf("%d", &size);
+   int *arr = (int *)malloc(sizeof(int) * size);
+   
+   input_array(arr, size);
+   output_array(arr, size);
 
-    if(sort(arr, size)) {
-        printf("Called swap function\n");
-        printf("============= sorted array =============\n");
-        output_array(arr, size);
-        int min = arr[0], max = arr[size-1];
-        printf("\nmin: %d, max: %d\n", min, max);
-    }
+   if(sort(arr, size)) {
+      printf("Called swap function\n");
+      printf("============= sorted array =============\n");
+      output_array(arr, size);
+      int min = arr[0], max = arr[size-1];
+      printf("\nmin: %d, max: %d\n", min, max);
+   }
 
-    return 0;
+   return 0;
 }

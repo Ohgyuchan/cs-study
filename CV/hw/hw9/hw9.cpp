@@ -16,7 +16,7 @@ void face_detection(Mat src, Mat &dst);
 void only_face(Mat src, Mat &dst);
 
 int main() {
-    Ptr<BackgroundSubtractor> bg_model = createBackgroundSubtractorMOG2(90);
+    Ptr<BackgroundSubtractor> bg_model = createBackgroundSubtractorMOG2(500, 20.0, false);
     Mat frame, onlyPeople, faceDetection, onlyFace, background, foreground, foregroundMask;
 
     VideoCapture cap;
@@ -27,7 +27,7 @@ int main() {
     }
 
     int key = -1;
-    int command = 'b';
+    int command = -1;
 
     while (1) {
         if(!cap.read(frame)) {

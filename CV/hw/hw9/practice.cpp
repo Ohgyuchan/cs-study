@@ -10,13 +10,13 @@ using namespace dnn;
 void morphOps_backSub(Mat &thresh);
 
 void only_people_deep_grabCut(Mat src, Mat &dst);
-void only_people_backSub(Mat src, Mat background, Mat &dst);
+void only_people_backSub(Mat src, Mat mask, Mat &dst);
 
 void face_detection(Mat src, Mat &dst);
 void only_face(Mat src, Mat &dst);
 
 int main() {
-    Ptr<BackgroundSubtractor> bg_model = createBackgroundSubtractorMOG2(10);
+    Ptr<BackgroundSubtractor> bg_model = createBackgroundSubtractorMOG2(90);
     Mat frame, onlyPeople, faceDetection, onlyFace, background, foreground, foregroundMask;
 
     VideoCapture cap;
@@ -34,14 +34,14 @@ int main() {
             cap.set(CAP_PROP_POS_FRAMES, 0);
             cap.read(frame);
         }
-        resize(frame, frame, Size(1100, 600));
+        resize(frame, frame, Size(800, 440));
         
         if (foregroundMask.empty())
             foregroundMask.create(frame.size(), frame.type());
 
-        bg_model->apply(frame, foregroundMask, 0.5);
-        // GaussianBlur(foregroundMask, foregroundMask, Size(11, 11), 3.5, 3.5);
-        threshold(foregroundMask, foregroundMask, 20, 255, THRESH_BINARY);
+        bg_model->apply(frame, foregroundMask);
+        GaussianBlur(foregroundMask, foregroundMask, Size(11, 11), 0);
+        threshold(foregroundMask, foregroundMask, 0, 255, THRESH_BINARY);
 
         if(key == -1 || command == -1) {
             imshow("Face", frame);
@@ -59,12 +59,9 @@ int main() {
         }
         
         if(command == 'b') {
-            // only_people_backSub(frame, background, onlyPeople);
-            morphOps_backSub(foregroundMask);
-            foreground = Scalar::all(0);
-            frame.copyTo(foreground, foregroundMask);
-            imshow("Face", foreground);
-            imshow("mask", foregroundMask);
+            only_people_backSub(frame, foregroundMask, onlyPeople);
+            
+            imshow("Face", onlyPeople);
         }
 
         if(command == 'f') {
@@ -145,58 +142,38 @@ void only_people_deep_grabCut(Mat src, Mat &dst) {
 }
 
 void morphOps_backSub(Mat &thresh) {
-    // Mat closing = getStructuringElement(MORPH_ELLIPSE, Size(11,11));
-    // Mat opening = getStructuringElement(MORPH_ELLIPSE, Size(11, 11));
-    Mat opening = getStructuringElement(MORPH_ELLIPSE, Size(31, 31));
-    Mat element = getStructuringElement(MORPH_ELLIPSE, Size(11, 11));
-	
-    // morphologyEx( thresh, thresh, MORPH_CLOSE, element );
-    // medianBlur(thresh, thresh, 11);
-    GaussianBlur(thresh, thresh, Size(11, 11), 3.5, 3.5);
-
-    morphologyEx( thresh, thresh, MORPH_OPEN, opening );
+    Mat opening = getStructuringElement(MORPH_RECT, Size(21, 21));
+    Mat closing = getStructuringElement(MORPH_RECT, Size(21, 21));
     
+    morphologyEx( thresh, thresh, MORPH_OPEN, opening );
+    morphologyEx( thresh, thresh, MORPH_CLOSE, closing );
 
-    // erode(thresh, thresh, element);
-    // dilate(thresh, thresh, element);
+    medianBlur(thresh, thresh, 11);
 }
 
-void only_people_backSub(Mat src, Mat background, Mat &dst) {
-    Mat gray, result;
+void only_people_backSub(Mat src, Mat mask, Mat &dst) {
+    CascadeClassifier face_classifier;
+    vector<Rect> faces;
+    Mat grayframe;
 
-    cvtColor(src, gray, CV_BGR2GRAY);
-    absdiff(gray, background, result);
-    
-    GaussianBlur(result, result, Size(11, 11), 3.5, 3.5);
-    threshold(result, result, 20, 255, CV_THRESH_BINARY);
-    morphOps_backSub(result);
-    medianBlur(result, result, 11);
+    face_classifier.load("haarcascade_frontalface_alt.xml");
 
+    cvtColor(src, grayframe, COLOR_BGR2GRAY);
+    face_classifier.detectMultiScale(
+                grayframe,
+                faces,
+                1.1, // increase search scale by 10% each pass
+                3, // merge groups of three detections
+                0, // not used for a new cascade
+                Size(20, 20), //min size
+                Size(50, 50) //max ize
+    );
+
+    morphOps_backSub(mask);
     dst = Scalar::all(0);
-    src.copyTo(dst, result);
-    
-    vector<vector<Point> > contours;
-    vector<Vec4i> hierarchy;
-    findContours(result, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
-    
-    int cout_people = 0;
-    vector<Rect> boundRect(contours.size());
-    for (int i = 0; i < contours.size(); i++) {
-        
-        if(contourArea(Mat(contours[i])) > 3000) {
-            boundRect[i] = boundingRect(Mat(contours[i]));
+    src.copyTo(dst, mask);
 
-            cout_people++;
-        }
-    }
-
-    for (int i = 0; i < contours.size(); i++) {
-        putText(dst, format("how many people: %d", cout_people), Point(50, 80), FONT_HERSHEY_SIMPLEX, 1, Scalar(255, 255, 255), 4);
-    }
-
-    if(contours.size() == 0) {
-        putText(dst, format("how many people: %d", cout_people), Point(50, 80), FONT_HERSHEY_SIMPLEX, 1, Scalar(255, 255, 255), 4);
-    }
+    putText(dst, format("There are %d people", faces.size()), Point(50, 80), FONT_HERSHEY_SIMPLEX, 1, Scalar(255, 255, 255), 4);
 }
 
 void face_detection(Mat src, Mat &dst) {
@@ -215,8 +192,8 @@ void face_detection(Mat src, Mat &dst) {
                 1.1, // increase search scale by 10% each pass
                 3, // merge groups of three detections
                 0, // not used for a new cascade
-                Size(30, 30), //min size
-                Size(70, 70) //max ize
+                Size(20, 20), //min size
+                Size(50, 50) //max ize
     );
 
     for (i = 0; i < faces.size(); i++) {
@@ -257,8 +234,8 @@ void only_face(Mat src, Mat &dst) {
                 1.1, // increase search scale by 10% each pass
                 3, // merge groups of three detections
                 0, // not used for a new cascade
-                Size(30, 30), //min size
-                Size(70, 70) //max ize
+                Size(20, 20), //min size
+                Size(50, 50) //max ize
     );
     
     Mat mask = Mat(src.size(), CV_8UC1, Scalar(0, 0, 0));
@@ -281,9 +258,8 @@ void only_face(Mat src, Mat &dst) {
         add(dst, faceGrabCut[i], dst);
     
     Mat bg = imread("virtualBackground.png");
-    resize(bg, bg, Size(1100, 600));
+    resize(bg, bg, Size(800, 440));
     threshold(mask, mask, 20, 255, THRESH_BINARY_INV);
 
     bg.copyTo(dst, mask);
-    
 }

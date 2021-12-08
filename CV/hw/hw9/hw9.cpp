@@ -152,28 +152,48 @@ void morphOps_backSub(Mat &thresh) {
 }
 
 void only_people_backSub(Mat src, Mat mask, Mat &dst) {
-    CascadeClassifier face_classifier;
-    vector<Rect> faces;
-    Mat grayframe;
+    Mat people[5];
 
-    face_classifier.load("haarcascade_frontalface_alt.xml");
+    String modelConfiguration = "deep/yolov2-tiny.cfg";
+    String modelBinary = "deep/yolov2-tiny.weights";
+    Net net = readNetFromDarknet(modelConfiguration, modelBinary);
+    vector<String> classNamesVec;
+    ifstream classNamesFile("deep/coco.names");
 
-    cvtColor(src, grayframe, COLOR_BGR2GRAY);
-    face_classifier.detectMultiScale(
-                grayframe,
-                faces,
-                1.1, // increase search scale by 10% each pass
-                3, // merge groups of three detections
-                0, // not used for a new cascade
-                Size(20, 20), //min size
-                Size(50, 50) //max ize
-    );
+    if (classNamesFile.is_open()) {
+        string className = "";
+        while (std::getline(classNamesFile, className)) classNamesVec.push_back(className);
+    }
+        
+    if (src.channels() == 4) cvtColor(src, src, COLOR_BGRA2BGR);
+    
+    // Convert Mat to batch of images
+    Mat inputBlob = blobFromImage(src, 1 / 255.F, Size(416, 416), Scalar(), true, false);
+    net.setInput(inputBlob, "data"); //set the network input
+    Mat detectionMat = net.forward("detection_out"); //compute output
+    
+    float confidenceThreshold = 0.6;
+    int count_people = 0;
+    for (int i = 0; i < detectionMat.rows; i++) {
+        const int probability_index = 5;
+        const int probability_size = detectionMat.cols - probability_index;
+        float *prob_array_ptr = &detectionMat.at<float>(i, probability_index);
+        size_t objectClass = max_element(prob_array_ptr, prob_array_ptr + probability_size) -
+        prob_array_ptr;
+        // prediction probability of each class
+        float confidence = detectionMat.at<float>(i, (int)objectClass + probability_index);
+        // for drawing labels with name and confidence
+        if (confidence > confidenceThreshold) {
+            String className = objectClass < classNamesVec.size() ? classNamesVec[objectClass] : format("unknown(%d)", objectClass);
+            if(className.compare("person?")) count_people++;
+        }
+    }
 
     morphOps_backSub(mask);
     dst = Scalar::all(0);
     src.copyTo(dst, mask);
 
-    putText(dst, format("There are %d people", faces.size()), Point(50, 80), FONT_HERSHEY_SIMPLEX, 1, Scalar(255, 255, 255), 4);
+    putText(dst, format("There are %d people", count_people), Point(50, 80), FONT_HERSHEY_SIMPLEX, 1, Scalar(255, 255, 255), 4);
 }
 
 void face_detection(Mat src, Mat &dst) {

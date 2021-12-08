@@ -16,7 +16,7 @@ void face_detection(Mat src, Mat &dst);
 void only_face(Mat src, Mat &dst);
 
 int main() {
-    Ptr<BackgroundSubtractor> bg_model = createBackgroundSubtractorMOG2(700, 20, false);
+    Ptr<BackgroundSubtractor> bg_model = createBackgroundSubtractorMOG2(10);
     Mat frame, onlyPeople, faceDetection, onlyFace, background, foreground, foregroundMask;
 
     VideoCapture cap;
@@ -27,7 +27,7 @@ int main() {
     }
 
     int key = -1;
-    int command = -1;
+    int command = 'b';
 
     while (1) {
         if(!cap.read(frame)) {
@@ -39,8 +39,8 @@ int main() {
         if (foregroundMask.empty())
             foregroundMask.create(frame.size(), frame.type());
 
-        bg_model->apply(frame, foregroundMask);
-        GaussianBlur(foregroundMask, foregroundMask, Size(11, 11), 3.5, 3.5);
+        bg_model->apply(frame, foregroundMask, 0.5);
+        // GaussianBlur(foregroundMask, foregroundMask, Size(11, 11), 3.5, 3.5);
         threshold(foregroundMask, foregroundMask, 20, 255, THRESH_BINARY);
 
         if(key == -1 || command == -1) {
@@ -53,17 +53,18 @@ int main() {
                 command = key;
         }
 
-        if(command == 'b') {
+        if(command == 'B') {
             only_people_deep_grabCut(frame, onlyPeople);
             imshow("Face", onlyPeople);
         }
         
-        if(command == 'B') {
+        if(command == 'b') {
             // only_people_backSub(frame, background, onlyPeople);
             morphOps_backSub(foregroundMask);
             foreground = Scalar::all(0);
             frame.copyTo(foreground, foregroundMask);
             imshow("Face", foreground);
+            imshow("mask", foregroundMask);
         }
 
         if(command == 'f') {
@@ -76,7 +77,6 @@ int main() {
             imshow("Face", onlyFace);
         }
         key = waitKey(33);
-        cout << key << endl;
     }
 
     return 0;
@@ -145,14 +145,20 @@ void only_people_deep_grabCut(Mat src, Mat &dst) {
 }
 
 void morphOps_backSub(Mat &thresh) {
-    Mat element = getStructuringElement(MORPH_ELLIPSE, Size(11,11));
+    // Mat closing = getStructuringElement(MORPH_ELLIPSE, Size(11,11));
+    // Mat opening = getStructuringElement(MORPH_ELLIPSE, Size(11, 11));
+    Mat opening = getStructuringElement(MORPH_ELLIPSE, Size(31, 31));
+    Mat element = getStructuringElement(MORPH_ELLIPSE, Size(11, 11));
+	
+    // morphologyEx( thresh, thresh, MORPH_CLOSE, element );
+    // medianBlur(thresh, thresh, 11);
+    GaussianBlur(thresh, thresh, Size(11, 11), 3.5, 3.5);
 
-    erode(thresh, thresh, element);
-    erode(thresh, thresh, element);
+    morphologyEx( thresh, thresh, MORPH_OPEN, opening );
     
-	dilate(thresh, thresh, element);
 
-    medianBlur(thresh, thresh, 11);
+    // erode(thresh, thresh, element);
+    // dilate(thresh, thresh, element);
 }
 
 void only_people_backSub(Mat src, Mat background, Mat &dst) {

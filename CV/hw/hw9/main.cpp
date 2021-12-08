@@ -69,14 +69,15 @@ int main() {
         }
 
         if(command == 'b') {
+            only_people_backSub(frame, background, onlyPeople);
+            imshow("Face", onlyPeople);
+        }
+
+        if(command == 'B') {
             only_people_deep_grabCut(frame, onlyPeople);
             imshow("Face", onlyPeople);
         }
         
-        if(command == 'B') {
-            only_people_backSub(frame, background, onlyPeople);
-            imshow("Face", onlyPeople);
-        }
 
         if(command == 'f') {
             face_detection(frame, faceDetection);
@@ -179,7 +180,6 @@ void only_people_backSub(Mat src, Mat background, Mat &dst) {
     cvtColor(src, gray, CV_BGR2GRAY);
     absdiff(gray, background, result);
     
-    GaussianBlur(result, result, Size(11, 11), 3.5, 3.5);
     threshold(result, result, 20, 255, CV_THRESH_BINARY);
     morphOps_backSub(result);
     medianBlur(result, result, 11);

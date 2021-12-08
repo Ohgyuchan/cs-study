@@ -142,8 +142,8 @@ void only_people_deep_grabCut(Mat src, Mat &dst) {
 }
 
 void morphOps_backSub(Mat &thresh) {
-    Mat opening = getStructuringElement(MORPH_RECT, Size(21, 21));
-    Mat closing = getStructuringElement(MORPH_RECT, Size(21, 21));
+    Mat opening = getStructuringElement(MORPH_RECT, Size(25, 25));
+    Mat closing = getStructuringElement(MORPH_RECT, Size(11, 11));
     
     morphologyEx( thresh, thresh, MORPH_OPEN, opening );
     morphologyEx( thresh, thresh, MORPH_CLOSE, closing );

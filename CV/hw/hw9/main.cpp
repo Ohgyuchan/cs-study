@@ -7,7 +7,6 @@ using namespace cv;
 using namespace std;
 using namespace dnn;
 
-void morphOps_deep(Mat &thresh);
 void morphOps_backSub(Mat &thresh);
 
 void only_people_deep_grabCut(Mat src, Mat &dst);
@@ -30,18 +29,18 @@ int main() {
     int count = 2;
 
     cap >> background;
-    resize(background, background, Size(1100, 600));
+    resize(frame, frame, Size(800, 440));
     cvtColor(background, background, COLOR_BGR2GRAY);
 
     while(1) {
         if(!cap.read(frame)) break;
-        resize(frame, frame, Size(1100, 600));
+        resize(frame, frame, Size(800, 440));
 
         cvtColor(frame, frame, CV_BGR2GRAY);
         
         add(frame / count, background*(count - 1) / count, background);
 
-        if(count == 3) break;
+        if(count == 10) break;
         
         count++;
     }
@@ -56,7 +55,7 @@ int main() {
             cap.set(CAP_PROP_POS_FRAMES, 0);
             cap.read(frame);
         }
-        resize(frame, frame, Size(1100, 600));
+        resize(frame, frame, Size(800, 440));
         
         if(key == -1) {
             imshow("Face", frame);
@@ -93,12 +92,6 @@ int main() {
     }
 
     return 0;
-}
-
-void morphOps_deep(Mat &thresh) {
-	Mat dilateElement = getStructuringElement(MORPH_CROSS, Size(5,5));
-
-	dilate(thresh,thresh,dilateElement);
 }
 
 void only_people_deep_grabCut(Mat src, Mat &dst) {
@@ -150,7 +143,6 @@ void only_people_deep_grabCut(Mat src, Mat &dst) {
             Mat bgModel, fgModel, result;
             grabCut(src, result, object, bgModel, fgModel, 10, GC_INIT_WITH_RECT);
             compare(result, GC_PR_FGD, result, CMP_EQ);
-            morphOps_deep(result);
     
             people[count_people - 1] = Mat(src.size(), CV_8UC3, Scalar(0, 0, 0));
             src.copyTo(people[count_people - 1], result);
@@ -293,7 +285,7 @@ void only_face(Mat src, Mat &dst) {
         add(dst, faceGrabCut[i], dst);
     
     Mat bg = imread("virtualBackground.png");
-    resize(bg, bg, Size(1100, 600));
+    resize(bg, bg, Size(800, 440));
     threshold(mask, mask, 20, 255, THRESH_BINARY_INV);
 
     bg.copyTo(dst, mask);

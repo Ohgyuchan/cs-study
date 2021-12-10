@@ -27,14 +27,33 @@ void swap(int *a, int *b) {
     *b = temp;
 }
 
-int main() {
-    char s[8] = "HanDong";
-    char *p;
-    for(p=&s[2]; p >= s; p--) {
-        ++*p;
-        printf("%c\n", *p);
-    }
-    printf("%s", s);
+// int main() {
+//     char s[8] = "HanDong";
+//     char *p;
+//     for(p=&s[2]; p >= s; p--) {
+//         ++*p;
+//         printf("%c\n", *p);
+//     }
+//     printf("%s", s);
     
+//     return 0;
+// }
+
+int main() {
+    int a, b;
+    char con1[10];
+    char con2[10];
+    scanf("%d %d", &a, &b);
+    if(a > b) {
+        int i = 0;
+        int temp = a;
+        while(temp > 0) {
+            int i = 0;
+        }
+    } else {
+
+    }
     return 0;
 }
+
+

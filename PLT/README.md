@@ -22,3 +22,5 @@ $> java -cp [class_path_settings] edu.handong.csee.plt.Main "{+ 2 3}"
 $> java -cp [class_path_settings] edu.handong.csee.plt.Main -p "{+ 2 3}"
 (add (num 2) (num 3))
 ```
+
+

@@ -51,3 +51,5 @@ int main() {
 감마
 
 ## 필터링
+### Convolution
+3x3 filter

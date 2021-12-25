@@ -24,9 +24,6 @@ public class Substitution {
 			return new Sub(subst(sub.getLhs(), idtf, val), subst(sub.getRhs(),idtf,val));
 		}
 
-		
-		
-		
 		if(ast instanceof Id) {
 			if(ast instanceof Id && idtf instanceof Id) {
 				return new Num(val);

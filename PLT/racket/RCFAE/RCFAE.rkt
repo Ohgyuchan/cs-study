@@ -53,20 +53,8 @@
     [(list 'fun (list p) b)     (fun p (parse b))]
     [(list f a)                 (app (parse f) (parse a))]
     [(list test then e)         (if0 (parse test) (parse then) (parse e))]
-    [(list 'rec (list n) ne fst) (rec n (parse ne) (parse fst))]
+    [(list 'rec (list n ne) fst) (rec n ne (parse fst))]
     [else                       (error 'parse "bad syntax: ~a" sexp)]))
-
-    (define-type RCFAE
-    [num (n number?)]
-    [add (lhs RCFAE?) (rhs RCFAE?)]
-    [sub (lhs RCFAE?) (rhs RCFAE?)]
-    [mul (lhs RCFAE?) (rhs RCFAE?)]
-    [id (name symbol?)]
-    [fun (param symbol?) (body RCFAE?)]
-    [app (fun-expr RCFAE?) (arg-expr RCFAE?)]
-    [if0 (test-expr RCFAE?) (then-expr RCFAE?) (else-expr RCFAE?)]
-    [rec (name symbol?) (named-expr RCFAE?) (fst-call RCFAE?)])
-
 
 (define (num-op op)
   (lambda (x y)
@@ -119,5 +107,5 @@
 ; (interp `{rec {count {fun {n} {if0 n 0 {+ 1 {count {- n 1}}}}}} {count 8}} (mtSub))
 (run `{rec {count {fun {n} {if0 n 0 {+ 1 {count {- n 1}}}}}} {count 8}} (mtSub))
 ; dynamic scope issue
-; (parse '{with {x 3} {with {f {fun {y} {+ x y}}} {with {x 5} {f 4}}}})
-; (interp (parse '{with {x 3} {with {f {fun {y} {+ x y}}} {with {x 5} {f 4}}}}) (mtSub))
+(parse '{with {x 3} {with {f {fun {y} {+ x y}}} {with {x 5} {f 4}}}})
+(interp (parse '{with {x 3} {with {f {fun {y} {+ x y}}} {with {x 5} {f 4}}}}) (mtSub))

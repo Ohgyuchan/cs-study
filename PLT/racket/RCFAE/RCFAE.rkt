@@ -12,23 +12,22 @@
     [if0 (test-expr RCFAE?) (then-expr RCFAE?) (else-expr RCFAE?)]
     [rec (name symbol?) (named-expr RCFAE?) (fst-call RCFAE?)])
 
-; DefrdSub
+(define (boxed-RCFAE-Value? value)
+  (and (box? value)
+      (RCFAE-Value? (unbox value))))
+
 (define-type DefrdSub
     [mtSub]
     [aSub     (name symbol?)
               (value RCFAE-Value?)
               (ds DefrdSub?)]
     [aRecSub  (name symbol?)
-              (value-box (box/c RCFAE-Value?))
+              (value boxed-RCFAE-Value?)
               (ds DefrdSub?)])
 
-; RFAE-Value
 (define-type RCFAE-Value
-    [numV (n number?)]
-    [closureV (param symbol?)
-              (body RCFAE?)
-              (ds DefrdSub?)])
-
+    [numV       (n number?)]
+    [closureV   (param symbol?) (body RCFAE?) (ds DefrdSub?)])
 
 ; lookup : symbol DefrdSub -> RCFAE-Value
 (define (lookup name ds)
@@ -68,7 +67,6 @@
 (define num+ (num-op +))
 ; num-: FAE FAE -> FAE
 (define num- (num-op -))
-; num*: RCFAE RCFAE -> FAE
 (define num* (num-op *))
 
 ; numzero? :  RCFAE-Value -> boolean
@@ -81,20 +79,21 @@
     [num(n)               (numV n)]
 	  [add(l r)             (num+ (interp l ds) (interp r ds))]
 	  [sub(l r)             (num- (interp l ds) (interp r ds))]
+    [mul(l r)             (num* (interp l ds) (interp r ds))]
 	  [id(name)             (lookup name ds)]
 	  [fun(param body-expr) (closureV param body-expr ds)]
 	  [app(f a)             (local [(define ftn (interp f ds))] 
                                   (interp (closureV-body ftn) (aRecSub (closureV-param ftn) (interp a ds)
 			                            (closureV-ds ftn))))]
-    [if0 (test-expr then-expr else-expr)
+    [if0(test-expr then-expr else-expr)
                           (if (numzero? (interp test-expr ds))
                           (interp then-expr ds) (interp else-expr ds))]
-	  [rec (bound-id named-expr fst-call)
-                          (local [(define value-holder (box (numV 198)))
-                                  (define new-ds (aRecSub bound-id value-holder ds))]
-                          (begin (set-box! value-holder (interp named-expr new-ds)) (interp fst-call new-ds)))]))
-
-
+	  [rec (f fun-expr fst-call)
+          (local [(define value-holder (box (numV 198)))
+                    (define new-ds (aRecSub f value-holder ds))]
+            (begin
+              (set-box! value-holder (interp fun-expr new-ds))
+              (interp fst-call new-ds)))]))
 
 
 ; run
@@ -102,5 +101,7 @@
   (interp (parse sexp) ds))
 
 ; (parse '{rec {count {fun {n} {if0 n 0 {+ 1 {count {- n 1}}}}}} {count 8}})
-; (interp '{rec {count {fun {n} {if0 n 0 {+ 1 {count {- n 1}}}}}} {count 8}} (mtSub))
+; (interp (parse '{rec {count {fun {n} {if0 n 0 {+ 1 {count {- n 1}}}}}} {count 8}} (mtSub)))
+
 (run '{rec {count {fun {n} {if0 n 0 {+ 1 {count {- n 1}}}}}} {count 8}} (mtSub))
+; (run '{rec {fac {fun {x} {if0 x 1 {* x {fac {+ x -1}}}}}} {fac 10}} (mtSub))

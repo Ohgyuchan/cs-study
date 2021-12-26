@@ -1,5 +1,15 @@
 #lang plai
 
+;; <RCFAE> ::= <num>
+;;           | {+ <RCFAE> <RCFAE>}
+;;           | {* <RCFAE> <RCFAE>}
+;;           | <id>
+;;           | {fun {<id>} <RCFAE>}
+;;           | {<RCFAE> <RCFAE>}
+;;           | {if0 <RCFAE> <RCFAE> <RCFAE>}
+;;           | {rec {<id> <RCFAE>} <RCFAE>}
+
+
 (define-type RCFAE
   [num (n number?)]
   [add (lhs RCFAE?) (rhs RCFAE?)]
@@ -20,7 +30,7 @@
 
 (define (boxed-RCFAE-Value? value)
   (and (box? value)
-      (RCFAE-Value? (unbox value))))
+       (RCFAE-Value? (unbox value))))
 
 (define-type Env
   [mtSub]
@@ -121,9 +131,4 @@
 (define (run sexp ds)
     (interp (parse sexp) ds))
 
-(run '{rec {fac {fun {x}
-                                     {if0 x
-                                          1
-                                          {* x {fac {+ x -1}}}}}}
-                           {fac 10}}
-              (mtSub))
+(interp (parse '{rec {fac {fun {x} {if0 x 1 {* x {fac {+ x -1}}}}}} {fac 10}} (mtSub)))

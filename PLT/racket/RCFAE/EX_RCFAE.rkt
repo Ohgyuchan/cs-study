@@ -1,40 +1,40 @@
 #lang plai
 
-(define-type RCFAE
+(define-type RFAE
   [num (n number?)]
-  [add (lhs RCFAE?) (rhs RCFAE?)]
-  [mul (lhs RCFAE?) (rhs RCFAE?)]
+  [add (l RFAE?) (r RFAE?)]
+  [mul (l RFAE?) (r RFAE?)]
   [id (name symbol?)]
-  [fun (param symbol?) (body RCFAE?)]
-  [app (fun-expr RCFAE?) (arg-expr RCFAE?)]
-  [if0 (pred RCFAE?) (truth RCFAE?) (falsity RCFAE?)]
-  [rec (name symbol?) (named-expr RCFAE?) (body RCFAE?)])
+  [fun (param symbol?) (body RFAE?)]
+  [app (fun-expr RFAE?) (arg-expr RFAE?)]
+  [if0 (pred RFAE?) (truth RFAE?) (falsity RFAE?)]
+  [rec (name symbol?) (named-expr RFAE?) (body RFAE?)])
 
-(define-type RCFAE-Value
-  [noV]
-  [numV (n number?)]
-  [closureV (param symbol?) (body RCFAE?) (env Env?)])
+(define-type RFAE-Value
+    [nV]
+    [numV (n number?)]
+    [closureV (param symbol?) (body RFAE?) (ds DefrdSub?)])
 
-;; boxed-RCFAE-Value? : any -> boolean
-;; returns true if given value is a boxed RCFAE-Value
+;; boxed-RFAE-Value? : any -> boolean
+;; returns true if given value is a boxed RFAE-Value
 
-(define (boxed-RCFAE-Value? value)
+(define (boxed-RFAE-Value? value)
   (and (box? value)
-      (RCFAE-Value? (unbox value))))
+      (RFAE-Value? (unbox value))))
 
-(define-type Env
+(define-type DefrdSub
   [mtSub]
-  [aSub (key symbol?) (value RCFAE-Value?) (next Env?)]
-  [aRecSub (key symbol?) (value boxed-RCFAE-Value?) (next Env?)])
+  [aSub (key symbol?) (value RFAE-Value?) (ds DefrdSub?)]
+  [aRecSub (key symbol?) (value boxed-RFAE-Value?) (ds DefrdSub?)])
 
-;; parse : sexp -> RCFAE
-;; converts given S-expression to RCFAE expression
+;; parse : sexp -> RFAE
+;; converts given S-expression to RFAE expression
 
 (define (parse sexp)
   (match sexp
     [(? number? n) (num n)]
-    [(list '+ lhs rhs) (add (parse lhs) (parse rhs))]
-    [(list '* lhs rhs) (mul (parse lhs) (parse rhs))]
+    [(list '+ l r) (add (parse l) (parse r))]
+    [(list '* l r) (mul (parse l) (parse r))]
     [(? symbol? v) (id v)]
     [(list 'fun (list (? symbol? param)) body)
      (fun param (parse body))]
@@ -58,72 +58,64 @@
 (define (num-zero? n)
   (zero? (numV-n n)))
 
-;; lookup : symbol Env -> RCFAE-Value
+;; lookup : symbol DefrdSub -> RFAE-Value
 ;; looks up given name in given environment
 
-(define (lookup name env)
-  (local [(define (lookup-helper name env)
-            (type-case Env env
+(define (lookup name ds)
+  (local [(define (lookup-helper name ds)
+            (type-case DefrdSub ds
               [mtSub () (error 'lookup "free identifier")]
-              [aSub (key value next)
+              [aSub (key value ds)
                     (if (symbol=? name key)
                         value
-                        (lookup-helper name next))]
-              [aRecSub (key boxed-value next)
+                        (lookup-helper name ds))]
+              [aRecSub (key boxed-value ds)
                        (if (symbol=? name key)
                            (unbox boxed-value)
-                           (lookup-helper name next))]))
-          (define val (lookup-helper name env))]
-    (if (noV? val)
+                           (lookup-helper name ds))]))
+          (define val (lookup-helper name ds))]
+    (if (nV? val)
         (error "no value assigned")
         val)))
 
-;; cyclically-bind-and-interp : symbol fun env -> env
-;; returns an environment that associates bound-id with a closure whose environment is the containing environment
-
-(define (cyclically-bind-and-interp bound-id named-expr env)
-  (local [(define value-holder (box (noV)))
-          (define new-env (aRecSub bound-id value-holder env))
-          (define named-expr-val (interp named-expr new-env))]
+;; cyclically-bind-and-interp : symbol fun ds -> ds
+(define (cyclically-bind-and-interp bound-id named-expr ds)
+  (local [(define value-holder (box (nV)))
+          (define new-ds (aRecSub bound-id value-holder ds))
+          (define named-expr-val (interp named-expr new-ds))]
     (begin
       (set-box! value-holder named-expr-val)
-      new-env)))
+      new-ds)))
 
-;; interp : RCFAE Env -> RCFAE-Value
-;; evaluates given RCFAE expression to its value
 
-(define (interp expr env)
-  (type-case RCFAE expr
+(define (interp expr ds)
+  (type-case RFAE expr
     [num (n) (numV n)]
-    [add (l r) (num-op + (interp l env) (interp r env))]
-    [mul (l r) (num-op * (interp l env) (interp r env))]
-    [id (v) (lookup v env)]
-    [fun (param body) (closureV param body env)]
+    [add (l r) (num-op + (interp l ds) (interp r ds))]
+    [mul (l r) (num-op * (interp l ds) (interp r ds))]
+    [id (v) (lookup v ds)]
+    [fun (param body) (closureV param body ds)]
     [app (fun-expr arg-expr)
-         (local [(define fun-val (interp fun-expr env))
-                 (define arg-val (interp arg-expr env))]
+         (local [(define fun-val (interp fun-expr ds))
+                 (define arg-val (interp arg-expr ds))]
            (interp (closureV-body fun-val)
                    (aSub (closureV-param fun-val)
                          arg-val
-                         (closureV-env fun-val))))]
+                         (closureV-ds fun-val))))]
     [if0 (pred truth falsity)
-         (local [(define pred-val (interp pred env))]
+         (local [(define pred-val (interp pred ds))]
            (if (num-zero? pred-val)
-               (interp truth env)
-               (interp falsity env)))]
+               (interp truth ds)
+               (interp falsity ds)))]
     [rec (bound-id named-expr bound-body)
          (interp bound-body
                  (cyclically-bind-and-interp bound-id
                                              named-expr
-                                             env))]))
+                                             ds))]))
 
 ; run
-(define (run sexp ds)
-    (interp (parse sexp) ds))
+(define (run sexp)
+    (interp (parse sexp) (mtSub)))
 
-(run '{rec {fac {fun {x}
-                                     {if0 x
-                                          1
-                                          {* x {fac {+ x -1}}}}}}
-                           {fac 10}}
-              (mtSub))
+(run '{rec {fac {fun {x} {if0 x 1 {* x {fac {+ x -1}}}}}} {fac 10}} )
+; (run '{with {count {fun {n} 0}} {with {count {fun {n} {if0 n 0 {+ 1 {count {- n 1}}}}}} {count 8}}})

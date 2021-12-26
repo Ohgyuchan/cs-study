@@ -1,6 +1,6 @@
 #lang plai
 
-; RFAE definition
+; RCFAE definition
 (define-type RCFAE
     [num (n number?)]
     [add (lhs RCFAE?) (rhs RCFAE?)]
@@ -12,9 +12,9 @@
     [if0 (test-expr RCFAE?) (then-expr RCFAE?) (else-expr RCFAE?)]
     [rec (name symbol?) (named-expr RCFAE?) (fst-call RCFAE?)])
 
-(define (boxed-RCFAE-Value? value)
-  (and (box? value)
-      (RCFAE-Value? (unbox value))))
+(define-type RCFAE-Value
+    [numV       (n number?)]
+    [closureV   (param symbol?) (body RCFAE?) (ds DefrdSub?)])
 
 (define-type DefrdSub
     [mtSub]
@@ -22,12 +22,8 @@
               (value RCFAE-Value?)
               (ds DefrdSub?)]
     [aRecSub  (name symbol?)
-              (value boxed-RCFAE-Value?)
+              (value-box (box/c RCFAE-Value?))
               (ds DefrdSub?)])
-
-(define-type RCFAE-Value
-    [numV       (n number?)]
-    [closureV   (param symbol?) (body RCFAE?) (ds DefrdSub?)])
 
 ; lookup : symbol DefrdSub -> RCFAE-Value
 (define (lookup name ds)
@@ -62,7 +58,7 @@
 
 (define (num-op op)
   (lambda (x y)
-    (num (op (numV-n x) (numV-n y)))))
+    (numV (op (numV-n x) (numV-n y)))))
 ; num+: FAE FAE -> FAE
 (define num+ (num-op +))
 ; num-: FAE FAE -> FAE

@@ -1,134 +1,117 @@
 #lang plai
 
-;; <RCFAE> ::= <num>
-;;           | {+ <RCFAE> <RCFAE>}
-;;           | {* <RCFAE> <RCFAE>}
-;;           | <id>
-;;           | {fun {<id>} <RCFAE>}
-;;           | {<RCFAE> <RCFAE>}
-;;           | {if0 <RCFAE> <RCFAE> <RCFAE>}
-;;           | {rec {<id> <RCFAE>} <RCFAE>}
+(define-type RFAE
+    [num (n number?)]
+    [add (l RFAE?) (r RFAE?)]
+    [sub (l RFAE?) (r RFAE?)]
+    [mul (l RFAE?) (r RFAE?)]
+    [id (name symbol?)]
+    [fun (param symbol?) (body RFAE?)]
+    [app (fun-expr RFAE?) (arg-expr RFAE?)]
+    [if0 (test-expr RFAE?) (then-expr RFAE?) (else-expr RFAE?)]
+    [rec (name symbol?) (named-expr RFAE?) (fst-call RFAE?)])
 
+(define-type RFAE-Value
+    [numV (n number?)]
+    [closureV (param symbol?) (body RFAE?) (ds DefrdSub?)])
 
-(define-type RCFAE
-  [num (n number?)]
-  [add (lhs RCFAE?) (rhs RCFAE?)]
-  [mul (lhs RCFAE?) (rhs RCFAE?)]
-  [id (name symbol?)]
-  [fun (param symbol?) (body RCFAE?)]
-  [app (fun-expr RCFAE?) (arg-expr RCFAE?)]
-  [if0 (pred RCFAE?) (truth RCFAE?) (falsity RCFAE?)]
-  [rec (name symbol?) (named-expr RCFAE?) (body RCFAE?)])
+; boxed-RFAE-Value? : any -> boolean
+; returns true if given value is a boxed RFAE-Value
 
-(define-type RCFAE-Value
-  [noV]
-  [numV (n number?)]
-  [closureV (param symbol?) (body RCFAE?) (env Env?)])
+(define (boxed-RFAE-Value? value)
+    (and    (box? value)
+            (RFAE-Value? (unbox value))))
 
-;; boxed-RCFAE-Value? : any -> boolean
-;; returns true if given value is a boxed RCFAE-Value
+(define-type DefrdSub
+    [mtSub]
+    [aSub (key symbol?) (value RFAE-Value?) (ds DefrdSub?)]
+    [aRecSub (key symbol?) (value-box boxed-RFAE-Value?) (ds DefrdSub?)])
 
-(define (boxed-RCFAE-Value? value)
-  (and (box? value)
-       (RCFAE-Value? (unbox value))))
-
-(define-type Env
-  [mtSub]
-  [aSub (key symbol?) (value RCFAE-Value?) (next Env?)]
-  [aRecSub (key symbol?) (value boxed-RCFAE-Value?) (next Env?)])
-
-;; parse : sexp -> RCFAE
-;; converts given S-expression to RCFAE expression
-
+; parse : sexp -> RFAE
 (define (parse sexp)
-  (match sexp
-    [(? number? n) (num n)]
-    [(list '+ lhs rhs) (add (parse lhs) (parse rhs))]
-    [(list '* lhs rhs) (mul (parse lhs) (parse rhs))]
-    [(? symbol? v) (id v)]
-    [(list 'fun (list (? symbol? param)) body)
-     (fun param (parse body))]
-    [(list fun-expr arg-expr) (app (parse fun-expr) (parse arg-expr))]
-    [(list 'if0 pred truth falsity)
-     (if0 (parse pred) (parse truth) (parse falsity))]
-    [(list 'with (list (? symbol? name) named-expr) body)
-     (app (fun name (parse body)) (parse named-expr))]
-    [(list 'rec (list (? symbol? name) named-expr) body)
-     (rec name (parse named-expr) (parse body))]))
+    (match sexp
+    [(? number? n)                                          (num n)]
+    [(list '+ l r)                                          (add (parse l) (parse r))]
+    [(list '- l r)                                          (sub (parse l) (parse r))]
+    [(list '* l r)                                          (mul (parse l) (parse r))]
+    [(? symbol? v)                                          (id v)]
+    [(list 'fun (list (? symbol? param)) body)              (fun param (parse body))]
+    [(list fun-expr arg-expr)                               (app (parse fun-expr) (parse arg-expr))]
+    [(list 'if0 test-expr then-expr else-expr)                         (if0 (parse test-expr) (parse then-expr) (parse else-expr))]
+    [(list 'with (list (? symbol? name) named-expr) body)   (cond
+                                                                [(eq? name 'fac) (rec name (parse named-expr) (parse body))]
+                                                                [else (app (fun name (parse body)) (parse named-expr))])]
+    [else                                                   (error 'parse "bad syntax: ~a" sexp)]))
 
-;; num-op : op numV numV -> numV
-;; applies given operation on given two numbers
+(define (num-op op)
+    (lambda (x y)
+        (numV (op (numV-n x) (numV-n y)))))
 
-(define (num-op op n1 n2)
-  (numV (op (numV-n n1) (numV-n n2))))
+; num+: FAE FAE -> FAE
+(define num+ (num-op +))
 
-;; num-zero? : numV -> boolean
-;; returns true if given numV value is zero
+; num-: FAE FAE -> FAE
+(define num- (num-op -))
 
+; num*: FAE FAE -> FAE
+(define num* (num-op *))
+
+; num-zero? : numV -> boolean
 (define (num-zero? n)
-  (zero? (numV-n n)))
+    (zero? (numV-n n)))
 
-;; lookup : symbol Env -> RCFAE-Value
-;; looks up given name in given environment
+; lookup : symbol DefrdSub -> RFAE-Value
+(define (lookup name ds)
+    (type-case DefrdSub ds
+        [mtSub  () (error 'lookup "free variable")]
+        [aSub    (sub-name val rest-ds)
+                            (if (symbol=? sub-name name)
+                                val
+                                (lookup name rest-ds))]
+        [aRecSub (sub-name val-box rest-ds)
+                            (if (symbol=? sub-name name)
+                                (unbox val-box)
+                                (lookup name rest-ds))]))
 
-(define (lookup name env)
-  (local [(define (lookup-helper name env)
-            (type-case Env env
-              [mtSub () (error 'lookup "free identifier")]
-              [aSub (key value next)
-                    (if (symbol=? name key)
-                        value
-                        (lookup-helper name next))]
-              [aRecSub (key boxed-value next)
-                       (if (symbol=? name key)
-                           (unbox boxed-value)
-                           (lookup-helper name next))]))
-          (define val (lookup-helper name env))]
-    (if (noV? val)
-        (error "no value assigned")
-        val)))
+; cyclically-bind-and-interp : symbol fun ds -> ds
+(define (cyclically-bind-and-interp bound-id named-expr ds)
+    (local [(define value-holder (box (numV 198)))
+            (define new-ds (aRecSub bound-id value-holder ds))
+            (define named-expr-val (interp named-expr new-ds))]
+            (begin
+                (set-box! value-holder named-expr-val)
+                new-ds)))
 
-;; cyclically-bind-and-interp : symbol fun env -> env
-;; returns an environment that associates bound-id with a closure whose environment is the containing environment
 
-(define (cyclically-bind-and-interp bound-id named-expr env)
-  (local [(define value-holder (box (noV)))
-          (define new-env (aRecSub bound-id value-holder env))
-          (define named-expr-val (interp named-expr new-env))]
-    (begin
-      (set-box! value-holder named-expr-val)
-      new-env)))
-
-;; interp : RCFAE Env -> RCFAE-Value
-;; evaluates given RCFAE expression to its value
-
-(define (interp expr env)
-  (type-case RCFAE expr
-    [num (n) (numV n)]
-    [add (l r) (num-op + (interp l env) (interp r env))]
-    [mul (l r) (num-op * (interp l env) (interp r env))]
-    [id (v) (lookup v env)]
-    [fun (param body) (closureV param body env)]
-    [app (fun-expr arg-expr)
-         (local [(define fun-val (interp fun-expr env))
-                 (define arg-val (interp arg-expr env))]
-           (interp (closureV-body fun-val)
-                   (aSub (closureV-param fun-val)
-                         arg-val
-                         (closureV-env fun-val))))]
-    [if0 (pred truth falsity)
-         (local [(define pred-val (interp pred env))]
-           (if (num-zero? pred-val)
-               (interp truth env)
-               (interp falsity env)))]
-    [rec (bound-id named-expr bound-body)
-         (interp bound-body
-                 (cyclically-bind-and-interp bound-id
-                                             named-expr
-                                             env))]))
+(define (interp expr ds)
+    (type-case RFAE expr
+        [num(n)                 (numV n)]
+        [add(l r)               (num+ (interp l ds) (interp r ds))]
+        [sub(l r)               (num- (interp l ds) (interp r ds))]
+        [mul(l r)               (num* (interp l ds) (interp r ds))]
+        [id(v)                  (lookup v ds)]
+        [fun(param body)        (closureV param body ds)]
+        [app(fun-expr arg-expr)
+                                (local [(define fun-val (interp fun-expr ds))
+                                        (define arg-val (interp arg-expr ds))]
+                                        (interp (closureV-body fun-val)
+                                                (aSub   (closureV-param fun-val)
+                                                        arg-val
+                                                        (closureV-ds fun-val))))]
+        [if0(test-expr then-expr else-expr)
+                                (local [(define test-expr-val (interp test-expr ds))]
+                                        (if (num-zero? test-expr-val)
+                                            (interp then-expr ds)
+                                            (interp else-expr ds)))]
+        [rec(bound-id named-expr bound-body)
+                                (interp bound-body
+                                        (cyclically-bind-and-interp bound-id
+                                                                    named-expr
+                                                                    ds))]))
 
 ; run
-(define (run sexp ds)
-    (interp (parse sexp) ds))
+(define (run sexp)
+    (interp (parse sexp) (mtSub)))
 
-(interp (parse '{rec {fac {fun {x} {if0 x 1 {* x {fac {+ x -1}}}}}} {fac 10}} (mtSub)))
+; (run '{with {fac {fun {x} {if0 x 1 {* x {fac {+ x -1}}}}}} {fac 10}} )
+(run '{with {count {fun {n} 0}} {with {count {fun {n} {if0 n 0 {+ 1 {count {- n 1}}}}}} {count 8}}})

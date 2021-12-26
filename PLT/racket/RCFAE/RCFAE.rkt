@@ -12,13 +12,6 @@
     [if0 (test-expr RCFAE?) (then-expr RCFAE?) (else-expr RCFAE?)]
     [rec (name symbol?) (named-expr RCFAE?) (fst-call RCFAE?)])
 
-; RFAE-Value
-(define-type RCFAE-Value
-    [numV (n number?)]
-    [closureV (param symbol?)
-              (body RCFAE?)
-              (ds DefrdSub?)])
-
 ; DefrdSub
 (define-type DefrdSub
     [mtSub]
@@ -28,6 +21,14 @@
     [aRecSub  (name symbol?)
               (value-box (box/c RCFAE-Value?))
               (ds DefrdSub?)])
+
+; RFAE-Value
+(define-type RCFAE-Value
+    [numV (n number?)]
+    [closureV (param symbol?)
+              (body RCFAE?)
+              (ds DefrdSub?)])
+
 
 ; lookup : symbol DefrdSub -> RCFAE-Value
 (define (lookup name ds)
@@ -74,32 +75,25 @@
 (define (numzero? n)
     (zero? (numV-n n)))
 
-; interp : RCFAE DefrdSub -> RCFAE-Value
+;[contract] interp: RCFAE DefrdSub -> RCFAE-Value
 (define (interp rcfae ds)
-    (type-case RCFAE rcfae
-        [num (n) (numV n)]
-        [add  (l r) (num+ (interp l ds) (interp r ds))]
-        [sub  (l r) (num- (interp l ds) (interp r ds))]
-        [mul  (l r) (num* (interp l ds) (interp r ds))]
-        [id   (name) (lookup name ds)]
-        [fun  (param body-expr) (closureV param body-expr ds)]
-        [app  (f a) (local [(define ftn (interp f ds))]
-                                    (interp (closureV-body ftn)
-                                                  (aSub (closureV-param ftn)
-                                                        (interp a ds)
-                                                        (closureV-ds ftn))))]
-        [if0   (test-expr then-expr else-expr) 
-                (if (numzero? (interp test-expr ds))
-                    (interp then-expr ds)
-                    (interp else-expr ds))]
-        [rec  (bound-id named-expr fst-call)
-                (local ([define value-holder (box (numV 1729))]
-                        [define new-ds (aRecSub bound-id value-holder ds)]
-                        [define named-expr-val (interp named-expr new-ds)])
-                        (begin 
-                          (set-box! value-holder (interp named-expr new-ds))
-                          (interp fst-call new-ds)))]))
-                          
+  (type-case RCFAE rcfae
+    [num(n)               (numV n)]
+	  [add(l r)             (num+ (interp l ds) (interp r ds))]
+	  [sub(l r)             (num- (interp l ds) (interp r ds))]
+	  [id(name)             (lookup name ds)]
+	  [fun(param body-expr) (closureV param body-expr ds)]
+	  [app(f a)             (local [(define ftn (interp f ds))] 
+                                  (interp (closureV-body ftn) (aRecSub (closureV-param ftn) (interp a ds)
+			                            (closureV-ds ftn))))]
+    [if0 (test-expr then-expr else-expr)
+                          (if (numzero? (interp test-expr ds))
+                          (interp then-expr ds) (interp else-expr ds))]
+	  [rec (bound-id named-expr fst-call)
+                          (local [(define value-holder (box (numV 198)))
+                                  (define new-ds (aRecSub bound-id value-holder ds))]
+                          (begin (set-box! value-holder (interp named-expr new-ds)) (interp fst-call new-ds)))]))
+
 
 
 
@@ -109,5 +103,4 @@
 
 ; (parse '{rec {count {fun {n} {if0 n 0 {+ 1 {count {- n 1}}}}}} {count 8}})
 ; (interp '{rec {count {fun {n} {if0 n 0 {+ 1 {count {- n 1}}}}}} {count 8}} (mtSub))
-; (run '{rec {count {fun {n} {if0 n 0 {+ 1 {count {- n 1}}}}}} {count 8}} (mtSub))
-(test (interp (parse '{rec {fac {fun {x} {if0 x 1 {* x {fac {+ x -1}}}}}} {fac 10}}) (mtSub)) (numV 3628800))
+(run '{rec {count {fun {n} {if0 n 0 {+ 1 {count {- n 1}}}}}} {count 8}} (mtSub))

@@ -38,9 +38,7 @@
     [(list 'fun (list (? symbol? param)) body)              (fun param (parse body))]
     [(list fun-expr arg-expr)                               (app (parse fun-expr) (parse arg-expr))]
     [(list 'if0 test-expr then-expr else-expr)                         (if0 (parse test-expr) (parse then-expr) (parse else-expr))]
-    [(list 'with (list (? symbol? name) named-expr) body)   (cond
-                                                                [(eq? name 'fac) (rec name (parse named-expr) (parse body))]
-                                                                [else (app (fun name (parse body)) (parse named-expr))])]
+    [(list 'with (list (? symbol? name) named-expr) body)   (app (fun name (parse body)) (parse named-expr))]
     [else                                                   (error 'parse "bad syntax: ~a" sexp)]))
 
 (define (num-op op)
@@ -92,18 +90,30 @@
         [id(v)                  (lookup v ds)]
         [fun(param body)        (closureV param body ds)]
         [app(fun-expr arg-expr)
-                                (local [(define fun-val (interp fun-expr ds))
+                                (cond
+                                [(eq? (local   [(define fun-val (interp fun-expr ds))
+                                                (define arg-val (interp arg-expr ds))]
+                                                (interp (closureV-body fun-val)
+                                                        (aSub   (closureV-param fun-val)
+                                                                arg-val
+                                                                (closureV-ds fun-val)))) 'lookup)
+                                                        (rec (fun-expr-param arg-expr fun-expr-body)
+                                (interp bound-body
+                                        (cyclically-bind-and-interp bound-id
+                                                                    named-expr
+                                                                    ds)))]
+                                                                    [else (local [(define fun-val (interp fun-expr ds))
                                         (define arg-val (interp arg-expr ds))]
                                         (interp (closureV-body fun-val)
                                                 (aSub   (closureV-param fun-val)
                                                         arg-val
-                                                        (closureV-ds fun-val))))]
+                                                        (closureV-ds fun-val))))])]
         [if0(test-expr then-expr else-expr)
                                 (local [(define test-expr-val (interp test-expr ds))]
                                         (if (num-zero? test-expr-val)
                                             (interp then-expr ds)
                                             (interp else-expr ds)))]
-        [rec(bound-id named-expr bound-body)
+        [rec (bound-id named-expr bound-body)
                                 (interp bound-body
                                         (cyclically-bind-and-interp bound-id
                                                                     named-expr
@@ -114,4 +124,6 @@
     (interp (parse sexp) (mtSub)))
 
 ; (run '{with {fac {fun {x} {if0 x 1 {* x {fac {+ x -1}}}}}} {fac 10}} )
-(run '{with {count {fun {n} 0}} {with {count {fun {n} {if0 n 0 {+ 1 {count {- n 1}}}}}} {count 8}}})
+; (run '{with {count {fun {n} 0}} {with {count {fun {n} {if0 n 0 {+ 1 {count {- n 1}}}}}} {count 8}}})
+; (run '{rec {count {fun {n} {if0 n 0 {+ 1 {count {- n 1}}}}}} {count 8}})
+(parse '{with {count {fun {n} {if0 n 0 {+ 1 {count {- n 1}}}}}} {count 8}})

@@ -117,5 +117,6 @@
 (define (run sexp)
     (interp (parse sexp) (mtSub)))
 
-(run '{rec {fac {fun {x} {if0 x 1 {* x {fac {+ x -1}}}}}} {fac 10}} )
+; (run '{rec {fac {fun {x} {if0 x 1 {* x {fac {+ x -1}}}}}} {fac 10}} )
 ; (run '{with {count {fun {n} 0}} {with {count {fun {n} {if0 n 0 {+ 1 {count {- n 1}}}}}} {count 8}}})
+(run '{rec {count {fun {n} {if0 n 0 {+ 1 {count {- n 1}}}}}} {count 8}})

@@ -47,9 +47,8 @@
 > [CV](./CV)  
 
 ## HTML/CSS
-|HEX COLOR OPACITY|
-|-----------------|
 
+## HEX COLOR OPACITY
 |100% | FF |
 |-----|----|
 |99% | FC|

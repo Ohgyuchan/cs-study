@@ -50,8 +50,9 @@
 
 ## HEX COLOR OPACITY
 
-|100% | FF |
+|Opacity|HEX|
 |-----|----|
+|100% | FF |
 |99% | FC|
 |98% | FA|
 |97% | F7|

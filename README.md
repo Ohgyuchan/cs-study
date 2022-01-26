@@ -37,7 +37,7 @@
 
 ## Algorithm
 
-## DataBase
+## DB
 
 ## Computer Architecture
 

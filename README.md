@@ -34,6 +34,8 @@
   Android
 
 ## Data Structure
+> AWS
+> SQL
 
 ## Algorithm
 

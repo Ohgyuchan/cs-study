@@ -28,10 +28,15 @@
 ## 백준 알고리즘
 [백준](./baekjoon)
 
-## 앱개발
+## Front-end
+### 웹개발
+> HTML/CSS  
+> JavaScript
+
+### 앱개발
 > [Flutter](./flutter)  
 > [Flutter Paractice](https://github.com/Ohgyuchan/flutter_dev)  
-  Android
+  iOS/Swift
 
 ## Data Structure
 > AWS  
@@ -47,8 +52,6 @@
 
 ## Computer Vision
 > [CV](./CV)  
-
-## HTML/CSS
 
 ## HEX COLOR OPACITY
 

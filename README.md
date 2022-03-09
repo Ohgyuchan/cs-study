@@ -36,6 +36,7 @@
 ### 앱개발
 > [Flutter](./flutter)  
 > [Flutter Paractice](https://github.com/Ohgyuchan/flutter_dev)  
+  android/Kotlin  
   iOS/Swift
 
 ## Data Structure

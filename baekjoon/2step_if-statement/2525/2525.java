@@ -20,7 +20,11 @@ class Main {
             minuet %= 60;
         }
 
-        System.out.print(hour + ' ' + minuet);
+        if(hour > 23) {
+			hour -= 24;
+		}
+
+        System.out.print(hour + " " + minuet);
         
         input.close();
     }

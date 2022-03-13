@@ -13,5 +13,6 @@ class Main {
       else
         System.out.print(0);
     }
+    key.close();
   }
 }

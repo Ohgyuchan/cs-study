@@ -12,5 +12,6 @@ class Main {
       else if (score >= 60) System.out.print("D");
       else System.out.print("F");
     }
+    key.close();
   }
 }

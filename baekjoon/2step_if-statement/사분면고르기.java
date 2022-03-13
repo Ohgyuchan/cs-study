@@ -15,5 +15,6 @@ class Main {
       if(y > 0) System.out.print(2);
       if(y < 0) System.out.print(3);
     }
+    key.close();
   }
 }

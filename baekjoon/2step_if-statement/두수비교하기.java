@@ -10,5 +10,6 @@ class Main {
     if(a == b) System.out.print("==");
     else if (a > b) System.out.print(">");
     else if ( a < b) System.out.print("<");
+    key.close();
   }
 }

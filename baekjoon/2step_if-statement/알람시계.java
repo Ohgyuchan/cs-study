@@ -16,5 +16,6 @@ class Main {
       else h--;
     }
     System.out.print(h + " " + m);
+    key.close();
   }
 }

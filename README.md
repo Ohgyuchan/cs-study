@@ -39,7 +39,7 @@
   android/Kotlin  
   iOS/Swift
 
-## Data Structure
+## Back-end
 > AWS  
 > SQL
 

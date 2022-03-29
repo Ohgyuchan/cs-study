@@ -41,11 +41,10 @@
 
 ## Back-end
 > AWS  
+> Firebase
 > SQL
 
 ## Algorithm
-
-## Database
 
 ## Computer Architecture
 

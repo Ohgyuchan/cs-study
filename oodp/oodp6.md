@@ -23,14 +23,16 @@
   * Category: Behavioral dp
   * Intent: 특정 작업을 처리하는 일부분을 서브 클래스로 캡슐화하여 전체적인 구조는 바꾸지 않으면서 특정 단계에서 수행하는 내용을 바꾸는 패턴
   * Applicability: 
+    * 공통되는 코드는 부모클래스에 하나로 넣어놓고, 공통되지 않는 코드는 자식 클래스에서 overide를 통해 한 번씩만 사용되게 하고, 이를 통해 유지보수하는 데 유용하게 한다.
     * non-abstract: 공통 behavior
     * abstract: context-specific behavior
     * context마다 특정 behavior가 placeholder의 역할을 하고, 이것을 hook-method라고 한다.
 
 * strategy 패턴
   * Category: Behavioral dp
-  * Intent: 메소드를 캡슐화를 통해 오브젝트화 시켜 코드의 중복을 없앤다.
+  * Intent: 알고리즘들을 각각 캡슐화 하여, 서로 교체가능하게 한다. 
   * Applicability:
+    * 동일한 문제를 다른 알고리즘으로 해결할 수 있게 한다.
     * abstract method: 각가의 전략 클래스에 선언되어있다.
     * context class에서 abstract method를 오버라이드한다.
     * 메소드들을 캡슐화를 통해 오브젝트처럼 사용하여 코드를 변경할 때 이것들만 변경하여서 확장에 용이하게 한다.

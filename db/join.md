@@ -1,0 +1,9 @@
+# JOIN
+
+- JOIN이란
+- LEFT JOIN
+- RIGHT JOIN
+- INNER JOIN
+- OUTER JOIN
+    - Oracle에는 OUTER JOIN 명령어를 지원해주지만 Mysql에서는 LEFT JOIN + RIGHT JOIN으로 사용
+- EXCLUSIVE JOIN

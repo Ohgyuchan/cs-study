@@ -37,32 +37,32 @@ summaries = ["《오만과 편견》 (Pride and Prejudice)은 제인 오스틴�
 borrowed = [False, False, False, False, False]
 
 def borrowMenu(index) : # 책 대여 함수
-    opt = input("If you want to borrow this book, please enter 'b': ") # 과제 8번 조건 충족
+    opt = input("이 책을 빌리려면 'b'를 누르세요: ") # 과제 8번 조건 충족
     
     if opt == 'b' :
         if borrowed[index] : # 과제 11번 조건 충족
-            cmd = input("You have already borrowed this book. If you like to cancel it, please enter c: ")
+            cmd = input("이미 빌린 책입니다. 반납하시려면 'c'를 누르세요: ")
             if cmd == 'c' : # 과제 12번 충족
                 borrowed[index] = False # 대여 취소를 했다면 해당 index 값 False
-                print("Successfully canceled") 
+                print("반납되었습니다.") 
             else : # 과제 13번 충족
-                print("Not canceled")
+                print("반납되지 않았습니다.")
         else : # 과제 9번 조건 충족
             borrowed[index] = True # 빌린 책의 index 값 True로 변경
-            print("Successfully borrowed")
+            print("성공적으로 대여하였습니다.")
     else : # 입력받음 opt의 값이 b가 아니면 Not borrowed 출력, 과제 10번 조건 충족
-        print("Not borrowed")
+        print("대여하지 않았습니다.")
     divider()
     
     while True : # 과제 17번 조건 충족
-        ch = input("Back to the list (y) or quit(q): ") # 과제  14번 조건 충족
+        ch = input("도서 목록으로 이동하시려면 'y', 프로그램을 종료하시려면 'q'을 누르세요: ") # 과제  14번 조건 충족
         if ch == 'y' :
             return back2list() # 과제 15번 A 조건 충족
         elif ch == 'q' :
             return -1
 
 def back2list() : # 책 제목 리스트로 돌아가는 옵션 선택 함수
-    cmd = input("1. All, 2. Not borrowed: ")
+    cmd = input("1. 전체, 2. 빌리지 않은 책만: ")
     if cmd.isdigit() :
         cmd = int(cmd)
         if cmd == 1 or cmd == 2 :
@@ -74,25 +74,25 @@ def back2list() : # 책 제목 리스트로 돌아가는 옵션 선택 함수
 
 def printBookInfo(index) : # 책 상세정보 출력 함수
     divider()
-    print("Title:", books[index])
-    print("Author:", authors[index])
-    print("Plot Summary:", summaries[index])
+    print("제목:", books[index])
+    print("저자:", authors[index])
+    print("줄거리 요약:", summaries[index])
     divider()
 
 def bookChoice(cmd) : # 책 고르는 함수
     while True : 
-        bookNum = input("Choose a book number: ") # 책 번호 입력 과제 5번 조건 충족
+        bookNum = input("책 번호 입력: ") # 책 번호 입력 과제 5번 조건 충족
         if bookNum.isdigit() : # 입력 받은 책 번호가 숫자인지 확인
             bookNum = int(bookNum) # 숫자라면 숫자로 재대입
             if bookNum < 1 or bookNum > len(books) : # 책 번호가 리스트 범위를 넘는 수라면 틀린 번호 출력
                 if cmd == 2 : # 과제 15번 D 조건 충족
                     notBorrowedBookNums = [i for i in range(len(borrowed)) if not borrowed[i]]
                     if bookNum in notBorrowedBookNums : # 빌리지 않은 책 번호가 아닌 다른 번호 고르면 Wrong Number 출력
-                        print("Wrong Number")
+                        print("잘못된 번호입니다.")
                     else :
                         break
                 else :
-                    print("Wrong Number")
+                    print("잘못된 번호입니다.")
             else : # 입력이 Wrong Number가 아닐 때만 반복문을 탈출, 과제 7번 조건 충족
                 break 
         else :
@@ -102,11 +102,11 @@ def bookChoice(cmd) : # 책 고르는 함수
     return borrowMenu(bookNum - 1)
 
 def printGoodByeMenu() :
-    print("Thank you for using my program")
+    print("프로그램 종료")
     # 과제 16번 조건 충족
-    print("You have borrowed", borrowed.count(True), "books.")
+    print(borrowed.count(True), "권의 책을 빌렸습니다.")
     printBorrowedBooks()
-    print("Good bye~!")
+    print("잘 가요~")
 
 def printBorrowedBooks() :
     bList = [books[borrowed.index(x)] for x in borrowed if x]
@@ -144,7 +144,7 @@ def divider() : # 반복문을 이용해서 문자를 40개를 출력해서 구�
     print()
 
 def startProgram() : # 프로그램 시작 시 처음 메뉴 출력
-    print("==Library Management Program==") # 과제 1번 조건 충족
+    print("==도서 대출 관리 프로그램==") # 과제 1번 조건 충족
     divider() # 과제 2번 조건 충족
     printMenu() # 과제 3번 조건 충족
     divider() # 과제 4번 조건 충족

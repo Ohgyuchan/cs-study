@@ -8,7 +8,7 @@ books = ["오만과 편견",
          "모비딕",
          "황야의 절규",
          "이상한 나라의 앨리스",
-         "아메리카의 비극",]
+         "아메리카의 비극"]
 
 # 책 저자 리스트
 authors = ["제인 오스틴",
@@ -34,24 +34,24 @@ summaries = ["《오만과 편견》 (Pride and Prejudice)은 제인 오스틴�
              "주인공 클라이드 그리피스는 캔자스 시의 순회 목사의 집안에서 태어났다. 그는 따분한 가정 생활에서 벗어나, 돈과 사회적 지위를 동경하게 되었다. 가난 때문에 심한 제약을 받고 불우하게 자란 주인공 클라이드가 자신이 동경해 온 상류사회에로의 진출을 위해 부유한 집 딸 산드라와의 결혼을 꿈꾼다.",]              # 책 줄거리 리스트
 
 # 대여한 책 리스트
-borrowed = [False, False, False, False, False]
+borrowed = [False, False, False, False, False, False, False, False, False, False]
 
 def borrowMenu(index) : # 책 대여 함수
-    opt = input("이 책을 빌리려면 'b'를 누르세요: ") # 과제 8번 조건 충족
-    
-    if opt == 'b' :
-        if borrowed[index] : # 과제 11번 조건 충족
+    if borrowed[index] : # 과제 11번 조건 충족
             cmd = input("이미 빌린 책입니다. 반납하시려면 'c'를 누르세요: ")
             if cmd == 'c' : # 과제 12번 충족
                 borrowed[index] = False # 대여 취소를 했다면 해당 index 값 False
                 print("반납되었습니다.") 
             else : # 과제 13번 충족
                 print("반납되지 않았습니다.")
-        else : # 과제 9번 조건 충족
+    else:            
+        opt = input("이 책을 빌리려면 'b'를 누르세요: ") # 과제 8번 조건 충족
+        
+        if opt == 'b' :
             borrowed[index] = True # 빌린 책의 index 값 True로 변경
             print("성공적으로 대여하였습니다.")
-    else : # 입력받음 opt의 값이 b가 아니면 Not borrowed 출력, 과제 10번 조건 충족
-        print("대여하지 않았습니다.")
+        else : # 입력받음 opt의 값이 b가 아니면 Not borrowed 출력, 과제 10번 조건 충족
+            print("대여하지 않았습니다.")
     divider()
     
     while True : # 과제 17번 조건 충족
@@ -81,27 +81,25 @@ def printBookInfo(index) : # 책 상세정보 출력 함수
 
 def bookChoice(cmd) : # 책 고르는 함수
     while True : 
+        if cmd == 2 : # 과제 15번 D 조건 충족
+            notBorrowedBookNums = [i + 1 for i in range(len(borrowed)) if not borrowed[i]]
+        else :
+            notBorrowedBookNums = [i + 1 for i in range(len(books))]
         bookNum = input("책 번호 입력: ") # 책 번호 입력 과제 5번 조건 충족
         if bookNum.isdigit() : # 입력 받은 책 번호가 숫자인지 확인
             bookNum = int(bookNum) # 숫자라면 숫자로 재대입
-            if bookNum < 1 or bookNum > len(books) : # 책 번호가 리스트 범위를 넘는 수라면 틀린 번호 출력
-                if cmd == 2 : # 과제 15번 D 조건 충족
-                    notBorrowedBookNums = [i for i in range(len(borrowed)) if not borrowed[i]]
-                    if bookNum in notBorrowedBookNums : # 빌리지 않은 책 번호가 아닌 다른 번호 고르면 Wrong Number 출력
-                        print("잘못된 번호입니다.")
-                    else :
-                        break
-                else :
-                    print("잘못된 번호입니다.")
-            else : # 입력이 Wrong Number가 아닐 때만 반복문을 탈출, 과제 7번 조건 충족
+            if bookNum in notBorrowedBookNums : # 입력이 Wrong Number가 아닐 때만 반복문을 탈출, 과제 7번 조건 충족
                 break 
+            else : # 책 번호가 리스트 범위를 넘는 수라면 틀린 번호 출력
+                print("잘못된 번호입니다.")
         else :
-            print("Wrong Number")
+            print("잘못된 번호입니다.")
             
     printBookInfo(bookNum - 1) # 과제 6번 조건 충족
     return borrowMenu(bookNum - 1)
 
 def printGoodByeMenu() :
+    divider()
     print("프로그램 종료")
     # 과제 16번 조건 충족
     print(borrowed.count(True), "권의 책을 빌렸습니다.")
@@ -109,34 +107,37 @@ def printGoodByeMenu() :
     print("잘 가요~")
 
 def printBorrowedBooks() :
-    bList = [books[borrowed.index(x)] for x in borrowed if x]
-    for b in bList :
-        print("\t", b)
+    for i in range(len(books)) :
+        if borrowed[i] :
+            print("\t", books[i])
 
 def operation() : # 프로그램을 구동하는(Operate) 함수
     startProgram() # 프로그램 시작
     cmd = 0
-    notBorrowed = []
     while True:
         if cmd == -1 : # 과제 16번 조건 충족
             printGoodByeMenu()
             break
         elif cmd == 1 : # 과제 15번 C 조건 충족
-            printMenu()
+            printBooks()
         elif cmd == 2 : # 과제 15번 D 조건 충족
             printNotBorrowed()
         cmd = bookChoice(cmd)
 
 def printNotBorrowed() : # 빌리지 않은 책 제목만 출력하는 함수
-    for i in books :
+    divider()
+    for i in range(len(books)) :
         if borrowed[i] : # borrowed 인덱스 값이 True면 continue
             continue
         else :
             print(i + 1, books[i]) # 빌리지 않은 책 제목은 번호와 함께 출력
+    divider()
 
-def printMenu() : # 책 제목들을 출력해주는 함수
+def printBooks() : # 책 제목들을 출력해주는 함수
+    divider() # 과제 2번 조건 충족
     for i in range(len(books)) :
         print(i + 1, books[i])
+    divider() # 과제 4번 조건 충족
 
 def divider() : # 반복문을 이용해서 문자를 40개를 출력해서 구분선을 생성하는 함수
     for i in range(40) :
@@ -144,10 +145,8 @@ def divider() : # 반복문을 이용해서 문자를 40개를 출력해서 구�
     print()
 
 def startProgram() : # 프로그램 시작 시 처음 메뉴 출력
-    print("==도서 대출 관리 프로그램==") # 과제 1번 조건 충족
-    divider() # 과제 2번 조건 충족
-    printMenu() # 과제 3번 조건 충족
-    divider() # 과제 4번 조건 충족
+    print("==도서 대출 관리 프로그램에 접속해주셔서 감사합니다==") # 과제 1번 조건 충족
+    printBooks() # 과제 3번 조건 충족
 
 operation() # 프로그램을 작동시키는 함수 호출
 

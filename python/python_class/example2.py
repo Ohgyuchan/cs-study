@@ -1,9 +1,44 @@
-mystr = "한동대학교는 “Why Not Change the World?”정신을 바탕으로 지역과 세계의 문제를 해결하는 글로벌 인재, 이웃과 인류의 필요를 채워주고 배풀 줄 아는 사랑의 인재, 확고한 신앙과 정체성을 지키며 진리의 말씀을 용감히 실천하고 도전하는 인재를 양육하고자 노력하고 있습니다. 이를 위해 한동대학교는 이웃과 지역사회를 섬기겠다는 ‘사랑’과 문제를 해결하고 타인을 도울 수 있는 ‘창의력’을 갖춤으로써 가깝게는 주변 지역에서부터 대한민국과 세계에 이르기까지 현실을 바라볼 줄 아는 깊고 넓은 인목을 갖춘 인재를 양성하는데 최선을 다하고 있습니다. 특별히 창의적이며 융복합적인 생각이 세상을 변화시키는 시대 속에서 한동대학교는 대학교육혁신의 선구자가 되어 글로벌(Global), 하이테크(High Tech), 하이터치(High Touch)형 인재 교육이 가능하도록 정책과 지원을 시행하고 있습니다."
+print("*** 병원 온라인 예약 시스템")
 
-myset = set(mystr)
-mylist = list(myset)
-mylist.sort()
-mylist.remove(" ")
+dates = []
+names = []
+symptoms = []
 
-for i in mylist :
-    print("%s: %d" % (i, mystr.count(i)))
+while True :
+    
+    while True :
+        date = input("예약 날짜 :")
+        if date.isdecimal() and len(date) == 4 :
+            if not date in dates :
+                dates.append(date)
+                print("정상적으로 예약 되었습니다.")
+                break
+            else :
+                print("해당 날짜는 이미 예약 되었습니다.")
+        else :
+            print("잘못 입력하셨습니다.")
+        
+    while True :
+        name = input("환자 이름: ")
+        if len(name) >= 2:
+            names.append(name)
+            break
+        else :
+            print("이름은 2글자 이상이어야 합니다.")
+    
+    symptoms.append(input("증상: "))
+    
+    check = input("추가 예약(y)")
+    
+    if check == 'y' :
+        continue
+    else :
+        break
+
+print("-"*20+"예약 목록"+"-"*20)
+for i in range(len(dates)) :
+    print("예약번호", i+1)
+    print("예약 날짜: ", dates[i])
+    print("환자 이름: ", names[i])
+    print("증상", symptoms[i])
+    print("="*40)

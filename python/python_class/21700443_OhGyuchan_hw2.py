@@ -1,7 +1,7 @@
 from random import *
 import datetime
 
-def is_leap_year(year):
+def is_leap_year(year): # year가 윤년인지 판별하는 함수
     if year % 400 == 0:
         return True
 
@@ -13,7 +13,7 @@ def is_leap_year(year):
 
     return False
 
-def getDate() :
+def get_date() :
     start = datetime.date(2010, 10, 1)
     today = datetime.datetime.today()
     end = datetime.date(today.year, today.month, today.day)
@@ -22,6 +22,9 @@ def getDate() :
 
 def get_random_date() :
     start = '2020-10-1'
+    
+def get_doomsday() :
+    return 0
 
 
 names = []
@@ -42,7 +45,7 @@ while True :
 
     print("*" * 30)
     for i in range(len(names)) :
-        birthDays.append(getDate())
+        birthDays.append(get_date())
         print(names[i], '\t', birthDays[i])
     print("*" * 30)
 

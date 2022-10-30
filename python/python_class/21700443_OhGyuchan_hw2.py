@@ -1,7 +1,7 @@
 from random import *
 import datetime
 
-def is_leap_year(year):
+def is_leap_year(year): # year가 윤년인지 판별하는 함수
     if year % 400 == 0:
         return True
 

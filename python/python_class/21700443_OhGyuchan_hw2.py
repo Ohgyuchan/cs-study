@@ -23,7 +23,9 @@ def get_date() :
 def get_random_date() :
     start = '2020-10-1'
     
-def get_doomsday() :
+def get_doomsday(date: datetime.date) :
+    dateDict = {0: '월요일', 1:'화요일', 2:'수요일', 3:'목요일', 4:'금요일', 5:'토요일', 6:'일요일'}
+    dateDict[date.weekday()]
     return 0
 
 
@@ -49,10 +51,14 @@ while True :
         print(names[i], '\t', birthDays[i])
     print("*" * 30)
 
+    index = -1
     while True :
         character = input("Please choose your character among %s:" % names)
         
         if character in names :
+            index = names.index(character)
             break
-
+    
+    print("You have chosen %s born in %s (%s)" % (names[index], birthDays[index], get_doomsday(birthDays[index])))
+    
 

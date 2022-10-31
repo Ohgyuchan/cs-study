@@ -1,18 +1,6 @@
 from random import *
 from datetime import *
 
-def is_leap_year(year): # year가 윤년인지 판별하는 함수
-    if year % 400 == 0:
-        return True
-
-    if year % 100 == 0:
-        return False
-
-    if year % 4 == 0:
-        return True
-
-    return False
-
 def get_date() : # 랜덤 날짜 생성 함수
     start = date(2010, 10, 1) # 2010.10.1을 시작일로 변수에 저장
     today = datetime.today() # 오늘 날짜를 변수에 저장
@@ -20,13 +8,10 @@ def get_date() : # 랜덤 날짜 생성 함수
     random_date = start + (end - start) * random() # end 날짜에서 start 날짜 사이의 랜덤 날짜 생성
     return random_date # 생성된 랜덤 날짜 return
 
-# def get_random_date() :
-#     start = '2020-10-1'
-    
-def get_doomsday(date: date) :
+
+def get_weekday(date: date) :
     date_dict = {0: 'Mon.', 1:'Tue.', 2:'Wed.', 3:'Thu.', 4:'Fri.', 5:'Sat.', 6:'Sun.'} # 요일을 dictionary 에 저장
     return date_dict[date.weekday()] # date의 요일을 return (weekday()는 요일에 따라 월~일을 0~6으로 return 해주는 datetime 모듈의 내장 함수)
-
 
 names = []
 birth_days = []
@@ -63,8 +48,8 @@ while True :
             break
     
     c_index = randrange(0, len(names)) # c_index에 0 ~ (names의 길이 -1) 값 사이에 있는 값 랜덤으로 저장
-    print("You have chosen %s born in %s (%s)" % (names[u_index], birth_days[u_index], get_doomsday(birth_days[u_index]))) # u_index에 해당하는 데이터 출력
-    print("The computer has chosen %s born in %s (%s)" % (names[c_index], birth_days[c_index], get_doomsday(birth_days[c_index]))) # c_index에 해당하는 데이터 출력
+    print("You have chosen %s born in %s (%s)" % (names[u_index], birth_days[u_index], get_weekday(birth_days[u_index]))) # u_index에 해당하는 데이터 출력
+    print("The computer has chosen %s born in %s (%s)" % (names[c_index], birth_days[c_index], get_weekday(birth_days[c_index]))) # c_index에 해당하는 데이터 출력
     
     result_str = "" # 결과 출력에 해당하는 문자열 변수
     if c_index == u_index : # u_index 와 c_index 가 같으면 같다고 출력

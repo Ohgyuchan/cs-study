@@ -7,6 +7,7 @@
 #include <arpa/inet.h>
 #include <time.h>
 #include <unistd.h>
+#include <netinet/tcp.h>
 
 #define BUFSIZE 1024
 
@@ -17,7 +18,10 @@ int main(int argc, char **argv)
     int serv_sock;
     int clnt_sock;
     char message[BUFSIZE];
-    int str_len;
+    int str_len, num = 0;
+    char MSG1[] = "ABCDEFGHIJKLNMOPQRST\n123123123123";
+    char MSG2[] = "Evening123123123123123123123123123\n12312312312312312";
+    char MSG3[] = "Everybody!\n123";
     struct sockaddr_in serv_addr;
     struct sockaddr_in clnt_addr;
     unsigned int clnt_addr_size;
@@ -27,10 +31,11 @@ int main(int argc, char **argv)
         printf("Usage : %s <port>\n", argv[0]);
         exit(1);
     }
+    
     serv_sock = socket(PF_INET, SOCK_STREAM, 0);
     
     if (serv_sock == -1)
-        error_handling("socket() error");
+        error_handling("socket error");
     
     memset(&serv_addr, 0, sizeof(serv_addr));
     
@@ -50,16 +55,52 @@ int main(int argc, char **argv)
     if (clnt_sock == -1)
         error_handling("accept() error");
     
-    /* receive data & send*/
-    while ((str_len = read(clnt_sock, message, BUFSIZE)) != 0)
-    {   
-        write(clnt_sock, message, str_len);
-        write(1, message, str_len);
+    sleep(5);
+    
+    str_len = recv(clnt_sock, message, BUFSIZE - 1, 0);
+    
+
+    char temp[4] = "";
+    temp[0] = message[0];
+    temp[1] = message[1];
+    temp[2] = message[2];
+    temp[3] = message[3];
+
+    int first = atoi(temp);
+    
+    temp[0] = message[first + 3];
+    temp[1] = message[first + 3 + 1];
+    temp[2] = message[first + 3 + 2];
+    temp[3] = message[first + 3 + 3];
+
+    int second = atoi(temp);
+
+    char result[BUFSIZE];
+    
+    for(int i = 4; i < first + 4; i++) {
+        result[i - 4] = message[i];
     }
+    printf("Message 1: %s", result);
+    
+    for(int i = first + 4 + 4; i < first + 4 + 4 + second; i++) {
+        result[i - (first + 4 + 4)] = message[i];
+    }
+    printf("Message 2: %s", result);
+
+    for(int i = first + 4 + 4 + second; i < str_len; i++) {
+        result[i - (first + 4 + 4 + second)] = message[i];
+    }
+    printf("Message 3: %s", result);
+    
+    // write(1, message, str_len);
+    // write(clnt_sock, message, str_len);
+    
+    
     close(clnt_sock);
     close(serv_sock);
     return 0;
 }
+
 void error_handling(char *message)
 {
     fputs(message, stderr);

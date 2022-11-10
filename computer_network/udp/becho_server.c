@@ -8,7 +8,7 @@
 #include <time.h>
 #include <unistd.h>
 
-#define BUFSIZE 30
+#define BUFSIZE 100
 
 void error_handling(char *message);
 
@@ -51,4 +51,11 @@ int main(int argc, char **argv)
         sendto(serv_sock, message, str_len, 0, (struct sockaddr *)&clnt_addr, sizeof(clnt_addr));
     }
     return 0;
+}
+
+void error_handling(char *message)
+{
+    fputs(message, stderr);
+    fputc('\n', stderr);
+    exit(1);
 }

@@ -8,17 +8,19 @@
 #include <time.h>
 #include <unistd.h>
 
-#define BUFSIZE 30
+#define BUFSIZE 100
+
 void error_handling(char *message);
+
 int main(int argc, char **argv)
 {
     int sock;
     char message[BUFSIZE];
     int str_len, i;
     unsigned int addr_size;
-    char MSG1[] = "Good ";
-    char MSG2[] = "Evening ";
-    char MSG3[] = "Everybody!";
+    char MSG1[] = "Good 1234578901010101010101010";
+    char MSG2[] = "Evening packet packet network network network";
+    char MSG3[] = "Everybody! Good Godd Gooood";
     struct sockaddr_in serv_addr;
     struct sockaddr_in from_addr;
     
@@ -53,4 +55,11 @@ int main(int argc, char **argv)
     
     close(sock);
     return 0;
+}
+
+void error_handling(char *message)
+{
+    fputs(message, stderr);
+    fputc('\n', stderr);
+    exit(1);
 }

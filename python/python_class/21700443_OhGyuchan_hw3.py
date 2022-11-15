@@ -11,7 +11,6 @@ while True : # 3번 조건을 위한 while 문
 
     except Exception as e: # 3-b번 조건 충족 system error 출력
         print(e)
-        continue
     
     else :
         try: # 3-a 조건 충족
@@ -20,7 +19,8 @@ while True : # 3번 조건을 위한 while 문
 
         except Exception as e: # 3-b번 조건 충족 system error 출력
             print(e)
-            if e == UnicodeDecodeError : # 3-d 조건 충족
+            if type(e) == UnicodeDecodeError : # 3-d 조건 충족
+                print("""encoding="utf-8" 옵션을 추가했습니다. 재시도 바랍니다.""")
                 isUnicodeDecodeError = True
         
         else :

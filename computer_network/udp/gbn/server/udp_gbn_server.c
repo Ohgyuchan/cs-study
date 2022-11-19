@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 
     /* loss rate is option, thus muct check for 4th argv */
     
-    loss_rate = 0.2;
+    loss_rate = 0;
 
     /* Create socket for sending/receiving datagrams */
     if ((sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0)

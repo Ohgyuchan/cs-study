@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/socket.h>
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
 
-#define BUFSIZE 501
+#define BUFSIZE 500
 
 typedef struct Packet
 {
@@ -42,10 +43,10 @@ int main(int argc, char *argv[])
     debug_key = atoi(argv[2]);
     port_num = atoi(argv[1]);
 
-    sock = socket(AF_INET, SOCK_DGRAM, 0);
-    if (sock < 0)
+    if ((sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0)
         exitByError("[ERROR] socket error", debug_key);
 
+    memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     server_addr.sin_port = htons(port_num);
@@ -67,112 +68,117 @@ int main(int argc, char *argv[])
 void write_file(int sock, struct sockaddr_in client_addr, int debug_key)
 {
     FILE *fp;
-    char *filename;
     int recv_size;
     char buffer[BUFSIZE];
     int base = -2;
-    int seqNumber = 0;
-    double loss_rate = 0;
+    int seq_num = 0;
+    double loss_rate = 0.4;
     socklen_t client_addr_size;
 
-    fp = fopen("server.docx", "wb");
+    // fp = fopen("server.txt", "w");
     // Receiving the data and writing it into the file.
     while (1)
     {
         client_addr_size = sizeof(client_addr);
-        PCK dataPacket;
+        PCK pck;
         ACK ack;
 
-        if ((recv_size = recvfrom(sock, buffer, BUFSIZE, 0, (struct sockaddr *)&client_addr, &client_addr_size)) < 0)
+        if ((recv_size = recvfrom(sock, &pck, sizeof(pck), 0, (struct sockaddr *)&client_addr, &client_addr_size)) < 0)
             exitByError("recvfrom() failed", debug_key);
-        if (strcmp(buffer, "END") == 0)
-            break;
+
+        // if (strcmp(buffer, "END") == 0)
+        //     break;
+
+        seq_num = pck.seq_no;
 
         // printf("[RECEVING] Data: %s", buffer);
-        if (debug_key)
-            printf("[RECEVING] Data size: %d bytes\n", recv_size);
-        fwrite(buffer, sizeof(char), BUFSIZE, fp);
-        bzero(buffer, BUFSIZE);
+        // if (debug_key)
+        //     printf("[RECEIVING] Data size: %d bytes\n", recv_size);
+        // fwrite(buffer, sizeof(char), BUFSIZE, fp);
+        // bzero(buffer, BUFSIZE);
 
-        // if (!is_lost(loss_rate))
-        // {
+        if (!is_lost(loss_rate))
+        {
 
-        //     if (strcmp(buffer, "END") == 0)
-        //         break;
+            // if (strcmp(buffer, "END") == 0)
+            //     break;
 
-        //     // printf("[RECEVING] Data: %s", buffer);
-        //     if (debug_key)
-        //         printf("[RECEVING] Data size: %d bytes\n", recv_size);
+            // printf("[RECEVING] Data: %s", buffer);
+            // if (debug_key)
+            //     printf("[RECEIVING] Data size: %d bytes\n", recv_size);
 
-        //     /* If seq is zero start new data collection */
-        //     if (dataPacket.seq_no == 0 && dataPacket.type == 1)
-        //     {
-        //         printf("Recieved Initial Packet from %s\n", inet_ntoa(client_addr.sin_addr));
-        //         memset(buffer, 0, sizeof(buffer));
-        //         strcpy(filename, dataPacket.data);
-        //         fp = fopen(filename, "wb");
-        //         base = 0;
-        //         ack = createACKPacket(2, base);
-        //     }
-        //     else if (dataPacket.seq_no == base + 1) /* if base+1 then its a subsequent in order packet */
-        //     {
-        //         /* then concatinate the data sent to the recieving buffer */
-        //         printf("Recieved  Subseqent Packet #%d\n", dataPacket.seq_no);
-        //         // strcat(buffer, dataPacket.data);
-        //         fwrite(buffer, sizeof(char), SIZE, fp);
-        //         base = dataPacket.seq_no;
-        //         ack = createACKPacket(2, base);
-        //     }
-        //     else if (dataPacket.type == 1 && dataPacket.seq_no != base + 1)
-        //     {
-        //         /* if recieved out of sync packet, send ACK with old base */
-        //         printf("Recieved Out of Sync Packet #%d\n", dataPacket.seq_no);
-        //         /* Resend ACK with old base */
-        //         ack = createACKPacket(2, base);
-        //     }
+            /* If seq is zero start new data collection */
+            if (pck.seq_no == 0 && pck.type == 1)
+            {
+                printf("Received Initial Packet from %s\n", inet_ntoa(client_addr.sin_addr));
+                memset(buffer, 0, BUFSIZE);
+                strcpy(buffer, pck.data);
+                printf("%s\n", buffer);
+                fp = fopen(buffer, "wb");
+                // fwrite(buffer, sizeof(char), BUFSIZE, fp);
+                base = 0;
+                ack = createACKPacket(2, base);
+            }
+            /* if base+1 then its a subsequent in order packet */
+            else if (pck.seq_no == base + 1)
+            {
+                /* then concatenate the data sent to the recieving buffer */
+                printf("Received Subsequent Packet #%d\n", pck.seq_no);
+                strcpy(buffer, pck.data);
+                fwrite(buffer, sizeof(char), BUFSIZE, fp);
+                base = pck.seq_no;
+                ack = createACKPacket(2, base);
+            }
+            else if (pck.type == 1 && pck.seq_no != base + 1)
+            {
+                /* if received out of sync packet, send ACK with old base */
+                printf("Received Out of Sync Packet #%d\n", pck.seq_no);
+                /* Resend ACK with old base */
+                ack = createACKPacket(2, base);
+            }
 
-        //     /* type 4 means that the packet recieved is a termination packet */
-        //     if (dataPacket.type == 4 && seqNumber == base)
-        //     {
-        //         base = -1;
-        //         /* create an ACK packet with terminal type 8 */
-        //         ack = createACKPacket(8, base);
-        //     }
+            /* type 4 means that the packet received is a termination packet */
+            if (pck.type == 4 && seq_num == base)
+            {
+                base = -1;
+                /* create an ACK packet with terminal type 8 */
+                ack = createACKPacket(8, base);
+            }
 
-        //     /* Send ACK for Packet Recieved */
-        //     if (base >= 0)
-        //     {
-        //         printf("------------------------------------  Sending ACK #%d\n", base);
-        //         if (sendto(sock, &ack, sizeof(ack), 0,
-        //                    (struct sockaddr *)&client_addr, sizeof(client_addr)) != sizeof(ack))
-        //             exitByError("sendto() sent a different number of bytes than expected", debug_key);
-        //     }
-        //     else if (base == -1)
-        //     {
-        //         if (debug_key)
-        //         {
-        //             printf("Recieved Teardown Packet\n");
-        //             // printf("Sending Terminal ACK\n", base);
-        //             printf("Sending Terminal ACK\n");
-        //         }
-        //         if (sendto(sock, &ack, sizeof(ack), 0,
-        //                    (struct sockaddr *)&client_addr, sizeof(client_addr)) != sizeof(ack))
-        //             exitByError("sendto() sent a different number of bytes than expected", debug_key);
-        //     }
+            /* Send ACK for Packet Received */
+            if (base >= 0)
+            {
+                printf("------------------------------------  Sending ACK #%d\n", base);
+                if (sendto(sock, &ack, sizeof(ack), 0,
+                           (struct sockaddr *)&client_addr, sizeof(client_addr)) != sizeof(ack))
+                    exitByError("sendto() sent a different number of bytes than expected", debug_key);
+            }
+            else if (base == -1)
+            {
+                if (debug_key)
+                {
+                    printf("Received Tier down Packet\n");
+                    // printf("Sending Terminal ACK\n", base);
+                    printf("Sending Terminal ACK\n");
+                }
+                if (sendto(sock, &ack, sizeof(ack), 0,
+                           (struct sockaddr *)&client_addr, sizeof(client_addr)) != sizeof(ack))
+                    exitByError("sendto() sent a different number of bytes than expected", debug_key);
+            }
 
-        //     /* if data packet is terminal packet, display and clear the recieved message */
-        //     if (dataPacket.type == 4 && base == -1)
-        //     {
-        //         printf("\n MESSAGE RECIEVED\n %s\n\n", buffer);
-        //         memset(buffer, 0, sizeof(buffer));
-        //         break;
-        //     }
-        // }
-        // else
-        // {
-        //     if (debug_key)
-        //         printf("PACKET LOSS\n");
-        // }
+            /* if data packet is terminal packet, display and clear the recieved message */
+            if (pck.type == 4 && base == -1)
+            {
+                printf("\n MESSAGE RECIEVED\n %s\n\n", buffer);
+                memset(buffer, 0, BUFSIZE);
+                break;
+            }
+        }
+        else
+        {
+            if (debug_key)
+                printf("PACKET LOSS\n");
+        }
     }
 
     fclose(fp);

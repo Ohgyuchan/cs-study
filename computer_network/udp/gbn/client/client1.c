@@ -3,44 +3,45 @@
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
-#define SIZE 125
+#define BUFSIZE 501
 
-void send_file_data(FILE *fp, int sockfd, struct sockaddr_in addr)
+typedef struct Packet
 {
-    int n;
-    char buffer[SIZE];
+    int type;
+    int seq_no;
+    int length;
+    char data[BUFSIZE];
+} PCK;
 
-    // Sending the data
-    size_t s;
-    while ((s = fread(buffer, sizeof(char), SIZE, fp)) != 0)
-    {
-        printf("[SENDING] Data: %s", buffer);
-        printf("[Data size] %lu bytes", s);
+typedef struct ACKPacket
+{
+    int type;
+    int ack_no;
+} ACK;
 
-        n = sendto(sockfd, buffer, SIZE, 0, (struct sockaddr *)&addr, sizeof(addr));
-        if (n == -1)
-        {
-            perror("[ERROR] sending data to the server.");
-            exit(1);
-        }
-        bzero(buffer, SIZE);
-    }
-
-    // Sending the 'END'
-    strcpy(buffer, "END");
-    sendto(sockfd, buffer, SIZE, 0, (struct sockaddr *)&addr, sizeof(addr));
-
-    fclose(fp);
-}
+void exitByError(char *errorMessage); /* Error handling function */
+void CatchAlarm(int ignored);         /* Handler for SIGALRM */
+void send_file_data(FILE *fp, int sockfd, struct sockaddr_in addr);
+PCK createDataPacket(int seq_no, int length, char *data);
+PCK createTerminalPacket(int seq_no, int length);
 
 int main(int argc, char *argv[])
 {
-
-    // Defining variables
     int server_sockfd;
     struct sockaddr_in server_addr;
     char *filename = "free_test_100kb.docx";
     FILE *fp = fopen(filename, "rb");
+    int debug_key;
+    int window_size;
+
+    if (argc != 5) /* Test for correct number of arguments */
+    {
+        fprintf(stderr, "Usage: %s <Server IP> <Server Port> <Window Size> <Debug Key>\n You gave %d Arguments\n", argv[0], argc);
+        exit(1);
+    }
+
+    window_size = atoi(argv[3]);
+    debug_key = atoi(argv[4]);
 
     // Creating a UDP socket
     server_sockfd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -69,4 +70,73 @@ int main(int argc, char *argv[])
     close(server_sockfd);
 
     return 0;
+}
+
+void send_file_data(FILE *fp, int sockfd, struct sockaddr_in addr)
+{
+    int n;
+    char buffer[BUFSIZE];
+    int segment_num = BUFSIZE / (BUFSIZE - 1);
+
+    // Sending the data
+    size_t s;
+    while ((s = fread(buffer, sizeof(char), BUFSIZE, fp)) != 0)
+    {
+        // printf("[SENDING] Data: %s", buffer);
+        printf("[Data size] %lu bytes\n", s);
+
+        n = sendto(sockfd, buffer, BUFSIZE, 0, (struct sockaddr *)&addr, sizeof(addr));
+        if (n == -1)
+        {
+            perror("[ERROR] sending data to the server.");
+            exit(1);
+        }
+        bzero(buffer, BUFSIZE);
+    }
+
+    strcpy(buffer, "END");
+    sendto(sockfd, buffer, BUFSIZE, 0, (struct sockaddr *)&addr, sizeof(addr));
+
+    fclose(fp);
+}
+
+void CatchAlarm(int ignored) /* Handler for SIGALRM */
+{
+    // printf("In Alarm\n");
+}
+
+/* If this is called there was an error, Printed and then the process exits */
+void exitByError(char *errorMessage)
+{
+    perror(errorMessage);
+    exit(1);
+}
+
+/* Creates and returns a segment Packet */
+PCK createDataPacket(int seq_no, int length, char *data)
+{
+
+    PCK pkt;
+
+    pkt.type = 1;
+    pkt.seq_no = seq_no;
+    pkt.length = length;
+    memset(pkt.data, 0, sizeof(pkt.data));
+    strcpy(pkt.data, data);
+
+    return pkt;
+}
+
+/* Creates and returns a terminal segment Packet */
+PCK createTerminalPacket(int seq_no, int length)
+{
+
+    PCK pkt;
+
+    pkt.type = 4;
+    pkt.seq_no = seq_no;
+    pkt.length = 0;
+    memset(pkt.data, 0, sizeof(pkt.data));
+
+    return pkt;
 }

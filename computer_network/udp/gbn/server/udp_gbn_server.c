@@ -6,6 +6,7 @@
 #include <unistd.h>     /* for close() */
 
 #define ECHOMAX 50000     /* Longest string to echo */
+#define BUFSIZE 500
 
 void DieWithError(char *errorMessage);                      /* External error handling function */
 struct ACKPacket createACKPacket (int ack_type, int base);  /* Creates a ACK packet to be sent */
@@ -13,18 +14,18 @@ int is_lost(float loss_rate);                               /* Given function fo
 
 
 /* Structure of the segmentPacket for recieving from sender */
-struct segmentPacket {
+typedef struct segmentPacket {
     int type;
     int seq_no;
     int length;
-    char data[512];
-};
+    char data[BUFSIZE];
+} PCK;
 
 /* Structure of the ACK Packet that is returned to sender */
-struct ACKPacket {
+typedef struct ACKPacket {
     int type;
     int ack_no;
-};
+} ACK;
 
 int main(int argc, char *argv[])
 {
@@ -43,19 +44,17 @@ int main(int argc, char *argv[])
 
     if (argc < 3 || argc > 4)         /* Test for correct number of parameters */
     {
-        fprintf(stderr,"Usage:  %s <UDP SERVER PORT> <CHUNK SIZE> [<LOSS RATE>]\n", argv[0]);
+        fprintf(stderr,"Usage:  %s <UDP SERVER PORT>\n", argv[0]);
         exit(1);
     }
 
     /* Set arguments to appropriate values */
     echoServPort = atoi(argv[1]);  /* First arg:  local port */
-    chunkSize = atoi(argv[2]);  /* Second arg:  size of chunks */
+    chunkSize = BUFSIZE;  /* Second arg:  size of chunks */
 
     /* loss rate is option, thus muct check for 4th argv */
-    if(argc == 4){
-        loss_rate = atof(argv[3]);
-
-    }
+    
+    loss_rate = 0.2;
 
     /* Create socket for sending/receiving datagrams */
     if ((sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0)
@@ -76,16 +75,16 @@ int main(int argc, char *argv[])
     int base = -2;
     int seqNumber = 0;
 
-    for (;;) /* Run forever */
+    while(1) /* Run forever */
     {
         /* Set the size of the in-out parameter */
         cliAddrLen = sizeof(echoClntAddr);
 
         /* struct for incoming datapacket */
-        struct segmentPacket dataPacket;
+        PCK dataPacket;
 
         /* struct for outgoing ACK */
-        struct ACKPacket ack;
+        ACK ack;
 
         /* Block until receive message from a client */
         if ((recvMsgSize = recvfrom(sock, &dataPacket, sizeof(dataPacket), 0,

@@ -1,85 +1,216 @@
-    #include <stdio.h>
-    #include <stdlib.h>
-    #include <string.h>
-    #include <unistd.h>
-    #include <arpa/inet.h>
-    #include <sys/socket.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/socket.h>
+#include <string.h>
+#include <unistd.h>
+#include <arpa/inet.h>
 
-    #define BUF_SIZE 256
+#define BUFSIZE 500
 
-    void error_handling(char *message);
+typedef struct Packet
+{
+    int type;
+    int seq_no;
+    int length;
+    char data[BUFSIZE];
+} PCK;
 
-    int main(int argc, char *argv[])
+typedef struct ACKPacket
+{
+    int type;
+    int ack_no;
+} ACK;
+
+void exitByError(char *errorMessage, int debug_key);
+struct ACKPacket createACKPacket(int ack_type, int base); /* Creates a ACK packet to be sent */
+int is_lost(float loss_rate);                             /* Given function for lose rate */
+
+void write_file(int sock, struct sockaddr_in addr, int debug_key);
+
+int main(int argc, char *argv[])
+{
+    int sock;
+    struct sockaddr_in server_addr, client_addr;
+    char buffer[BUFSIZE];
+    int port_num, debug_key;
+
+    if (argc < 3)
     {
-        int serv_sd, clnt_sd;
-        int str_len;
-        FILE *fp;
-        char buf[BUF_SIZE];
-        char file_name[BUF_SIZE];
-        int read_cnt;
+        fprintf(stderr, "Usage:  %s <PORT NUMBER> <DEBUG KEY(0: OFF / 1: ON)>\n You gave %d Arguments\n", argv[0], argc);
+        exit(1);
+    }
 
-        struct sockaddr_in serv_adr, clnt_adr;
-        socklen_t clnt_adr_sz;
+    debug_key = atoi(argv[2]);
+    port_num = atoi(argv[1]);
 
-        if (argc != 2)
+    if ((sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0)
+        exitByError("[ERROR] socket error", debug_key);
+
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    server_addr.sin_port = htons(port_num);
+
+    if (bind(sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
+        exitByError("[ERROR] bind error", debug_key);
+
+    printf("[STARTING] UDP File Server started. \n");
+    write_file(sock, client_addr, debug_key);
+
+    printf("[SUCCESS] Data transfer complete.\n");
+    printf("[CLOSING] Closing the server.\n");
+
+    close(sock);
+
+    return 0;
+}
+
+void write_file(int sock, struct sockaddr_in client_addr, int debug_key)
+{
+    FILE *fp;
+    int recv_size;
+    char buffer[BUFSIZE];
+    int base = -2;
+    int seq_num = 0;
+    double loss_rate = 0.4;
+    socklen_t client_addr_size;
+
+    // fp = fopen("server.txt", "w");
+    // Receiving the data and writing it into the file.
+    while (1)
+    {
+        client_addr_size = sizeof(client_addr);
+        PCK pck;
+        ACK ack;
+
+        if ((recv_size = recvfrom(sock, &pck, sizeof(pck), 0, (struct sockaddr *)&client_addr, &client_addr_size)) < 0)
+            exitByError("recvfrom() failed", debug_key);
+
+        // if (strcmp(buffer, "END") == 0)
+        //     break;
+
+        seq_num = pck.seq_no;
+
+        // printf("[RECEVING] Data: %s", buffer);
+        // if (debug_key)
+        //     printf("[RECEIVING] Data size: %d bytes\n", recv_size);
+        // fwrite(buffer, sizeof(char), BUFSIZE, fp);
+        // bzero(buffer, BUFSIZE);
+
+        if (!is_lost(loss_rate))
         {
-            printf("Usage: %s <port>\n", argv[0]);
-            exit(1);
-        }
 
-        serv_sd = socket(PF_INET, SOCK_DGRAM, 0);
+            // if (strcmp(buffer, "END") == 0)
+            //     break;
 
-        memset(buf, 0, BUF_SIZE);
-        memset(&serv_adr, 0, sizeof(serv_adr));
-        serv_adr.sin_family = AF_INET;
-        serv_adr.sin_addr.s_addr = htonl(INADDR_ANY);
-        serv_adr.sin_port = htons(atoi(argv[1]));
+            // printf("[RECEVING] Data: %s", buffer);
+            // if (debug_key)
+            //     printf("[RECEIVING] Data size: %d bytes\n", recv_size);
 
-        bind(serv_sd, (struct sockaddr *)&serv_adr, sizeof(serv_adr));
-
-        clnt_adr_sz = sizeof(clnt_adr);
-
-        if (fp != NULL)
-        {
-            while (1)
+            /* If seq is zero start new data collection */
+            if (pck.seq_no == 0 && pck.type == 1)
             {
-                recvfrom(serv_sd, file_name, BUF_SIZE, 0, (struct sockaddr *)&clnt_adr, &clnt_adr_sz);
-                printf("file name : %s\n", file_name);
-                fp = fopen(file_name, "rb"); // get out
-                if (fp == NULL) {
-                    printf("fopen error\n");
-                    return -1;
-                }
+                printf("Received Initial Packet from %s\n", inet_ntoa(client_addr.sin_addr));
+                memset(buffer, 0, BUFSIZE);
+                strcpy(buffer, pck.data);
+                printf("%s\n", buffer);
+                fp = fopen(buffer, "wb");
+                // fwrite(buffer, sizeof(char), BUFSIZE, fp);
+                base = 0;
+                ack = createACKPacket(2, base);
+            }
+            /* if base+1 then its a subsequent in order packet */
+            else if (pck.seq_no == base + 1)
+            {
+                /* then concatenate the data sent to the recieving buffer */
+                printf("Received Subsequent Packet #%d\n", pck.seq_no);
+                strcpy(buffer, pck.data);
+                fwrite(buffer, sizeof(char), BUFSIZE, fp);
+                base = pck.seq_no;
+                ack = createACKPacket(2, base);
+            }
+            else if (pck.type == 1 && pck.seq_no != base + 1)
+            {
+                /* if received out of sync packet, send ACK with old base */
+                printf("Received Out of Sync Packet #%d\n", pck.seq_no);
+                /* Resend ACK with old base */
+                ack = createACKPacket(2, base);
+            }
 
-                read_cnt = fread(buf, 1, BUF_SIZE, fp);
+            /* type 4 means that the packet received is a termination packet */
+            if (pck.type == 4 && seq_num == base)
+            {
+                base = -1;
+                /* create an ACK packet with terminal type 8 */
+                ack = createACKPacket(8, base);
+            }
 
-                if (read_cnt < BUF_SIZE)
+            /* Send ACK for Packet Received */
+            if (base >= 0)
+            {
+                printf("------------------------------------  Sending ACK #%d\n", base);
+                if (sendto(sock, &ack, sizeof(ack), 0,
+                           (struct sockaddr *)&client_addr, sizeof(client_addr)) != sizeof(ack))
+                    exitByError("sendto() sent a different number of bytes than expected", debug_key);
+            }
+            else if (base == -1)
+            {
+                if (debug_key)
                 {
-                    sendto(serv_sd, buf, read_cnt, 0, (struct sockaddr *)&clnt_adr, clnt_adr_sz);
-                    printf("case 1]fread() return value : %d\n", read_cnt);
-                    printf("**********************************************************\n");
-                    printf("I read '%s' from '%s'\n", buf, file_name);
-                    printf("**********************************************************\n");
-                    break;
+                    printf("Received Tier down Packet\n");
+                    // printf("Sending Terminal ACK\n", base);
+                    printf("Sending Terminal ACK\n");
                 }
-                printf("read : %s\n", buf);
-                sendto(serv_sd, buf, BUF_SIZE, 0, (struct sockaddr *)&clnt_adr, clnt_adr_sz);
-                printf("case 2]fread() return value : %d\n", read_cnt);
-                // fclose:w!
+                if (sendto(sock, &ack, sizeof(ack), 0,
+                           (struct sockaddr *)&client_addr, sizeof(client_addr)) != sizeof(ack))
+                    exitByError("sendto() sent a different number of bytes than expected", debug_key);
+            }
+
+            /* if data packet is terminal packet, display and clear the recieved message */
+            if (pck.type == 4 && base == -1)
+            {
+                printf("\n MESSAGE RECIEVED\n %s\n\n", buffer);
+                memset(buffer, 0, BUFSIZE);
+                break;
             }
         }
         else
-            printf("fopen() failed\n");
-
-        fclose(fp);
-        close(clnt_sd);
-        close(serv_sd);
-        return 0;
+        {
+            if (debug_key)
+                printf("PACKET LOSS\n");
+        }
     }
 
-    void error_handling(char *message)
+    fclose(fp);
+}
+
+void exitByError(char *errorMessage, int debug_key)
+{
+    if (debug_key)
+        perror(errorMessage);
+    else
+        perror("Error Occurred!");
+    exit(1);
+}
+
+struct ACKPacket createACKPacket(int ack_type, int base)
+{
+    struct ACKPacket ack;
+    ack.type = ack_type;
+    ack.ack_no = base;
+    return ack;
+}
+
+int is_lost(float loss_rate)
+{
+    double rv;
+    rv = drand48();
+    if (rv < loss_rate)
     {
-        fputs(message, stderr);
-        fputc('\n', stderr);
-        exit(1);
+        return (1);
     }
+    else
+    {
+        return (0);
+    }
+}

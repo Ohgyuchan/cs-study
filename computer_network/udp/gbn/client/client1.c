@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+
 #define BUFSIZE 501
 
 typedef struct Packet
@@ -29,9 +30,9 @@ int main(int argc, char *argv[])
 {
     int server_sockfd;
     struct sockaddr_in server_addr;
-    struct sockaddr_in client_addr;
-    char *filename = "free_test_100kb.docx";
-    FILE *fp = fopen(filename, "rb"); 
+    // char *filename = "free_test_100kb.docx";
+    char *filename = "test.txt";
+    FILE *fp = fopen(filename, "rb");
     int debug_key;
     int window_size;
     struct sigaction myAction;

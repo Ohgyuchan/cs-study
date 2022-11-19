@@ -29,10 +29,12 @@ int main(int argc, char *argv[])
 {
     int server_sockfd;
     struct sockaddr_in server_addr;
+    struct sockaddr_in client_addr;
     char *filename = "free_test_100kb.docx";
-    FILE *fp = fopen(filename, "rb");
+    FILE *fp = fopen(filename, "rb"); 
     int debug_key;
     int window_size;
+    struct sigaction myAction;
 
     if (argc != 5) /* Test for correct number of arguments */
     {

@@ -3,7 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
-#define SIZE 1024
+#define SIZE 125
 
 void send_file_data(FILE *fp, int sockfd, struct sockaddr_in addr)
 {
@@ -11,9 +11,11 @@ void send_file_data(FILE *fp, int sockfd, struct sockaddr_in addr)
     char buffer[SIZE];
 
     // Sending the data
-    while (fgets(buffer, SIZE, fp) != NULL)
+    size_t s;
+    while ((s = fread(buffer, sizeof(char), SIZE, fp)) != 0)
     {
         printf("[SENDING] Data: %s", buffer);
+        printf("[Data size] %lu bytes", s);
 
         n = sendto(sockfd, buffer, SIZE, 0, (struct sockaddr *)&addr, sizeof(addr));
         if (n == -1)
@@ -37,7 +39,7 @@ int main(int argc, char *argv[])
     // Defining variables
     int server_sockfd;
     struct sockaddr_in server_addr;
-    char *filename = "client.txt";
+    char *filename = "free_test_100kb.docx";
     FILE *fp = fopen(filename, "rb");
 
     // Creating a UDP socket

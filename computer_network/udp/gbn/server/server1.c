@@ -4,18 +4,18 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
-#define SIZE 1024
+#define SIZE 125
 
 void write_file(int sockfd, struct sockaddr_in addr)
 {
 
-    char *filename = "server.txt";
+    char *filename = "server.docx";
     int n;
     char buffer[SIZE];
     socklen_t addr_size;
 
     // Creating a file.
-    FILE *fp = fp = fopen(filename, "wb");
+    FILE *fp = fopen(filename, "wb");
 
     // Receiving the data and writing it into the file.
     while (1)
@@ -29,7 +29,7 @@ void write_file(int sockfd, struct sockaddr_in addr)
         }
 
         printf("[RECEVING] Data: %s", buffer);
-        fprintf(fp, "%s", buffer);
+        fwrite(buffer, sizeof(char), SIZE, fp);
         bzero(buffer, SIZE);
     }
 
@@ -38,18 +38,11 @@ void write_file(int sockfd, struct sockaddr_in addr)
 
 int main(int argc, char *argv[])
 {
-
-    // Defining the IP and Port
-    // char *ip = "127.0.0.1";
-    const int port = 8080;
-
-    // Defining variables
     int server_sockfd;
     struct sockaddr_in server_addr, client_addr;
     char buffer[SIZE];
     int e;
 
-    // Creating a UDP socket
     server_sockfd = socket(AF_INET, SOCK_DGRAM, 0);
     if (server_sockfd < 0)
     {

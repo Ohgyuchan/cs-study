@@ -8,14 +8,14 @@
 #include <signal.h>
 
 #define BUFSIZE 500
-#define TIMEOUT_SECS 5
+#define TIMEOUT_SECS 3
 
 typedef struct Packet
 {
     int type;
     int seq_no;
     int length;
-    char data[BUFSIZE];
+    char data[501];
 } PCK;
 
 typedef struct ACKPacket
@@ -24,8 +24,8 @@ typedef struct ACKPacket
     int ack_no;
 } ACK;
 
-void exitByError(char *errorMessage, int debug_key); /* Error handling function */
-void CatchAlarm(int ignored);                        /* Handler for SIGALRM */
+void exitByError(char *errorMessage, int debug_key);
+void catchAlarm(int ignored);
 void send_file_data(int sock, struct sockaddr_in server_addr, struct sockaddr_in client_addr, int debug_key, int window_size);
 PCK createDataPacket(int seq_no, int length, char *data);
 PCK createTerminalPacket(int seq_no, int length);
@@ -38,6 +38,7 @@ int main(int argc, char *argv[])
     int debug_key;
     int window_size;
     struct sigaction myAction;
+    char buffer[50];
 
     if (argc != 5)
     {
@@ -46,9 +47,13 @@ int main(int argc, char *argv[])
     }
 
     window_size = atoi(argv[3]);
+
+    if (window_size > 10)
+    {
+        fprintf(stderr, "Usage: <Window Size> must be <= 10. You typed <Window Size>:%s.\n", argv[3]);
+    }
     debug_key = atoi(argv[4]);
 
-    // Creating a UDP socket
     if ((server_sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0)
         exitByError("[ERROR] socket error", debug_key);
 
@@ -57,11 +62,30 @@ int main(int argc, char *argv[])
     server_addr.sin_addr.s_addr = inet_addr(argv[1]);
     server_addr.sin_port = htons(atoi(argv[2]));
 
-    // Sending the file data to the server
     send_file_data(server_sock, server_addr, client_addr, debug_key, window_size);
 
+
     printf("[SUCCESS] Data transfer complete.\n");
-    printf("[CLOSING] Disconnecting from the server.\n");
+    
+    char *command = "wc free_test_100kb.docx";
+    FILE *fp;
+    for (int i = 0; i < 5; i++)
+    {
+        fp = popen(command, "r");
+        if (NULL == fp)
+        {
+            exitByError("popen() error", debug_key);
+        }
+        
+        int size = fread(buffer,1, sizeof(buffer), fp);
+        
+        if(sendto(server_sock, &buffer, size, 0,(struct sockaddr *)&server_addr, sizeof(server_addr)) != size) {
+            exitByError("sendto(wc [filename] error", debug_key);
+        }
+        memset(buffer, 0, sizeof(buffer));
+
+        pclose(fp);
+    }
 
     close(server_sock);
 
@@ -71,13 +95,11 @@ int main(int argc, char *argv[])
 void send_file_data(int sock, struct sockaddr_in server_addr, struct sockaddr_in client_addr, int debug_key, int window_size)
 {
     int n;
-    int chunk_size = BUFSIZE - 1;
-    char buffer[BUFSIZE - 1];
+    char buffer[BUFSIZE];
     int base = -1;
-    // char *filename = "free_test_100kb.docx";
-    char *filename = "test.txt";
-    FILE *fp = fopen(filename, "r");
-    // Reading the text file
+    char *filename = "free_test_100kb.docx";
+    // char *filename = "test.txt";
+    FILE *fp = fopen(filename, "rb");
     if (fp == NULL)
     {
         exitByError("[ERROR] reading the file", debug_key);
@@ -85,23 +107,24 @@ void send_file_data(int sock, struct sockaddr_in server_addr, struct sockaddr_in
 
     fseek(fp, 0L, SEEK_END);
     int total_data_size = ftell(fp);
-    int segment_num = total_data_size / chunk_size;
-    if (total_data_size % chunk_size > 0)
-    {
-        segment_num++;
-    }
     fseek(fp, 0L, SEEK_SET);
-    // while (fread(buffer, sizeof(char), chunk_size, fp) != 0)
-    // {
-    //     printf("%s", buffer);
-    // }
+    int segment_num = (total_data_size / BUFSIZE);
+    if (total_data_size % BUFSIZE > 0)
+    {
+        segment_num += 2;
+    }
+    else
+    {
+        segment_num += 1;
+    }
 
-    printf("tds: %d sn: %d\n", total_data_size, segment_num);
+    if (debug_key)
+        printf("total_data_size: %d segment_num: %d\n", total_data_size, segment_num);
     int seq_num = 0;
     int data_len = 0;
     struct sigaction action;
 
-    action.sa_handler = CatchAlarm;
+    action.sa_handler = catchAlarm;
     if (sigemptyset(&action.sa_mask) < 0)
         exitByError("sigemptyset() failed", debug_key);
 
@@ -112,37 +135,38 @@ void send_file_data(int sock, struct sockaddr_in server_addr, struct sockaddr_in
 
     int no_tier_down_ack = 1;
     int tries = 0;
-    size_t s;
 
     while (no_tier_down_ack)
     {
         while (seq_num <= segment_num && (seq_num - base) <= window_size)
         {
             PCK pck;
-            fseek(fp, chunk_size * seq_num, SEEK_SET);
 
-            if (1 && seq_num == segment_num)
+            if (seq_num == segment_num)
             {
-                /* Reached end, create terminal packet */
                 pck = createTerminalPacket(seq_num, 0);
                 printf("Sending Terminal Packet\n");
             }
             else
             {
-                /* Create Data Packet Struct */
-                char seg_data[chunk_size];
+                char seg_data[BUFSIZE];
                 if (seq_num == 0)
-                    strncpy(seg_data, (filename), chunk_size);
+                {
+                    strncpy(seg_data, (filename), BUFSIZE);
+                    data_len = strlen(seg_data);
+                }
                 else
                 {
-                    if (fread(buffer, sizeof(char), chunk_size, fp) == 0)
+                    memset(buffer, 0, BUFSIZE);
+                    if ((data_len = fread(buffer, 1, sizeof(buffer), fp)) == 0)
                         exitByError("fread() error\n", debug_key);
-                    strncpy(seg_data, (buffer), chunk_size);
+                    strncpy(seg_data, (buffer), BUFSIZE);
                 }
 
                 pck = createDataPacket(seq_num, data_len, seg_data);
-                printf("Sending Packet: %d, %s\n", seq_num, pck.data);
-                // printf("Chunk: %s\n", seg_data);
+                printf("Sending Packet: %d\n", seq_num);
+                if (debug_key)
+                    printf("Chunk Length: %d\n", data_len);
             }
 
             if (sendto(sock, &pck, sizeof(pck), 0,
@@ -168,7 +192,6 @@ void send_file_data(int sock, struct sockaddr_in server_addr, struct sockaddr_in
             if (errno == EINTR)
             {
                 seq_num = base + 1;
-                fseek(fp, chunk_size * seq_num, SEEK_SET);
 
                 printf("Timeout: Resending\n");
                 if (tries >= 10)
@@ -184,31 +207,31 @@ void send_file_data(int sock, struct sockaddr_in server_addr, struct sockaddr_in
                     {
                         PCK pck;
 
-                        if (seq_num == segment_num && 1)
+                        if (seq_num == segment_num)
                         {
-                            /* Reached end, create terminal packet */
                             pck = createTerminalPacket(seq_num, 0);
                             printf("Sending Terminal Packet\n");
                         }
                         else
                         {
-                            /* Create Data Packet Struct */
-                            char seg_data[chunk_size];
+                            char seg_data[BUFSIZE];
                             if (seq_num == 0)
-                                strncpy(seg_data, (filename), chunk_size);
+                            {
+                                strncpy(seg_data, (filename), BUFSIZE);
+                                data_len = strlen(seg_data);
+                            }
                             else
                             {
-                                if (fread(buffer, sizeof(char), chunk_size, fp) == 0)
+                                memset(buffer, 0, BUFSIZE);
+                                if ((data_len = fread(buffer, 1, sizeof(buffer), fp)) == 0)
                                     exitByError("fread() error\n", debug_key);
-                                strncpy(seg_data, (buffer), chunk_size);
+                                strncpy(seg_data, (buffer), BUFSIZE);
                             }
-
                             pck = createDataPacket(seq_num, data_len, seg_data);
-                            printf("Sending Packet: %d, %s\n", seq_num, pck.data);
-                            // printf("Chunk: %s\n", seg_data);
+                            printf("Sending Packet: %d\n", seq_num);
+                            if (debug_key)
+                                printf("Chunk: %s\n", seg_data);
                         }
-
-                        /* Send the constructed data packet to the receiver */
                         if (sendto(sock, &pck, sizeof(pck), 0,
                                    (struct sockaddr *)&server_addr, sizeof(server_addr)) != sizeof(pck))
                             exitByError("sendto() sent a different number of bytes than expected", debug_key);
@@ -229,33 +252,26 @@ void send_file_data(int sock, struct sockaddr_in server_addr, struct sockaddr_in
             printf("----------------------- Received ACK: %d\n", ack.ack_no);
             if (ack.ack_no > base)
             {
-                /* Advances the sending, reset tries */
                 base = ack.ack_no;
             }
         }
         else
         {
             printf("Received Terminal ACK\n");
+            memset(buffer, 0, BUFSIZE);
             no_tier_down_ack = 0;
         }
-
-        /* recvfrom() got something --  cancel the timeout, reset tries */
         alarm(0);
         tries = 0;
     }
-
-    // strcpy(buffer, "END");
-    // sendto(sock, buffer, BUFSIZE, 0, (struct sockaddr *)&server_addr, sizeof(server_addr));
-
     fclose(fp);
 }
 
-void CatchAlarm(int ignored) /* Handler for SIGALRM */
+void catchAlarm(int ignored)
 {
     // printf("In Alarm\n");
 }
 
-/* If this is called there was an error, Printed and then the process exits */
 void exitByError(char *errorMessage, int debug_key)
 {
     if (debug_key)
@@ -265,22 +281,17 @@ void exitByError(char *errorMessage, int debug_key)
     exit(1);
 }
 
-/* Creates and returns a segment Packet */
 PCK createDataPacket(int seq_no, int length, char *data)
 {
-
     PCK pkt;
-
     pkt.type = 1;
     pkt.seq_no = seq_no;
     pkt.length = length;
     memset(pkt.data, 0, sizeof(pkt.data));
     strcpy(pkt.data, data);
-
     return pkt;
 }
 
-/* Creates and returns a terminal segment Packet */
 PCK createTerminalPacket(int seq_no, int length)
 {
 

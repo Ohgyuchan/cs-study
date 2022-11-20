@@ -29,8 +29,8 @@ int main(int argc, char *argv[])
 {
     int server_sockfd;
     struct sockaddr_in server_addr;
-    // char *filename = "free_test_100kb.docx";
-    char *filename = "test.txt";
+    char *filename = "free_test_100kb.docx";
+    // char *filename = "test.txt";
     FILE *fp = fopen(filename, "rb");
     int debug_key;
     int window_size;
@@ -77,7 +77,7 @@ void send_file_data(FILE *fp, int sockfd, struct sockaddr_in addr)
 {
     int n;
     char buffer[BUFSIZE];
-    int segment_num = BUFSIZE / (BUFSIZE - 1);
+    // int segment_num = BUFSIZE / (BUFSIZE - 1);
 
     // Sending the data
     size_t s;

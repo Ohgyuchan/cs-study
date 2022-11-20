@@ -5,16 +5,16 @@
 #include <string.h>     /* for memset() */
 #include <unistd.h>     /* for close() */
 
-#define ECHOMAX 50000     /* Longest string to echo */
+#define ECHOMAX 50000 /* Longest string to echo */
 #define BUFSIZE 500
 
-void DieWithError(char *errorMessage);                      /* External error handling function */
-struct ACKPacket createACKPacket (int ack_type, int base);  /* Creates a ACK packet to be sent */
-int is_lost(float loss_rate);                               /* Given function for lose rate */
-
+void DieWithError(char *errorMessage);                    /* External error handling function */
+struct ACKPacket createACKPacket(int ack_type, int base); /* Creates a ACK packet to be sent */
+int is_lost(float loss_rate);                             /* Given function for lose rate */
 
 /* Structure of the segmentPacket for recieving from sender */
-typedef struct segmentPacket {
+typedef struct segmentPacket
+{
     int type;
     int seq_no;
     int length;
@@ -22,7 +22,8 @@ typedef struct segmentPacket {
 } PCK;
 
 /* Structure of the ACK Packet that is returned to sender */
-typedef struct ACKPacket {
+typedef struct ACKPacket
+{
     int type;
     int ack_no;
 } ACK;
@@ -42,18 +43,18 @@ int main(int argc, char *argv[])
     /* random generator seeding */
     srand48(2345);
 
-    if (argc < 3 || argc > 4)         /* Test for correct number of parameters */
+    if (argc < 3 || argc > 4) /* Test for correct number of parameters */
     {
-        fprintf(stderr,"Usage:  %s <UDP SERVER PORT>\n", argv[0]);
+        fprintf(stderr, "Usage:  %s <UDP SERVER PORT>\n", argv[0]);
         exit(1);
     }
 
     /* Set arguments to appropriate values */
-    echoServPort = atoi(argv[1]);  /* First arg:  local port */
-    chunkSize = BUFSIZE;  /* Second arg:  size of chunks */
+    echoServPort = atoi(argv[1]); /* First arg:  local port */
+    chunkSize = BUFSIZE;          /* Second arg:  size of chunks */
 
     /* loss rate is option, thus muct check for 4th argv */
-    
+
     loss_rate = 0;
 
     /* Create socket for sending/receiving datagrams */
@@ -67,7 +68,7 @@ int main(int argc, char *argv[])
     echoServAddr.sin_port = htons(echoServPort);      /* Local port */
 
     /* Bind to the local address */
-    if (bind(sock, (struct sockaddr *) &echoServAddr, sizeof(echoServAddr)) < 0)
+    if (bind(sock, (struct sockaddr *)&echoServAddr, sizeof(echoServAddr)) < 0)
         DieWithError("bind() failed");
 
     /* Initialize variables to their needed start values */
@@ -75,7 +76,7 @@ int main(int argc, char *argv[])
     int base = -2;
     int seqNumber = 0;
 
-    while(1) /* Run forever */
+    while (1) /* Run forever */
     {
         /* Set the size of the in-out parameter */
         cliAddrLen = sizeof(echoClntAddr);
@@ -88,29 +89,32 @@ int main(int argc, char *argv[])
 
         /* Block until receive message from a client */
         if ((recvMsgSize = recvfrom(sock, &dataPacket, sizeof(dataPacket), 0,
-            (struct sockaddr *) &echoClntAddr, &cliAddrLen)) < 0)
+                                    (struct sockaddr *)&echoClntAddr, &cliAddrLen)) < 0)
             DieWithError("recvfrom() failed");
 
-            seqNumber = dataPacket.seq_no;
+        seqNumber = dataPacket.seq_no;
 
         /* Add random packet lose, if lost dont process */
-        if(!is_lost(loss_rate)){
+        if (!is_lost(loss_rate))
+        {
             /* If seq is zero start new data collection */
-            if(dataPacket.seq_no == 0 && dataPacket.type == 1)
+            if (dataPacket.seq_no == 0 && dataPacket.type == 1)
             {
                 printf("Recieved Initial Packet from %s\n", inet_ntoa(echoClntAddr.sin_addr));
                 memset(dataBuffer, 0, sizeof(dataBuffer));
                 strcpy(dataBuffer, dataPacket.data);
                 base = 0;
                 ack = createACKPacket(2, base);
-            } else if (dataPacket.seq_no == base + 1) /* if base+1 then its a subsequent in order packet */
+            }
+            else if (dataPacket.seq_no == base + 1) /* if base+1 then its a subsequent in order packet */
             {
                 /* then concatinate the data sent to the recieving buffer */
                 printf("Recieved  Subseqent Packet #%d\n", dataPacket.seq_no);
                 strcat(dataBuffer, dataPacket.data);
                 base = dataPacket.seq_no;
                 ack = createACKPacket(2, base);
-            } else if (dataPacket.type == 1 && dataPacket.seq_no != base + 1)
+            }
+            else if (dataPacket.type == 1 && dataPacket.seq_no != base + 1)
             {
                 /* if recieved out of sync packet, send ACK with old base */
                 printf("Recieved Out of Sync Packet #%d\n", dataPacket.seq_no);
@@ -119,37 +123,41 @@ int main(int argc, char *argv[])
             }
 
             /* type 4 means that the packet recieved is a termination packet */
-            if(dataPacket.type == 4 && seqNumber == base ){
+            if (dataPacket.type == 4 && seqNumber == base)
+            {
                 base = -1;
                 /* create an ACK packet with terminal type 8 */
                 ack = createACKPacket(8, base);
             }
 
             /* Send ACK for Packet Recieved */
-            if(base >= 0){
+            if (base >= 0)
+            {
                 printf("------------------------------------  Sending ACK #%d\n", base);
                 if (sendto(sock, &ack, sizeof(ack), 0,
-                     (struct sockaddr *) &echoClntAddr, sizeof(echoClntAddr)) != sizeof(ack))
+                           (struct sockaddr *)&echoClntAddr, sizeof(echoClntAddr)) != sizeof(ack))
                     DieWithError("sendto() sent a different number of bytes than expected");
-            } else if (base == -1) {
+            }
+            else if (base == -1)
+            {
                 printf("Recieved Teardown Packet\n");
-                // printf("Sending Terminal ACK\n", base);
                 printf("Sending Terminal ACK\n");
                 if (sendto(sock, &ack, sizeof(ack), 0,
-                     (struct sockaddr *) &echoClntAddr, sizeof(echoClntAddr)) != sizeof(ack))
+                           (struct sockaddr *)&echoClntAddr, sizeof(echoClntAddr)) != sizeof(ack))
                     DieWithError("sendto() sent a different number of bytes than expected");
             }
 
             /* if data packet is terminal packet, display and clear the recieved message */
-            if(dataPacket.type == 4 && base == -1){
+            if (dataPacket.type == 4 && base == -1)
+            {
                 printf("\n MESSAGE RECIEVED\n %s\n\n", dataBuffer);
                 memset(dataBuffer, 0, sizeof(dataBuffer));
             }
-
-        } else {
+        }
+        else
+        {
             printf("SIMULATED LOSE\n");
         }
-
     }
     /* NOT REACHED */
 }
@@ -162,21 +170,25 @@ void DieWithError(char *errorMessage)
 }
 
 /* Creates and returns a segment Packet */
-struct ACKPacket createACKPacket (int ack_type, int base){
-        struct ACKPacket ack;
-        ack.type = ack_type;
-        ack.ack_no = base;
-        return ack;
+struct ACKPacket createACKPacket(int ack_type, int base)
+{
+    struct ACKPacket ack;
+    ack.type = ack_type;
+    ack.ack_no = base;
+    return ack;
 }
 
 /* The given lost rate function */
-int is_lost(float loss_rate) {
+int is_lost(float loss_rate)
+{
     double rv;
     rv = drand48();
     if (rv < loss_rate)
     {
-        return(1);
-    } else {
-        return(0);
+        return (1);
+    }
+    else
+    {
+        return (0);
     }
 }

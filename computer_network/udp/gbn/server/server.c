@@ -24,13 +24,13 @@ typedef struct ACKPacket
 void exitByError(char *errorMessage, int debug_key);
 struct ACKPacket createACKPacket(int ack_type, int base);
 void write_file(int sock, struct sockaddr_in addr, int debug_key);
+void wc_command(int sock, struct sockaddr_in addr, int debug_key);
 
 int main(int argc, char *argv[])
 {
     int sock;
     struct sockaddr_in server_addr, client_addr;
     int port_num, debug_key;
-    char buffer[50];
 
     if (argc < 3)
     {
@@ -56,36 +56,111 @@ int main(int argc, char *argv[])
     write_file(sock, client_addr, debug_key);
 
     printf("[SUCCESS] Data transfer complete.\n");
+    wc_command(sock, client_addr, debug_key);
+    printf("[CLOSING] Closing the server.\n");
+
+    close(sock);
+
+    return 0;
+}
+
+void wc_command(int sock, struct sockaddr_in client_addr, int debug_key)
+{
+    int i = 0;
     char *command = "wc free_test_100kb.docx";
+    char buffer[50];
     FILE *fp;
-    socklen_t client_addr_size = sizeof(client_addr);
-    for (int i = 0; i < 5; i++)
+    socklen_t client_addr_size;
+    int base = -2;
+    int seq_num = 0;
+    int recv_size;
+
+    while (1)
     {
+        client_addr_size = sizeof(client_addr);
+        PCK pck;
+        ACK ack;
+
         fp = popen(command, "r");
         if (NULL == fp)
         {
             exitByError("popen() error", debug_key);
         }
 
-        int size = fread(buffer, 1, sizeof(buffer), fp);
-        printf("server[wc]:\t%s\n", buffer);
-        memset(buffer, 0, sizeof(buffer));
         if (recvfrom(sock, &buffer, sizeof(buffer), 0, (struct sockaddr *)&client_addr, &client_addr_size) < 0)
         {
             exitByError("sendto(wc [filename] error", debug_key);
         }
 
-        printf("client[wc]:\t%s\n", buffer);
-        memset(buffer, 0, sizeof(buffer));
+        if ((recv_size = recvfrom(sock, &pck, sizeof(pck), 0, (struct sockaddr *)&client_addr, &client_addr_size)) < 0)
+            exitByError("recvfrom() failed", debug_key);
+
+        seq_num = pck.seq_no;
+
+        if (pck.seq_no == 0 && pck.type == 1)
+        {
+            printf("Received Initial Packet from %s\n", inet_ntoa(client_addr.sin_addr));
+            memset(buffer, 0, sizeof(buffer));
+            int size = fread(buffer, 1, sizeof(buffer), fp);
+            printf("server[wc]:\t%s\n", buffer);
+            memset(buffer, 0, sizeof(buffer));
+            strcpy(buffer, pck.data);
+            printf("client[wc]:\t%s\n", buffer);
+            base = 0;
+            ack = createACKPacket(2, base);
+        }
+        else if (pck.seq_no == base + 1)
+        {
+            printf("Received Subsequent Packet #%d\n", pck.seq_no);
+            memset(buffer, 0, sizeof(buffer));
+            int size = fread(buffer, 1, sizeof(buffer), fp);
+            printf("server[wc]:\t%s\n", buffer);
+            memset(buffer, 0, sizeof(buffer));
+            strcpy(buffer, pck.data);
+            printf("client[wc]:\t%s\n", buffer);
+            base = pck.seq_no;
+            ack = createACKPacket(2, base);
+        }
+        else if (pck.type == 1 && pck.seq_no != base + 1)
+        {
+            printf("Received Out of Sync Packet #%d\n", pck.seq_no);
+            ack = createACKPacket(2, base);
+        }
+
+        if (pck.type == 4 && seq_num == base)
+        {
+            base = -1;
+            ack = createACKPacket(8, base);
+        }
+        if (base >= 0)
+        {
+            printf("------------------------------------  Sending ACK #%d\n", base);
+            if (sendto(sock, &ack, sizeof(ack), 0,
+                       (struct sockaddr *)&client_addr, sizeof(client_addr)) != sizeof(ack))
+                exitByError("sendto() sent a different number of bytes than expected", debug_key);
+            seq_num++;
+        }
+        else if (base == -1)
+        {
+            if (debug_key)
+            {
+                printf("Received Tier down Packet\n");
+                printf("Sending Terminal ACK\n");
+            }
+            if (sendto(sock, &ack, sizeof(ack), 0,
+                       (struct sockaddr *)&client_addr, sizeof(client_addr)) != sizeof(ack))
+                exitByError("sendto() sent a different number of bytes than expected", debug_key);
+        }
+
+        if (pck.type == 4 && base == -1)
+        {
+            printf("\n FILE RECEIVED\n %s\n\n", buffer);
+            memset(buffer, 0, sizeof(buffer));
+            break;
+        }
 
         pclose(fp);
     }
-
-    printf("[CLOSING] Closing the server.\n");
-
-    close(sock);
-
-    return 0;
 }
 
 void write_file(int sock, struct sockaddr_in client_addr, int debug_key)
@@ -126,6 +201,8 @@ void write_file(int sock, struct sockaddr_in client_addr, int debug_key)
             memset(buffer, 0, sizeof(buffer));
             strcpy(buffer, pck.data);
             fwrite(buffer, 1, pck.length, fp);
+            if (debug_key)
+                printf("pck.length: %d\n", pck.length);
             base = pck.seq_no;
             ack = createACKPacket(2, base);
         }

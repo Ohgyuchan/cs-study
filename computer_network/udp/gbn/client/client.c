@@ -63,7 +63,16 @@ int main(int argc, char *argv[])
     server_addr.sin_port = htons(atoi(argv[2]));
 
     send_file_data(server_sock, server_addr, client_addr, debug_key, window_size);
+    close(server_sock);
     printf("[SUCCESS] Data transfer complete.\n");
+    if ((server_sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0)
+        exitByError("[ERROR] socket error", debug_key);
+
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = inet_addr(argv[1]);
+    server_addr.sin_port = htons(atoi(argv[2]));
+    sleep(1);
     wc_command(server_sock, server_addr, client_addr, debug_key, 1);
     close(server_sock);
 

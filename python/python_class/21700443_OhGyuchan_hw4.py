@@ -6,7 +6,7 @@ from tkinter import messagebox
 from PIL import Image
 from PIL import ImageTk
 
-def changeImage():
+def updateBookCover():
     global bookCoverImageName
     bookCoverImageName = askopenfilename(title='책표지 변경', filetypes=((".png","*.png"),(".jpg","*.jpg"),)) 
     try:
@@ -124,7 +124,7 @@ bookCoverLabel = Label(masterFrame, image=defaultBookCoverImage)
 bookCoverLabel.grid(column=0, row=0)
 
 # masterFrame에 북커버 변경 버튼 배치
-changBookCoverButton = Button(masterFrame, text="커버 사진 변경", command=changeImage).grid(column=0, row=1)
+changBookCoverButton = Button(masterFrame, text="커버 사진 변경", command=updateBookCover).grid(column=0, row=1)
 
 # masterFrame에 bookInfoFrame 배치
 bookInfoFrame = Frame(masterFrame)

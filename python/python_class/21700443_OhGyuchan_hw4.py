@@ -8,8 +8,8 @@ from PIL import ImageTk
 
 def updateBookCover():
     global bookCoverImageName
-    bookCoverImageName = askopenfilename(title='책표지 변경', filetypes=((".png","*.png"),(".jpg","*.jpg"),)) 
     try:
+        bookCoverImageName = askopenfilename(title='책표지 변경', filetypes=((".png","*.png"),(".jpg","*.jpg"),)) 
         newBookCoverImage = ImageTk.PhotoImage(Image.open(bookCoverImageName).resize((200,200)))
         bookCoverLabel.configure(image=newBookCoverImage)
         bookCoverLabel.image = newBookCoverImage
@@ -56,7 +56,6 @@ def openFile():
         messagebox.showerror("파일 열기 에러", e)
     
 def saveFile():
-    global bookCoverImageName
     text = contents.get(1.0, END)
     if text.replace(" ", "").replace("\n", "") == "":
         messagebox.showwarning("파일 저장 에러", "저장할 내용이 없습니다.")

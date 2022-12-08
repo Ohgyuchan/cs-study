@@ -80,7 +80,7 @@ def saveFile():
         except Exception as e:
             messagebox.showerror("파일 저장 에러", e)
         
-def aboutMenu():
+def about():
     messagebox.showinfo("정보", "HW4 입니다.")
 
 def quit():
@@ -108,7 +108,7 @@ fileMenu.add_command(label="종료", command=quit)
 # 도움말 메뉴
 helpMenu = Menu(menu)
 menu.add_cascade(label="도움말", menu=helpMenu)
-helpMenu.add_command(label="정보", command=aboutMenu)
+helpMenu.add_command(label="정보", command=about)
 
 # master에 menu 설정
 master.config(menu=menu)

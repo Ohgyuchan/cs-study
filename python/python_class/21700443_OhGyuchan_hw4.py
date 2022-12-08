@@ -6,7 +6,14 @@ from tkinter import messagebox
 from PIL import Image
 from PIL import ImageTk
 
+def toNightMode():
+    contents.configure(background="black", foreground="white")
+
+def toDayMode():
+    contents.configure(background="white", foreground="black")
+
 def updateBookCover():
+    # bookCoverImageName이 업데이트가 되어야하기 때문에 global 선언, global 선언하지 않으면 동명의 local 변수가 생성됨.
     global bookCoverImageName
     try:
         bookCoverImageName = askopenfilename(title='책표지 변경', filetypes=((".png","*.png"),(".jpg","*.jpg"),)) 
@@ -15,12 +22,11 @@ def updateBookCover():
         bookCoverLabel.image = newBookCoverImage
     except Exception as e:
         messagebox.showerror("이미지 파일 선택 에러", e)
-
-def toNightMode():
-    contents.configure(background="black", foreground="white")
-
-def toDayMode():
-    contents.configure(background="white", foreground="black")
+        
+def setBookCoverLabelImage(imgUrl:str):
+    newBookCoverImage = ImageTk.PhotoImage(Image.open(imgUrl).resize((200,200)))
+    bookCoverLabel.configure(image=newBookCoverImage)
+    bookCoverLabel.image = newBookCoverImage
 
 def newFile():
     title.set('')
@@ -28,9 +34,7 @@ def newFile():
     year.set('')
     language.set('')
     contents.delete(1.0, END)
-    defaultBookCoverImage = ImageTk.PhotoImage(Image.open(defaultBookCoverImageName).resize((200,200)))
-    bookCoverLabel.configure(image=defaultBookCoverImage)
-    bookCoverLabel.image = defaultBookCoverImage
+    setBookCoverLabelImage(defaultBookCoverImageName)
     
 def openFile():
     try:
@@ -47,9 +51,7 @@ def openFile():
             author.set(infoDictionary['author'])
             year.set(infoDictionary['year'])
             language.set(infoDictionary['language'])
-            newBookCoverImage = ImageTk.PhotoImage(Image.open(infoDictionary['image']).resize((200,200)))
-            bookCoverLabel.configure(image=newBookCoverImage)
-            bookCoverLabel.image = newBookCoverImage
+            setBookCoverLabelImage(infoDictionary['image'])
         except Exception as e:
             messagebox.showwarning("파일 열기 에러", ".info 파일이 없습니다.")
     except Exception as e:
@@ -86,6 +88,7 @@ def about():
 def quit():
     master.destroy()
     master.quit()
+    
 
 master = Tk()
 master.title("HW4")
@@ -118,8 +121,8 @@ masterFrame = Frame(master)
 masterFrame.grid(column=0, row=0)
 
 # masterFrame에 북커버 이미지 라벨 배치
-defaultBookCoverImage = ImageTk.PhotoImage(Image.open(defaultBookCoverImageName).resize((200,200)))
-bookCoverLabel = Label(masterFrame, image=defaultBookCoverImage)
+bookCoverLabel = Label(masterFrame)
+setBookCoverLabelImage(defaultBookCoverImageName)
 bookCoverLabel.grid(column=0, row=0)
 
 # masterFrame에 북커버 변경 버튼 배치
@@ -129,25 +132,24 @@ changBookCoverButton = Button(masterFrame, text="커버 사진 변경", command=
 bookInfoFrame = Frame(masterFrame)
 bookInfoFrame.grid(column=0, row=2)
 
-title = StringVar()
-author = StringVar()
-year = StringVar()
-language = StringVar()
-
 # bookInfoFrame에 제목 라벨 배치
 titleLabel = Label(bookInfoFrame, text="제목").grid(column=0, row=1)
+title = StringVar()
 titleEntry = Entry(bookInfoFrame, width=10, textvariable=title).grid(column=1, row=1)
 
 # bookInfoFrame에 저자 라벨 배치
 authorLabel = Label(bookInfoFrame, text="저자").grid(column=0, row=2)
+author = StringVar()
 authorEntry = Entry(bookInfoFrame, width=10, textvariable=author).grid(column=1, row=2)
 
 # bookInfoFrame에 출판년도 라벨 배치
 yearLabel = Label(bookInfoFrame, text="출판년도").grid(column=0, row=3)
+year = StringVar()
 yearEntry = Entry(bookInfoFrame, width=10, textvariable=year).grid(column=1, row=3)
 
 # bookInfoFrame에 언어 라벨 배치
 languageLabel = Label(bookInfoFrame, text="언어").grid(column=0, row=4)
+language = StringVar()
 languageEntry = Entry(bookInfoFrame, width=10, textvariable=language).grid(column=1, row=4)
 
 # masterFrame에 책 내용 ScrolledText 배치

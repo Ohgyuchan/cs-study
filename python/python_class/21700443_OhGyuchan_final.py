@@ -21,12 +21,13 @@ def newFile():
     searchResultsLabel.configure(text=searchResultsText)
     
 def openFile():
+    global myBook
     try:
         bookFileName = askopenfilename(title='Open', filetypes=((".txt","*.txt"),)) 
         bookFile = open(bookFileName, 'r')
         bookText = bookFile.read()
-        book = Book(bookFileName)
-        booTitle = book.directory.split("/")[-1].split(".")[0]
+        myBook = Book(bookFileName)
+        booTitle = myBook.directory.split("/")[-1].split(".")[0]
         bookTitleLabel.configure(text=booTitle)
         
         bookInfo = "Length of the text: %d\nCount of words: %d" % (len(bookText), len(bookText.split()))
@@ -37,8 +38,8 @@ def openFile():
         try:
             histFileName = bookFileName.split('.')[0]+'.hist'
             histFile = open(histFileName, 'r')
-            book.histDict = eval(histFile.read())
-            searchHistory = "%s" % (book.histDict)
+            myBook.histDict = eval(histFile.read())
+            searchHistory = "%s" % (myBook.histDict)
             searchHistoryLabel.configure(text=searchHistory)
             
         except Exception as e:
@@ -54,15 +55,16 @@ def search():
         se = searchEntry.get()
         text = "%s" % st1.get(1.0, END)
         sentences = text.split("\n")
-        print(sentences)
+
         sa = ""
         ca = 0
         for s in sentences :
             if s.count(se) > 0 :
-                sa = sa + "\n" + s 
+                sa = sa + "\n" + s + "\n"
                 ca += 1
         st2.insert(1.0, sa)
     searchResultsLabel.configure(text="%d sentences were found." % ca)
+    myBook.histDict.update({se:ca})
 
 def saveFile():
     text = st2.get(1.0, END)
@@ -70,22 +72,12 @@ def saveFile():
         messagebox.showwarning("파일 저장 에러", "저장할 내용이 없습니다.")
     else:
         try:
-            fileName= asksaveasfilename(defaultextension=".txt", filetypes=((".txt", "*.txt"),)) 
-            saveTextFile = open(fileName, 'w')
-            saveTextFile.write(text)
-            saveTextFile.close()
-
-            infoDictionary = dict()
-            infoDictionary['title'] = title.get()
-            infoDictionary['author'] = author.get()
-            infoDictionary['year'] = year.get()
-            infoDictionary['language'] = language.get()
-            infoDictionary['image'] = bookCoverImageName
-
-            infoFileName = fileName.split('.')[0]+'.info'
-            infoFile = open(infoFileName,'w')
-            infoFile.write(str(infoDictionary))
-            infoFile.close()
+            fileName= myBook.directory.split(".")[0] + ".hist"
+            
+            histFile = open(fileName,'w')
+            histFile.write(str(myBook.histDict))
+            histFile.close()
+            messagebox.showinfo("save history", "검색 히스토리 저장 성공: %s" % (fileName))
         except Exception as e:
             messagebox.showerror("파일 저장 에러", e)
 
@@ -95,6 +87,8 @@ def exit():
     
 master = Tk()
 master.title("Final")
+
+myBook= Book("")
 
 menu = Menu(master)
 

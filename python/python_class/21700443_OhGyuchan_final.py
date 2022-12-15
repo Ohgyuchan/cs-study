@@ -77,7 +77,7 @@ def saveFile():
             histFile = open(fileName,'w')
             histFile.write(str(myBook.histDict))
             histFile.close()
-            
+            messagebox.showinfo("save history", "검색 히스토리 저장 성공: %s" % (fileName))
         except Exception as e:
             messagebox.showerror("파일 저장 에러", e)
 
